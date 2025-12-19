@@ -1,3 +1,5 @@
+'use client';
+
 import { FaTelegramPlane, FaVk, FaYoutube, FaEnvelope, FaPhone } from "react-icons/fa";
 
 export default function SiteHeader() {
