@@ -3,7 +3,8 @@ import PhotoCarousel from './components/PhotoCarousel';
 import PartnersCarousel from './components/PartnersCarousel';
 import AwardsCarousel from './components/AwardsCarousel';
 import VideoCarousel from './components/VideoCarousel';
-import CompanyProjects from './components/CompanyProjects'; // Добавили импорт нового компонента
+import CompanyProjects from './components/CompanyProjects';
+import Footer from './components/Footer'; // Добавили импорт подвала
 
 export default function Home() {
   const images = ["/photo/ИЖ_1920на1080.jpg", "/photo/Чумазая.jpg"]; 
@@ -24,8 +25,11 @@ export default function Home() {
       {/* Блок видео-ленты RuTube */}
       <VideoCarousel />
 
-      {/* Новая секция проектов с текстовым блоком и цветными карточками */}
+      {/* Секция проектов с текстовым блоком и цветными карточками */}
       <CompanyProjects />
+
+      {/* Подвал сайта */}
+      <Footer />
     </main>
   );
 }
