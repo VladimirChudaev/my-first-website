@@ -2,7 +2,8 @@ import SiteHeader from './components/SiteHeader';
 import PhotoCarousel from './components/PhotoCarousel';
 import PartnersCarousel from './components/PartnersCarousel';
 import AwardsCarousel from './components/AwardsCarousel';
-import VideoCarousel from './components/VideoCarousel'; // 1. Добавили импорт видео-карусели
+import VideoCarousel from './components/VideoCarousel';
+import CompanyProjects from './components/CompanyProjects'; // Добавили импорт нового компонента
 
 export default function Home() {
   const images = ["/photo/ИЖ_1920на1080.jpg", "/photo/Чумазая.jpg"]; 
@@ -20,17 +21,11 @@ export default function Home() {
       {/* Блок наград */}
       <AwardsCarousel />
 
-      {/* 2. Добавили блок видео-ленты RuTube сразу под наградами */}
+      {/* Блок видео-ленты RuTube */}
       <VideoCarousel />
 
-      {/* Секция проектов */}
-      <section className="h-[150vh] bg-white w-full px-10 py-20">
-        <div className="container mx-auto">
-          <h2 className="text-black text-4xl font-light border-b border-gray-100 pb-10">
-            ПРОЕКТЫ КИНОКОМПАНИИ
-          </h2>
-        </div>
-      </section>
+      {/* Новая секция проектов с текстовым блоком и цветными карточками */}
+      <CompanyProjects />
     </main>
   );
 }
