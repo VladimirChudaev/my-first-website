@@ -1,9 +1,10 @@
 import SiteHeader from './components/SiteHeader';
 import PhotoCarousel from './components/PhotoCarousel';
+import PartnersCarousel from './components/PartnersCarousel';
 
 export default function Home() {
-  const images = ["/photo/ИЖ_1920на1080.jpg"]; 
-  const intervals = [5000];
+  const images = ["/photo/ИЖ_1920на1080.jpg", "/photo/Чумазая.jpg"]; 
+  const intervals = [5000, 5000];
 
   return (
     <main className="bg-white min-h-screen">
@@ -11,6 +12,7 @@ export default function Home() {
       <div className="max-w-[1920px] mx-auto relative overflow-hidden">
         <SiteHeader />
         <PhotoCarousel images={images} intervals={intervals} />
+        <PartnersCarousel />
       </div>
 
       {/* Секция под фото: она даст белый фон и прокрутку */}
