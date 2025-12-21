@@ -1,38 +1,71 @@
 'use client';
+import { useState } from 'react';
 import Image from "next/image";
+import Link from "next/link";
+import { HiMenuAlt3, HiX } from 'react-icons/hi';
 import { FaTelegram, FaVk, FaYoutube, FaEnvelope } from 'react-icons/fa6';
 
 export default function SiteHeader() {
-  const navigationItems = [
-    { label: "Главная", href: "#" },
-    { label: "Проекты", href: "#" },
-    { label: "Партнеры", href: "#" },
-    { label: "Кинорезерв", href: "#" },
-    { label: "Новости", href: "#" },
-    { label: <span className="flex items-center gap-1"><FaEnvelope /> Email</span>, href: "mailto:info@vtagency.ru" },
-    { label: <span className="font-bold">+7(922) 147 13-50</span> },
-  ];
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <header className="absolute top-0 left-0 w-full z-50 bg-black/10 backdrop-blur-sm">
-      <div className="w-full py-8 flex items-center justify-between px-10">
-        <Image src="/photo/logo.png" alt="Logo" width={200} height={60} className="object-contain" />
-        
-        <nav className="flex gap-8 text-white/90 text-base font-medium">
-          {navigationItems.map((item, i) => (
-            <a key={i} href={item.href} className="hover:text-white transition-colors">{item.label}</a>
-          ))}
-        </nav>
+    <header className="absolute top-0 w-full z-[100]">
+      <div className="bg-gradient-to-b from-black/70 to-transparent">
+        <div className="container mx-auto px-4 md:px-10 h-24 md:h-32 flex justify-between items-center">
+          
+          <div className="flex-shrink-0">
+            <Link href="/" className="relative block w-32 h-12 md:w-56 md:h-24">
+              <Image 
+                src="/photo/logo.png" 
+                alt="Logo" 
+                fill 
+                className="object-contain" 
+                priority 
+              />
+            </Link>
+          </div>
 
-        <div className="flex gap-5 text-xl text-white/80">
-          <a href="https://t.me/+Yj_bim_Qdi9mMTcy" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors"><FaTelegram /></a>
-          <a href="https://vk.com/club230590987?from=groups" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors"><FaVk /></a>
-          <a href="https://rutube.ru/channel/25381755/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors"><FaYoutube /></a>
-          <a href="https://dzen.ru/vtagency" target="_blank" rel="noopener noreferrer">
-            <Image src="/photo/zen.svg" alt="Zen" width={20} height={20} className="invert opacity-80 hover:opacity-100 transition-opacity" />
-          </a>
+          {/* Десктопное меню — появится только на экранах шире 1280px */}
+          <div className="hidden xl:flex items-center gap-10 text-white uppercase font-bold text-[12px] tracking-[0.2em]">
+            <nav className="flex items-center gap-8">
+              <Link href="/">Главная</Link>
+              <Link href="#">Проекты</Link>
+              <Link href="#">Партнеры</Link>
+              <Link href="#">Кинорезерв</Link>
+              <Link href="#">Новости</Link>
+            </nav>
+            <div className="flex items-center gap-10 border-l border-white/20 pl-10">
+              <span className="font-bold">+7 (922) 147 13-50</span>
+            </div>
+          </div>
+
+          {/* Правая часть: Соцсети и Бургер */}
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3 text-white text-xl md:text-2xl">
+               <a href="#"><FaTelegram /></a>
+               <a href="#"><FaVk /></a>
+               <a href="#"><FaYoutube /></a>
+            </div>
+
+            <button 
+              className="xl:hidden text-4xl text-white" 
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            >
+              {isMenuOpen ? <HiX /> : <HiMenuAlt3 />}
+            </button>
+          </div>
+
         </div>
       </div>
+
+      {isMenuOpen && (
+        <div className="fixed inset-0 bg-black/98 z-[110] flex flex-col items-center justify-center gap-8 text-white text-2xl uppercase xl:hidden">
+          <button onClick={() => setIsMenuOpen(false)} className="absolute top-8 right-8 text-4xl"><HiX /></button>
+          <Link href="/" onClick={() => setIsMenuOpen(false)}>Главная</Link>
+          <Link href="#" onClick={() => setIsMenuOpen(false)}>Проекты</Link>
+          <Link href="#" onClick={() => setIsMenuOpen(false)}>Контакты</Link>
+        </div>
+      )}
     </header>
   );
 }
