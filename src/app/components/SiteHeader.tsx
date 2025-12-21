@@ -25,10 +25,12 @@ export default function SiteHeader() {
         </nav>
 
         <div className="flex gap-5 text-xl text-white/80">
-          <a href="#"><FaTelegram /></a>
-          <a href="#"><FaVk /></a>
-          <a href="#"><FaYoutube /></a>
-          <Image src="/photo/zen.svg" alt="Zen" width={20} height={20} className="invert opacity-80" />
+          <a href="https://t.me/+Yj_bim_Qdi9mMTcy" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors"><FaTelegram /></a>
+          <a href="https://vk.com/club230590987?from=groups" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors"><FaVk /></a>
+          <a href="https://rutube.ru/channel/25381755/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors"><FaYoutube /></a>
+          <a href="https://dzen.ru/vtagency" target="_blank" rel="noopener noreferrer">
+            <Image src="/photo/zen.svg" alt="Zen" width={20} height={20} className="invert opacity-80 hover:opacity-100 transition-opacity" />
+          </a>
         </div>
       </div>
     </header>
