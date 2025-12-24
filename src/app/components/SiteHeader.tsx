@@ -33,6 +33,10 @@ export default function SiteHeader() {
               <Link href="#">Партнеры</Link>
               <Link href="#">Кинорезерв</Link>
               <Link href="#">Новости</Link>
+              {/* Email — как на скрине */}
+              <Link href="mailto:info@vtagency.ru" className="flex items-center gap-1">
+                <FaEnvelope /> Email
+              </Link>
             </nav>
             <div className="flex items-center gap-10 border-l border-white/20 pl-10">
               <span className="font-bold">+7 (922) 147 13-50</span>
@@ -42,9 +46,25 @@ export default function SiteHeader() {
           {/* Правая часть: Соцсети и Бургер */}
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-3 text-white text-xl md:text-2xl">
-               <a href="#"><FaTelegram /></a>
-               <a href="#"><FaVk /></a>
-               <a href="#"><FaYoutube /></a>
+              <a href="https://t.me/VandTAgency" target="_blank" rel="noopener noreferrer">
+                <FaTelegram />
+              </a>
+              <a href="https://vk.com/club230590987" target="_blank" rel="noopener noreferrer">
+                <FaVk />
+              </a>
+              <a href="https://rutube.ru/channel/25381755/" target="_blank" rel="noopener noreferrer">
+                <FaYoutube />
+              </a>
+              {/* Дзен — используем настоящую иконку из public/photo/zen.svg */}
+              <a href="https://dzen.ru/vtagency" target="_blank" rel="noopener noreferrer">
+                <Image 
+                  src="/photo/zen.svg" 
+                  alt="Дзен" 
+                  width={20} 
+                  height={20} 
+                  className="invert opacity-80"
+                />
+              </a>
             </div>
 
             <button 
@@ -58,6 +78,7 @@ export default function SiteHeader() {
         </div>
       </div>
 
+      {/* Мобильное меню */}
       {isMenuOpen && (
         <div className="fixed inset-0 bg-black/98 z-[110] flex flex-col items-center justify-center gap-8 text-white text-2xl uppercase xl:hidden">
           <button onClick={() => setIsMenuOpen(false)} className="absolute top-8 right-8 text-4xl"><HiX /></button>
