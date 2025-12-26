@@ -1,4 +1,5 @@
 'use client';
+
 import { useState } from 'react';
 import Image from "next/image";
 import Link from "next/link";
@@ -29,10 +30,10 @@ export default function SiteHeader() {
           <div className="hidden xl:flex items-center gap-10 text-white uppercase font-bold text-[12px] tracking-[0.2em]">
             <nav className="flex items-center gap-8">
               <Link href="/">Главная</Link>
-              <Link href="#">Проекты</Link>
-              <Link href="#">Партнеры</Link>
-              <Link href="#">Кинорезерв</Link>
-              <Link href="#">Новости</Link>
+              <Link href="/projects">Проекты</Link>
+              <Link href="/partners">Партнеры</Link>
+              <Link href="/film-reserve">Кинорезерв</Link>
+              <Link href="/news">Новости</Link>
               {/* Email — как на скрине */}
               <Link href="mailto:info@vtagency.ru" className="flex items-center gap-1">
                 <FaEnvelope /> Email

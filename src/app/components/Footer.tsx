@@ -25,16 +25,16 @@ export default function Footer() {
             />
           </div>
 
-          {/* Навигация — без изменений (оставляем #) */}
-          <div className="md:col-span-3 flex flex-col items-center md:items-start gap-5">
-            <h4 className="text-white font-bold uppercase text-[10px] tracking-[0.2em] opacity-40">Навигация</h4>
-            <nav className="flex flex-col items-center md:items-start gap-4 text-xl">
-              <Link href="/" className="hover:text-blue-400 transition-colors">Главная</Link>
-              <Link href="#" className="hover:text-blue-400 transition-colors">Партнеры</Link>
-              <Link href="#" className="hover:text-blue-400 transition-colors">Проекты</Link>
-              <Link href="#" className="hover:text-blue-400 transition-colors">Новости</Link>
-            </nav>
-          </div>
+          {/* Навигация — активные ссылки */}
+<div className="md:col-span-3 flex flex-col items-center md:items-start gap-5">
+  <h4 className="text-white font-bold uppercase text-[10px] tracking-[0.2em] opacity-40">Навигация</h4>
+  <nav className="flex flex-col items-center md:items-start gap-4 text-xl">
+    <Link href="/" className="hover:text-blue-400 transition-colors">Главная</Link>
+    <Link href="/partners" className="hover:text-blue-400 transition-colors">Партнёры</Link>
+    <Link href="/projects" className="hover:text-blue-400 transition-colors">Проекты</Link>
+    <Link href="/news" className="hover:text-blue-400 transition-colors">Новости</Link>
+  </nav>
+</div>
 
           {/* Контакты — телефон теперь просто текст */}
           <div className="md:col-span-3 flex flex-col items-center md:items-start gap-6 text-center md:text-left">

@@ -1,6 +1,6 @@
 import InnerPageHeader from '@/components/InnerPageHeader';
 
-export default function ProjectsPage() {
+export default function NewsPage() {
   return (
     <>
       <InnerPageHeader />
