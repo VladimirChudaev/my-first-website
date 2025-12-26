@@ -30,7 +30,7 @@ export default function Footer() {
             <h4 className="text-white font-bold uppercase text-[10px] tracking-[0.2em] opacity-40">Навигация</h4>
             <nav className="flex flex-col items-center md:items-start gap-4 text-xl">
               <Link href="/" className="hover:text-blue-400 transition-colors">Главная</Link>
-              <Link href="#" className="hover:text-blue-400 transition-colors">Кинокомпания</Link>
+              <Link href="#" className="hover:text-blue-400 transition-colors">Партнеры</Link>
               <Link href="#" className="hover:text-blue-400 transition-colors">Проекты</Link>
               <Link href="#" className="hover:text-blue-400 transition-colors">Новости</Link>
             </nav>
