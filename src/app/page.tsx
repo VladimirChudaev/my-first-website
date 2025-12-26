@@ -4,8 +4,6 @@ import PartnersCarousel from './components/PartnersCarousel';
 import AwardsCarousel from './components/AwardsCarousel';
 import VideoCarousel from './components/VideoCarousel';
 import CompanyProjects from './components/CompanyProjects';
-import Footer from './components/Footer'; // Добавили импорт подвала
-
 export default function Home() {
   const images = ["/photo/ИЖ_1920на1080.jpg", "/photo/Чумазая.jpg"]; 
   const intervals = [5000, 5000];
@@ -29,7 +27,6 @@ export default function Home() {
       <CompanyProjects />
 
       {/* Подвал сайта */}
-      <Footer />
     </main>
   );
 }
