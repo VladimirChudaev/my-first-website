@@ -96,10 +96,10 @@ export default function ProjectsPage() {
     <>
       <InnerPageHeader />
       <main className="min-h-screen bg-white py-12 md:py-24">
-        <div className="container mx-auto px-4 max-w-7xl">
 
-          {/* Блок 1: Художественное кино */}
-          <section id="art" className="mb-16 md:mb-24">
+        {/* Блок 1: Художественное кино */}
+        <section id="art" className="mb-16 md:mb-24 bg-[#f0f7ff] py-12">
+          <div className="container mx-auto px-4 max-w-7xl">
             <div className="flex flex-col md:flex-row items-start md:items-center mb-8 md:mb-12">
               <div className="md:w-1/2 pr-0 md:pr-8">
                 <h2 className="text-3xl font-bold">ХУДОЖЕСТВЕННОЕ КИНО</h2>
@@ -117,10 +117,12 @@ export default function ProjectsPage() {
                 <ProjectCarousel projects={projects.art} />
               </div>
             </div>
-          </section>
+          </div>
+        </section>
 
-          {/* Блок 2: Документальное кино */}
-          <section id="documentary" className="mb-16 md:mb-24">
+        {/* Блок 2: Документальное кино */}
+        <section id="documentary" className="mb-16 md:mb-24 bg-[#fffaf0] py-12">
+          <div className="container mx-auto px-4 max-w-7xl">
             <div className="flex flex-col md:flex-row items-start md:items-center mb-8 md:mb-12">
               <div className="md:w-1/2 pr-0 md:pr-8">
                 <h2 className="text-3xl font-bold">ДОКУМЕНТАЛЬНОЕ КИНО</h2>
@@ -138,10 +140,12 @@ export default function ProjectsPage() {
                 <ProjectCarousel projects={projects.documentary} />
               </div>
             </div>
-          </section>
+          </div>
+        </section>
 
-          {/* Блок 3: Телевизионные проекты */}
-          <section id="tv" className="mb-16 md:mb-24">
+        {/* Блок 3: Телевизионные проекты */}
+        <section id="tv" className="mb-16 md:mb-24 bg-[#f0fff4] py-12">
+          <div className="container mx-auto px-4 max-w-7xl">
             <div className="flex flex-col md:flex-row items-start md:items-center mb-8 md:mb-12">
               <div className="md:w-1/2 pr-0 md:pr-8">
                 <h2 className="text-3xl font-bold">ТЕЛЕВИЗИОННЫЕ ПРОЕКТЫ</h2>
@@ -159,10 +163,12 @@ export default function ProjectsPage() {
                 <ProjectCarousel projects={projects.tv} isTvCarousel={true} />
               </div>
             </div>
-          </section>
+          </div>
+        </section>
 
-          {/* Блок 4: Кино для бизнеса */}
-          <section id="business" className="mb-16 md:mb-24">
+        {/* Блок 4: Кино для бизнеса */}
+        <section id="business" className="mb-16 md:mb-24 bg-[#f5f5f7] py-12">
+          <div className="container mx-auto px-4 max-w-7xl">
             <div className="flex flex-col md:flex-row items-start md:items-center mb-8 md:mb-12">
               <div className="md:w-1/2 pr-0 md:pr-8">
                 <h2 className="text-3xl font-bold">КИНО ДЛЯ БИЗНЕСА</h2>
@@ -180,9 +186,9 @@ export default function ProjectsPage() {
                 <ProjectCarousel projects={projects.business} />
               </div>
             </div>
-          </section>
+          </div>
+        </section>
 
-        </div>
       </main>
     </>
   );
