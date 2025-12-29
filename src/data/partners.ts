@@ -1,0 +1,53 @@
+export interface Partner {
+    name: string;
+    url: string;
+    logo: string;
+  }
+  
+  export const partnersData: Partner[] = [
+    { name: "Фонд культурных инициатив", url: "https://фондкультурныхинициатив.рф", logo: "/partners/PFKI.jpg" },
+    { name: "Светоцех", url: "https://светоцех.рф", logo: "/partners/SwetoZech.png" },
+    { name: "Theatrum", url: "https://theatrum.center/", logo: "/partners/Theatrum.png" },
+    { name: "Т Плюс", url: "https://www.tplusgroup.ru/", logo: "/partners/TPlus.png" },
+    { name: "Зоопарк Екб", url: "https://xn--80ankoagi.xn--80acgfbsl1azdqr.xn--p1ai/", logo: "/partners/ZooEkb.png" },
+    { name: "Музей Победы", url: "https://victorymuseum.ru", logo: "/partners/WikMuseum.png" },
+    { name: "12 канал", url: "https://12-kanal.ru", logo: "/partners/12TV.png" },
+    { name: "1 ОБЛ", url: "https://www.1obl.ru", logo: "/partners/1Obl.png" },
+    { name: "ТВ21", url: "https://www.tv21.ru", logo: "/partners/21TV.png" },
+    { name: "Алтай 24", url: "https://katun24.ru", logo: "/partners/Altay24TV.png" },
+    { name: "АТВ", url: "https://vk.com/atv_asb", logo: "/partners/ATV.png" },
+    { name: "Белгород 24", url: "https://www.belnovosti.ru/teleканал-belgorod-24", logo: "/partners/BelgorodTV.png" },
+    { name: "Дагестан", url: "https://rgvktv.ru", logo: "/partners/DagTV.png" },
+    { name: "День 24", url: "https://vk.com/tvn163", logo: "/partners/Den24.png" },
+    { name: "ТВ Экспресс", url: "https://tv-express.ru", logo: "/partners/ExpressTV.png" },
+    { name: "ТВ-Губерния", url: "https://tv-gubernia.ru", logo: "/partners/GuberniaTV.png" },
+    { name: "НТС_Иркутск", url: "https://nts-tv.ru", logo: "/partners/NTS.png" },
+    { name: "Кубань 24", url: "https://kuban24.tv", logo: "/partners/Kuban24V.png" },
+    { name: "Липецк24", url: "https://lipetsktime.ru", logo: "/partners/LlpetskTime.jpg" },
+    { name: "Курган ТВ", url: "https://oblast45.ru", logo: "/partners/KurganTV.png" },
+    { name: "Миг ТВ", url: "https://tvmig.ru", logo: "/partners/MigTV.png" },
+    { name: "Липецк24", url: "https://lipetsktime.ru/channels/lipetsk-24", logo: "/partners/Lipetsk24.png" },
+    { name: "Мир звезд", url: "https://vk.com/mirzvezd_rf", logo: "/partners/mipZvezd.png" },
+    { name: "НВК Саха", url: "https://nvk-online.ru", logo: "/partners/NVK_sakha.png" },
+    { name: "НСК49", url: "https://nsk49.ru", logo: "/partners/NSK49.png" },
+    { name: "ОТР", url: "https://otr-online.ru", logo: "/partners/OTR.png" },
+    { name: "ОТВ Челябинск", url: "https://1obl.tv", logo: "/partners/OTV_Chel.png" },
+    { name: "ОТВ Екатеринбург", url: "https://obltv.ru", logo: "/partners/OTV_ekb.png" },
+    { name: "ОТВ Прим", url: "https://otvprim.tv", logo: "/partners/OTV_Prim.png" },
+    { name: "Первоуральск", url: "https://vk.com/tv_pervouralsk", logo: "/partners/PervouralskTV.png" },
+    { name: "Почта России", url: "https://www.pochta.ru", logo: "/partners/PostRussia.jpg" },
+    { name: "Сахалин Онлайн", url: "https://sakh.online", logo: "/partners/Sakhonline.png" },
+    { name: "Саратов 24", url: "https://saratov24.ru", logo: "/partners/Saratov24.png" },
+    { name: "Севастополь ТВ", url: "https://sevtrk.ru", logo: "/partners/SewastopolTV.png" },
+    { name: "Сочи 24", url: "https://sochi24.tv", logo: "/partners/Sochi24TV.png" },
+    { name: "ТВ СПб", url: "https://tvspb.ru", logo: "/partners/SPBTV.png" },
+    { name: "ОТС Новосибирск", url: "https://otstv.ru", logo: "/partners/OTS.png" },
+    { name: "СвоёТВ", url: "https://stv24.tv", logo: "/partners/StavropolTV.png" },
+    { name: "СВХ", url: "https://svx.company", logo: "/partners/SVXlogistics.png" },
+    { name: "Тюмень-ТВ", url: "https://tyumen-time.ru", logo: "/partners/TumenTime.png" },
+    { name: "Югра ТВ", url: "https://ugra-tv.ru", logo: "/partners/Ugra.png" },
+    { name: "VOIR fest", url: "https://t.me/voir_fest", logo: "/partners/VOIR.png" },
+    { name: "Русский север", url: "https://rusevertv.ru", logo: "/partners/VologdaTV.png" },
+    { name: "Ярославль Город ТВ", url: "https://www.gtk.tv", logo: "/partners/Yaroslavl_gor_TV.png" },
+    { name: "Забайкалье ТВ", url: "https://zrtk.ru", logo: "/partners/ZabTV.png" }
+  ];
