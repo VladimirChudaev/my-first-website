@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { FaTelegram, FaVk, FaYoutube, FaEnvelope, FaPhone, FaLocationDot } from 'react-icons/fa6';
+import { FaTelegram, FaVk, FaYoutube, FaEnvelope, FaPhone, FaLocationDot, FaLock } from 'react-icons/fa6';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -10,10 +10,9 @@ export default function Footer() {
   return (
     <footer className="bg-[#1a1a1a] text-white py-12 md:py-16 border-t border-white/5">
       <div className="container mx-auto px-6 lg:px-20">
-        {/* Адаптивная сетка */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12 mb-16 items-start">
           
-          {/* Логотип — увеличен по рекомендации */}
+          {/* Логотип */}
           <div className="md:col-span-4 flex justify-center md:justify-start">
             <Image 
               src="/photo/logo.png" 
@@ -25,18 +24,18 @@ export default function Footer() {
             />
           </div>
 
-          {/* Навигация — активные ссылки */}
-<div className="md:col-span-3 flex flex-col items-center md:items-start gap-5">
-  <h4 className="text-white font-bold uppercase text-[10px] tracking-[0.2em] opacity-40">Навигация</h4>
-  <nav className="flex flex-col items-center md:items-start gap-4 text-xl">
-    <Link href="/" className="hover:text-blue-400 transition-colors">Главная</Link>
-    <Link href="/partners" className="hover:text-blue-400 transition-colors">Партнёры</Link>
-    <Link href="/projects" className="hover:text-blue-400 transition-colors">Проекты</Link>
-    <Link href="/news" className="hover:text-blue-400 transition-colors">Новости</Link>
-  </nav>
-</div>
+          {/* Навигация */}
+          <div className="md:col-span-3 flex flex-col items-center md:items-start gap-5">
+            <h4 className="text-white font-bold uppercase text-[10px] tracking-[0.2em] opacity-40">Навигация</h4>
+            <nav className="flex flex-col items-center md:items-start gap-4 text-xl">
+              <Link href="/" className="hover:text-blue-400 transition-colors">Главная</Link>
+              <Link href="/partners" className="hover:text-blue-400 transition-colors">Партнёры</Link>
+              <Link href="/projects" className="hover:text-blue-400 transition-colors">Проекты</Link>
+              <Link href="/news" className="hover:text-blue-400 transition-colors">Новости</Link>
+            </nav>
+          </div>
 
-          {/* Контакты — телефон теперь просто текст */}
+          {/* Контакты */}
           <div className="md:col-span-3 flex flex-col items-center md:items-start gap-6 text-center md:text-left">
             <h4 className="text-white font-bold uppercase text-[10px] tracking-[0.2em] opacity-40">Контакты</h4>
             <div className="flex flex-col md:flex-row items-center gap-3 text-xl">
@@ -45,7 +44,7 @@ export default function Footer() {
             </div>
             <div className="flex flex-col md:flex-row items-center gap-3 text-xl font-semibold">
               <FaPhone className="text-white/20 text-xl hidden md:block" />
-              <span>+7 (922) 147 13-50</span> {/* не ссылка — просто текст */}
+              <span>+7 (922) 147 13-50</span>
             </div>
             <div className="flex flex-col md:flex-row items-center gap-3 text-xl">
               <FaLocationDot className="text-white/20 text-xl hidden md:block" />
@@ -53,10 +52,10 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Соцсети — активные ссылки */}
+          {/* Соцсети */}
           <div className="md:col-span-2 flex flex-col items-center md:items-end gap-6">
             <h4 className="text-white font-bold uppercase text-[10px] tracking-[0.2em] opacity-40">Мы в сети</h4>
-            <div className="flex gap-6 text-3xl">
+            <div className="flex items-center gap-6 text-3xl">
               <a href="https://t.me/VandTAgency" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400">
                 <FaTelegram />
               </a>
@@ -66,20 +65,31 @@ export default function Footer() {
               <a href="https://rutube.ru/channel/25381755/" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400">
                 <FaYoutube />
               </a>
-              <a href="https://dzen.ru/vtagency" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400">
-                <Image 
-                  src="/photo/zen.svg" 
-                  alt="Дзен" 
-                  width={24} 
-                  height={24} 
-                  className="invert opacity-80"
-                />
+              
+              <a href="https://dzen.ru/vtagency" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400 flex items-center justify-center">
+                <div className="w-[24px] h-[24px] relative">
+                  <Image 
+                    src="/photo/zen.svg" 
+                    alt="Дзен" 
+                    fill
+                    className="invert opacity-80 object-contain"
+                  />
+                </div>
               </a>
+
+              {/* Пятый элемент — замочек. Прозрачность 20% на мобильных, 5% на десктопе */}
+              <Link 
+                href="/auth/login" 
+                className="opacity-20 md:opacity-[0.05] hover:opacity-100 transition-opacity"
+                title="Admin"
+              >
+                <FaLock className="text-2xl" />
+              </Link>
             </div>
           </div>
         </div>
 
-        {/* Подвал — без изменений */}
+        {/* Копирайт */}
         <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 text-[9px] tracking-[0.2em] uppercase opacity-30 text-center">
           <p>© {currentYear} ООО «Кинокомпания Ви Эн Ти». ВСЕ ПРАВА ЗАЩИЩЕНЫ.</p>
           <Link href="/privacy" className="underline underline-offset-8 decoration-white/20">
@@ -89,4 +99,4 @@ export default function Footer() {
       </div>
     </footer>
   );
-} 
+}
