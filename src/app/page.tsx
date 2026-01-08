@@ -5,7 +5,7 @@ import AwardsCarousel from './components/AwardsCarousel';
 import VideoCarousel from './components/VideoCarousel';
 import CompanyProjects from './components/CompanyProjects';
 export default function Home() {
-  const images = ["/photo/ИЖ_1920на1080.jpg", "/photo/Чумазая.jpg"]; 
+  const images = ["/photo/izh_1920x1080.jpg", "/photo/chumazaya.jpg"]; 
   const intervals = [5000, 5000];
 
   return (
