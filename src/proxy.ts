@@ -1,9 +1,9 @@
-import { updateSession } from './lib/middleware'
+import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-// Экспорт по умолчанию (Default Export)
 export default async function proxy(request: NextRequest) {
-  return await updateSession(request)
+  // Аутентификация НЕ будет срабатывать автоматически
+  return NextResponse.next()
 }
 
 export const config = {
