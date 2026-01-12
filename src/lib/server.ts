@@ -1,3 +1,14 @@
+@"
+
+// ============================================
+// 🥶 FROZEN FOR SPRINT 1 - $(Get-Date -Format 'yyyy-MM-dd')
+// Reason: server-client duplication, overlaps with middleware.ts
+// Action: Do not use in Sprint 1. Will be refactored in Sprint 2.
+// ============================================
+
+"@ + (Get-Content "src\lib\server.ts" -Raw) | Set-Content "src\lib\server.ts"
+
+
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
