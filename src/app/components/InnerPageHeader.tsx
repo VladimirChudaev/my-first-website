@@ -2,14 +2,20 @@
 
 import Image from 'next/image';
 
-export default function InnerPageHeader() {
+interface InnerPageHeaderProps {
+  backgroundUrl: string;
+  alt?: string;
+}
+
+export default function InnerPageHeader({
+  backgroundUrl,
+  alt = 'Header Background',
+}: InnerPageHeaderProps) {
   return (
-    <div
-      className="relative w-full h-[200px]"
-    >
+    <div className="relative w-full h-[200px]">
       <Image
-        src="/photo/header_bg.png"
-        alt="Header Background"
+        src={backgroundUrl}
+        alt={alt}
         fill
         priority
         className="object-cover"

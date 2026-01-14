@@ -11,7 +11,6 @@ import {
   FaLocationDot,
   FaLock
 } from 'react-icons/fa6';
-// import { getMediaUrl } from '@/lib/supabase/getMediaUrl';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -78,21 +77,13 @@ export default function Footer() {
               <a href="https://t.me/VandTAgency" target="_blank" rel="noopener noreferrer">
                 <FaTelegram />
               </a>
-
               <a href="https://vk.com/club230590987" target="_blank" rel="noopener noreferrer">
                 <FaVk />
               </a>
-
               <a href="https://rutube.ru/channel/25381755/" target="_blank" rel="noopener noreferrer">
                 <FaYoutube />
               </a>
-
-              <a
-                href="https://dzen.ru/vtagency"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center"
-              >
+              <a href="https://dzen.ru/vtagency" target="_blank" rel="noopener noreferrer">
                 <div className="w-[24px] h-[24px] relative">
                   <Image
                     src="/photo/zen.svg"
@@ -102,7 +93,6 @@ export default function Footer() {
                   />
                 </div>
               </a>
-
               <Link
                 href="/auth/login"
                 className="opacity-20 md:opacity-[0.05] hover:opacity-100 transition-opacity"

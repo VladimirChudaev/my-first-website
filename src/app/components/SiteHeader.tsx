@@ -1,11 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import Image from "next/image";
-import Link from "next/link";
+import Image from 'next/image';
+import Link from 'next/link';
 import { HiMenuAlt3, HiX } from 'react-icons/hi';
 import { FaTelegram, FaVk, FaYoutube, FaEnvelope } from 'react-icons/fa6';
-// import { getMediaUrl } from '@/lib/supabase/getMediaUrl';
 
 export default function SiteHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -14,7 +13,6 @@ export default function SiteHeader() {
     <header className="absolute top-0 w-full z-[100]">
       <div className="bg-gradient-to-b from-black/70 to-transparent">
         <div className="container mx-auto px-4 md:px-10 h-24 md:h-32 flex justify-between items-center">
-
           <div className="flex-shrink-0">
             <Link href="/" className="relative block w-32 h-12 md:w-56 md:h-24">
               <Image
@@ -27,7 +25,6 @@ export default function SiteHeader() {
             </Link>
           </div>
 
-          {/* Десктопное меню */}
           <div className="hidden xl:flex items-center gap-10 text-white uppercase font-bold text-[12px] tracking-[0.2em]">
             <nav className="flex items-center gap-8">
               <Link href="/">Главная</Link>
@@ -44,7 +41,6 @@ export default function SiteHeader() {
             </div>
           </div>
 
-          {/* Соцсети + бургер */}
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-3 text-white text-xl md:text-2xl">
               <a href="https://t.me/VandTAgency" target="_blank" rel="noopener noreferrer">
@@ -74,11 +70,9 @@ export default function SiteHeader() {
               {isMenuOpen ? <HiX /> : <HiMenuAlt3 />}
             </button>
           </div>
-
         </div>
       </div>
 
-      {/* Мобильное меню */}
       {isMenuOpen && (
         <div className="fixed inset-0 bg-black/98 z-[110] flex flex-col items-center justify-center gap-8 text-white text-2xl uppercase xl:hidden">
           <button
