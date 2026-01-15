@@ -20,4 +20,6 @@ export interface MediaAsset {
   url?: string;
   link?: string;
   order: number;
+  width?: number;
+  height?: number;
 }

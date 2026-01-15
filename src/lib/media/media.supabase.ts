@@ -24,8 +24,8 @@ async function getMediaByDomainSupabase(domain: MediaDomain): Promise<MediaAsset
     filename: item.filename,
     path: item.path,
     alt: item.alt,
-    width: item.width,
-    height: item.height,
+    width: item.width || undefined,
+    height: item.height || undefined,
     order: item.position ?? 0,
   }));
 }

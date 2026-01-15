@@ -9,6 +9,8 @@ type DbMediaRow = {
   alt_text: string | null;
   title: string | null;
   position: number;
+  width?: number | null;
+  height?: number | null;
 };
 
 export function mapDbMediaToAsset(row: DbMediaRow): MediaAsset {
@@ -19,5 +21,7 @@ export function mapDbMediaToAsset(row: DbMediaRow): MediaAsset {
     path: `${row.filename}`,
     alt: row.alt_text ?? row.title ?? '',
     order: row.position,
+    width: row.width || undefined,
+    height: row.height || undefined,
   };
 }

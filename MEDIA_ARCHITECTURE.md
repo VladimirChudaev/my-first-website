@@ -155,7 +155,16 @@ created_at: timestamp
 ### Типы (types.ts)
 
 ```ts
-export type MediaDomain = 'logo' | 'partner' | 'photo' | 'video';
+export type MediaDomain =
+  | 'video'
+  | 'photo'
+  | 'partner'
+  | 'award'
+  | 'project'
+  | 'news'
+  | 'logo'
+  | 'header'
+  | 'footer';
 
 export interface MediaAsset {
   id: string;
@@ -163,6 +172,9 @@ export interface MediaAsset {
   filename: string;
   path: string;
   alt?: string;
+  url?: string;
+  link?: string;
+  order: number;
   width?: number;
   height?: number;
 }
