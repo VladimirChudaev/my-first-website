@@ -1,8 +1,15 @@
+// src/lib/media/types.ts
+
 export type MediaDomain =
-  | 'logo'
-  | 'partner'
+  | 'video'
   | 'photo'
-  | 'video';
+  | 'partner'
+  | 'award'
+  | 'project'
+  | 'news'
+  | 'logo'
+  | 'header'
+  | 'footer';
 
 export interface MediaAsset {
   id: string;
@@ -10,6 +17,7 @@ export interface MediaAsset {
   filename: string;
   path: string;
   alt?: string;
-  width?: number;
-  height?: number;
+  url?: string;
+  link?: string;
+  order: number;
 }

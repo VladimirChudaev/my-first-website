@@ -1,46 +1,64 @@
-import { createClient } from '@/lib/client';
+// src/lib/media/media.ts
 import { MediaAsset, MediaDomain } from './types';
+import { getMediaByDomain as getMediaByDomainSupabase, getMediaUrl as getMediaUrlSupabase } from './media.supabase';
+import { getMediaByDomain as getMediaByDomainMock, getMediaUrl as getMediaUrlMock } from './media.mock';
 
 const BUCKET = 'media';
 
 export type { MediaDomain };
 
-export async function getMediaUrl(path: string): Promise<string> {
-  const supabase = createClient();
-  const { data } = supabase
-    .storage
-    .from(BUCKET)
-    .getPublicUrl(path);
+// Определяем используемую реализацию на основе переменной окружения
+const useMockImplementation = process.env.NEXT_PUBLIC_MEDIA_SOURCE === 'mock';
 
-  return data.publicUrl;
+// Экспортируем функции в зависимости от выбранной реализации
+export async function getMediaUrl(path: string): Promise<string> {
+  if (useMockImplementation) {
+    return getMediaUrlMock(path);
+  } else {
+    return getMediaUrlSupabase(path);
+  }
 }
 
-export async function getMediaByDomain(
-  domain: MediaDomain
-): Promise<MediaAsset[]> {
-  const supabase = createClient();
-  try {
-    const { data, error } = await supabase
-      .from('media_assets')
-      .select('*')
-      .eq('domain', domain)
-      .order('created_at');
-
-    if (error) throw error;
-    return data;
-  } catch (error) {
-    console.warn(`Table 'media_assets' not found or error occurred, using fallback for domain '${domain}':`, error);
-    // Fallback: возвращаем пустой массив или используем альтернативный источник данных
-    return [];
+export async function getMediaByDomain(domain: MediaDomain): Promise<MediaAsset[]> {
+  if (useMockImplementation) {
+    return getMediaByDomainMock(domain);
+  } else {
+    return getMediaByDomainSupabase(domain);
   }
 }
 
 export async function getMediaMap(domain: MediaDomain): Promise<Record<string, string>> {
   const assets = await getMediaByDomain(domain);
-
   const map: Record<string, string> = {};
+  
   for (const asset of assets) {
     map[asset.filename] = await getMediaUrl(asset.path);
   }
+  
   return map;
+}
+
+// Также можно сохранить существующую функцию createMediaService для обратной совместимости
+export function createMediaService() {
+  return {
+    async getByDomain(domain: MediaDomain): Promise<MediaAsset[]> {
+      return getMediaByDomain(domain);
+    },
+    
+    async getVideos(): Promise<MediaAsset[]> {
+      return getMediaByDomain('video');
+    },
+    
+    async getPhotos(): Promise<MediaAsset[]> {
+      return getMediaByDomain('photo');
+    },
+    
+    async getPartners(): Promise<MediaAsset[]> {
+      return getMediaByDomain('partner');
+    },
+    
+    async getLogos(): Promise<MediaAsset[]> {
+      return getMediaByDomain('logo');
+    }
+  };
 }

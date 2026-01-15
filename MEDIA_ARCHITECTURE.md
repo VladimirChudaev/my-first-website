@@ -71,6 +71,49 @@ export class MediaService {
 - `createClient()` из `@/lib/client`
 - Работа с Supabase Storage и DB
 
+## Архитектурный флаг NEXT_PUBLIC_MEDIA_SOURCE
+
+Для обеспечения гибкости и возможности работы в разных окружениях реализован архитектурный флаг `NEXT_PUBLIC_MEDIA_SOURCE`, который позволяет переключаться между Supabase и Mock реализациями.
+
+### Переменная окружения
+
+```env
+# Media source (uncomment one of the following):
+# NEXT_PUBLIC_MEDIA_SOURCE=supabase  # для работы с базой
+# NEXT_PUBLIC_MEDIA_SOURCE=mock     # для локальной разработки
+NEXT_PUBLIC_MEDIA_SOURCE=supabase
+```
+
+### Реализации
+
+#### Supabase Implementation (`media.supabase.ts`)
+- Подключение к реальной базе данных Supabase
+- Использование Supabase Storage для получения URL
+- Работа с таблицей `media_assets`
+
+#### Mock Implementation (`media.mock.ts`)
+- Заглушка без подключения к базе данных
+- Возврат предопределенных данных
+- Использование локальных путей для медиа-файлов
+
+### Механизм переключения
+
+Основной файл `src/lib/media/media.ts` использует динамический импорт в зависимости от значения флага:
+
+```ts
+async function getMediaImplementation() {
+  const source = process.env.NEXT_PUBLIC_MEDIA_SOURCE || 'supabase';
+  
+  if (source === 'mock') {
+    const { getMediaByDomain, getMediaUrl } = await import('./media.mock');
+    return { getMediaByDomain, getMediaUrl };
+  } else {
+    const { getMediaByDomain, getMediaUrl } = await import('./media.supabase');
+    return { getMediaByDomain, getMediaUrl };
+  }
+}
+```
+
 ## Структура медиа-данных
 
 ### Сущности (DB)
@@ -122,7 +165,7 @@ import { getMediaUrl, getMediaByDomain, getMediaMap } from '@/lib/media/media';
 ### 3. Принцип работы с медиа
 
 ```
-Storage (Supabase)
+Storage (Supabase/Mock)
 ↓
 MediaRepository (media.ts)
 ↓
@@ -145,12 +188,17 @@ const mediaMap = await mediaService.getMediaMap('partner');
 const imageUrl = mediaMap['filename.png'];
 ```
 
-### Пример обновленного компонента
+### Переключение между режимами
 
-Компонент `PartnersCarousel.tsx` был обновлен для использования новой архитектуры:
-- Использует `mediaService.getMediaMap('partner')` вместо статических данных
-- Получает актуальные URL для медиа-файлов
-- Следует принципу инверсии зависимостей
+Для переключения между Supabase и Mock режимами измените значение переменной окружения:
+
+```env
+# Для работы с Supabase (по умолчанию)
+NEXT_PUBLIC_MEDIA_SOURCE=supabase
+
+# Для локальной разработки без базы данных
+NEXT_PUBLIC_MEDIA_SOURCE=mock
+```
 
 ## Преимущества новой архитектуры
 
@@ -159,13 +207,14 @@ const imageUrl = mediaMap['filename.png'];
 3. **Централизованное управление**: все медиа-операции в одном месте
 4. **Безопасность**: инфраструктурные детали не протекают в UI
 5. **Поддерживаемость**: изменения в медиа-слое не влияют на UI
-6. **Гибкость**: реализован механизм fallback для работы без базы данных
+6. **Гибкость**: возможность работы в разных окружениях (локально, тест, прод)
+7. **Архитектурный флаг**: динамическое переключение между реализациями
 
 ## Обработка ситуаций без базы данных
 
-При отсутствии таблицы `media_assets` в базе данных система автоматически использует резервный механизм:
-- Компоненты получают данные из локальных файлов (например, `src/data/partners.ts`)
-- В консоль выводится предупреждение, но приложение продолжает работать
+При значении `NEXT_PUBLIC_MEDIA_SOURCE=mock` система использует заглушку:
+- Компоненты получают предопределенные данные
+- В консоль не выводятся ошибки подключения к базе
 - Все изображения отображаются из папки `/public`
 
 ## Статус реализации
@@ -175,5 +224,7 @@ const imageUrl = mediaMap['filename.png'];
 - [x] Обновление компонентов (PartnersCarousel.tsx)
 - [x] Удаление статического заголовка из PartnersCarousel.tsx
 - [x] Документация
+- [x] Архитектурный флаг NEXT_PUBLIC_MEDIA_SOURCE
+- [x] Динамический импорт на основе флага
 
 Архитектура полностью реализована и готова к использованию.

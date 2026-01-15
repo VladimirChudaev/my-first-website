@@ -1,24 +1,23 @@
-import { MediaAsset } from './types';
+// src/lib/media/mapper.ts
+import { MediaAsset, MediaDomain } from './types';
 
-/**
- * Converts database records to MediaAsset objects
- * This utility helps map raw data from DB queries to typed MediaAsset interfaces
- */
-export function mapDbToMediaAsset(dbRecord: any): MediaAsset {
+type DbMediaRow = {
+  id: string;
+  filename: string;
+  bucket: string;
+  category: string;
+  alt_text: string | null;
+  title: string | null;
+  position: number;
+};
+
+export function mapDbMediaToAsset(row: DbMediaRow): MediaAsset {
   return {
-    id: dbRecord.id,
-    domain: dbRecord.domain,
-    filename: dbRecord.filename,
-    path: dbRecord.path,
-    alt: dbRecord.alt || undefined,
-    width: dbRecord.width || undefined,
-    height: dbRecord.height || undefined,
+    id: row.id,
+    domain: row.category as MediaDomain,
+    filename: row.filename,
+    path: `${row.filename}`,
+    alt: row.alt_text ?? row.title ?? '',
+    order: row.position,
   };
-}
-
-/**
- * Converts an array of database records to MediaAsset objects
- */
-export function mapDbToMediaAssets(dbRecords: any[]): MediaAsset[] {
-  return dbRecords.map(mapDbToMediaAsset);
 }
