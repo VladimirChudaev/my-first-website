@@ -1,12 +1,14 @@
 export type MediaDomain = 'video' | 'photo' | 'partner';
 
-export interface MediaAsset {
+interface MediaAsset {
   id: string;
   domain: MediaDomain;
   path: string;
   alt?: string;
   url?: string;
 }
+
+export type { MediaAsset };
 
 export function createMediaService() {
   return {

@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
-import { createMediaService, MediaAsset } from '@/lib/media.mock';
+import { createMediaService, MediaAsset } from '@/lib/media/media.mock';
 
 export default function VideoCarousel() {
   const [videos, setVideos] = useState<MediaAsset[]>([]);
