@@ -127,3 +127,9 @@ export function createMediaService() {
 
 // Экспортируем типы для соответствия архитектурному принципу "единого источника истины"
 export type { MediaAsset, MediaDomain };
+
+// Алиасы для соответствия архитектуре "единого источника истины"
+export {
+  getMediaByDomain as getMediaByDomainMock,
+  getMediaUrl as getMediaUrlMock
+};

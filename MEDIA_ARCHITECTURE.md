@@ -89,14 +89,16 @@ NEXT_PUBLIC_MEDIA_SOURCE=supabase
 #### Supabase Implementation (`media.supabase.ts`)
 - Подключение к реальной базе данных Supabase
 - Использование Supabase Storage для получения URL
-- Работа с таблицей `media_assets`
+- Работа с таблицей `media`
 - Экспорт типов `MediaAsset` и `MediaDomain` для соответствия принципу "единого источника истины"
+- Экспорт алиасов функций: `getMediaByDomain as getMediaByDomainSupabase` и `getMediaUrl as getMediaUrlSupabase`
 
 #### Mock Implementation (`media.mock.ts`)
 - Заглушка без подключения к базе данных
 - Возврат предопределенных данных
 - Использование локальных путей для медиа-файлов
 - Экспорт типов `MediaAsset` и `MediaDomain` для соответствия принципу "единого источника истины"
+- Экспорт алиасов функций: `getMediaByDomain as getMediaByDomainMock` и `getMediaUrl as getMediaUrlMock`
 
 ### Механизм переключения
 
@@ -131,6 +133,8 @@ export async function getMediaByDomain(domain: MediaDomain): Promise<MediaAsset[
 export async function getMediaByDomain(/* ... */);
 export async function getMediaUrl(/* ... */);
 export type { MediaAsset, MediaDomain }; // экспорт типов для соответствия архитектуре
+export { getMediaByDomain as getMediaByDomainMock, getMediaUrl as getMediaUrlMock }; // алиасы для mock версии
+export { getMediaByDomain as getMediaByDomainSupabase, getMediaUrl as getMediaUrlSupabase }; // алиасы для supabase версии
 ```
 
 Это позволяет другим компонентам импортировать как функции, так и типы из одного и того же источника, что улучшает согласованность архитектуры.
@@ -259,5 +263,6 @@ NEXT_PUBLIC_MEDIA_SOURCE=mock
 - [x] Документация
 - [x] Архитектурный флаг NEXT_PUBLIC_MEDIA_SOURCE
 - [x] Динамический импорт на основе флага
+- [x] Алиасы функций для соответствия архитектуре "единого источника истины"
 
 Архитектура полностью реализована и готова к использованию.

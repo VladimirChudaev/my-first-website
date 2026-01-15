@@ -1,50 +1,47 @@
 import { createClient } from '@/lib/client';
 import { MediaAsset, MediaDomain } from './types';
+import { mapMediaRow } from './mapper';
 
-const BUCKET = 'media';
-
-// Внутренняя реализация для получения медиа по домену
-async function getMediaByDomainSupabase(domain: MediaDomain): Promise<MediaAsset[]> {
+async function getMediaByDomainInternal(
+  domain: MediaDomain,
+  direction: 'asc' | 'desc' = 'asc'
+): Promise<MediaAsset[]> {
   const supabase = createClient();
 
   const { data, error } = await supabase
-    .from('media_assets')
+    .from('media')
     .select('*')
     .eq('domain', domain)
-    .order('id');
+    .eq('is_visible', true)
+    .order('order', { ascending: direction === 'asc' });
 
-  if (error) {
-    console.warn(`Error fetching media assets for domain "${domain}":`, error);
-    return []; // Возвращаем пустой массив при ошибке, чтобы приложение продолжало работать
+  if (error || !data) {
+    console.warn(`[media.supabase] ${domain}`, error);
+    return [];
   }
 
-  return data.map(item => ({
-    id: item.id,
-    domain: item.domain as MediaDomain,
-    filename: item.filename,
-    path: item.path,
-    alt: item.alt,
-    width: item.width || undefined,
-    height: item.height || undefined,
-    order: item.position ?? 0,
-  }));
+  return data.map(mapMediaRow);
 }
 
 export async function getMediaByDomain(
   domain: MediaDomain
 ): Promise<MediaAsset[]> {
-  return getMediaByDomainSupabase(domain);
+  return getMediaByDomainInternal(domain, 'asc');
 }
 
 export async function getMediaUrl(path: string): Promise<string> {
   const supabase = createClient();
-  const { data } = supabase
+  
+  const { data } = await supabase
     .storage
-    .from(BUCKET)
+    .from('media')
     .getPublicUrl(path);
-
+    
   return data.publicUrl;
 }
 
-// Экспортируем типы для соответствия архитектурному принципу "единого источника истины"
-export type { MediaAsset, MediaDomain };
+// Алиасы для соответствия архитектуре "единого источника истины"
+export {
+  getMediaByDomain as getMediaByDomainSupabase,
+  getMediaUrl as getMediaUrlSupabase
+};

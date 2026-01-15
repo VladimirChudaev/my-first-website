@@ -19,7 +19,7 @@ export interface MediaAsset {
   alt?: string;
   url?: string;
   link?: string;
-  order: number;
+  order: number;          // ОБЯЗАТЕЛЬНО
   width?: number;
   height?: number;
 }

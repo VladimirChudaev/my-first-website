@@ -1,27 +1,27 @@
-// src/lib/media/mapper.ts
 import { MediaAsset, MediaDomain } from './types';
 
-type DbMediaRow = {
+interface MediaRow {
   id: string;
+  domain: string;
   filename: string;
-  bucket: string;
-  category: string;
-  alt_text: string | null;
-  title: string | null;
-  position: number;
+  path: string;
+  alt?: string | null;
   width?: number | null;
   height?: number | null;
-};
+  order?: number | null;
+  link?: string | null;
+}
 
-export function mapDbMediaToAsset(row: DbMediaRow): MediaAsset {
+export function mapMediaRow(row: MediaRow): MediaAsset {
   return {
     id: row.id,
-    domain: row.category as MediaDomain,
+    domain: row.domain as MediaDomain,
     filename: row.filename,
-    path: `${row.filename}`,
-    alt: row.alt_text ?? row.title ?? '',
-    order: row.position,
-    width: row.width || undefined,
-    height: row.height || undefined,
+    path: row.path,
+    alt: row.alt ?? undefined,
+    width: row.width ?? undefined,
+    height: row.height ?? undefined,
+    order: row.order ?? 0,
+    link: row.link ?? undefined,
   };
 }
