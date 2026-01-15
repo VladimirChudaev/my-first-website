@@ -90,29 +90,50 @@ NEXT_PUBLIC_MEDIA_SOURCE=supabase
 - Подключение к реальной базе данных Supabase
 - Использование Supabase Storage для получения URL
 - Работа с таблицей `media_assets`
+- Экспорт типов `MediaAsset` и `MediaDomain` для соответствия принципу "единого источника истины"
 
 #### Mock Implementation (`media.mock.ts`)
 - Заглушка без подключения к базе данных
 - Возврат предопределенных данных
 - Использование локальных путей для медиа-файлов
+- Экспорт типов `MediaAsset` и `MediaDomain` для соответствия принципу "единого источника истины"
 
 ### Механизм переключения
 
-Основной файл `src/lib/media/media.ts` использует динамический импорт в зависимости от значения флага:
+Основной файл `src/lib/media/media.ts` использует статические импорты обеих реализаций и условную логику в зависимости от значения флага:
 
 ```ts
-async function getMediaImplementation() {
-  const source = process.env.NEXT_PUBLIC_MEDIA_SOURCE || 'supabase';
-  
-  if (source === 'mock') {
-    const { getMediaByDomain, getMediaUrl } = await import('./media.mock');
-    return { getMediaByDomain, getMediaUrl };
+const useMockImplementation = process.env.NEXT_PUBLIC_MEDIA_SOURCE === 'mock';
+
+export async function getMediaUrl(path: string): Promise<string> {
+  if (useMockImplementation) {
+    return getMediaUrlMock(path);
   } else {
-    const { getMediaByDomain, getMediaUrl } = await import('./media.supabase');
-    return { getMediaByDomain, getMediaUrl };
+    return getMediaUrlSupabase(path);
+  }
+}
+
+export async function getMediaByDomain(domain: MediaDomain): Promise<MediaAsset[]> {
+  if (useMockImplementation) {
+    return getMediaByDomainMock(domain);
+  } else {
+    return getMediaByDomainSupabase(domain);
   }
 }
 ```
+
+### Принцип "единого источника истины"
+
+Каждая реализация (mock и supabase) теперь является единым источником истины для своего слоя, экспортируя как функции, так и необходимые типы данных:
+
+```ts
+// В каждом файле реализации (media.mock.ts и media.supabase.ts)
+export async function getMediaByDomain(/* ... */);
+export async function getMediaUrl(/* ... */);
+export type { MediaAsset, MediaDomain }; // экспорт типов для соответствия архитектуре
+```
+
+Это позволяет другим компонентам импортировать как функции, так и типы из одного и того же источника, что улучшает согласованность архитектуры.
 
 ## Структура медиа-данных
 

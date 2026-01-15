@@ -124,3 +124,6 @@ export function createMediaService() {
     },
   };
 }
+
+// Экспортируем типы для соответствия архитектурному принципу "единого источника истины"
+export type { MediaAsset, MediaDomain };

@@ -45,3 +45,6 @@ export async function getMediaUrl(path: string): Promise<string> {
 
   return data.publicUrl;
 }
+
+// Экспортируем типы для соответствия архитектурному принципу "единого источника истины"
+export type { MediaAsset, MediaDomain };
