@@ -53,18 +53,20 @@ export default function VideoCarousel() {
               className="w-1/3 aspect-video rounded-xl overflow-hidden shadow-lg"
             >
               <a
-                href={video.url}
+                href={video.url || '#'}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="relative block w-full h-full"
               >
-                <Image
-                  src={video.path}
-                  alt={video.alt || ''}
-                  fill
-                  className="object-cover"
-                  priority
-                />
+                {video.path && (
+                  <Image
+                    src={video.path}
+                    alt={video.alt || ''}
+                    fill
+                    className="object-cover"
+                    priority
+                  />
+                )}
                 <div className="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/40 transition">
                   <span className="text-white text-2xl">▶</span>
                 </div>

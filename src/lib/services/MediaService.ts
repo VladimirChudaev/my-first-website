@@ -53,3 +53,22 @@ export class MediaService {
 
 // Создаем глобальный экземпляр сервиса для удобства использования
 export const mediaService = new MediaService();
+
+/**
+ * ИСТОРИЯ ИЗМЕНЕНИЙ:
+ *
+ * 1. Обновлен интерфейс MediaRow в mapper.ts - изменены поля domain на category, order на position,
+ *    и поле path сделано опциональным
+ * 2. Обновлена функция mapMediaRow для корректной обработки новых полей
+ * 3. Добавлена защита от undefined в функцию getMediaMap - теперь проверяется наличие
+ *    поля path перед вызовом getMediaUrl
+ * 4. Обновлен интерфейс MediaAsset, чтобы поле path стало опциональным
+ * 5. Обновлена функция getUrlByFilename в сервисе для проверки наличия path
+ * 6. Обновлена документация в MEDIA_ARCHITECTURE.md
+ * 7. Обновлен компонент VideoCarousel.tsx для безопасного обращения к опциональному полю path
+ * 8. Обновлен компонент VideoCarousel.tsx для безопасного обращения к опциональному полю url
+ *
+ * Эти изменения были внесены для устранения ошибки "Cannot read properties of undefined (reading 'replace')"
+ * в PartnersCarousel, которая происходила при обращении к полю path, которое может быть undefined
+ * в данных из Supabase, а также для обеспечения безопасности при использовании других опциональных полей.
+ */
