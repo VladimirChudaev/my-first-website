@@ -42,7 +42,7 @@ export class MediaService {
    */
   async getUrlByFilename(domain: MediaDomain, filename: string): Promise<string | null> {
     const asset = await this.findByFilename(domain, filename);
-    if (!asset) {
+    if (!asset || !asset.path) {
       return null;
     }
     

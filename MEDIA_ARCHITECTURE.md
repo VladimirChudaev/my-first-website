@@ -149,10 +149,11 @@ id: uuid (PK)
 category: text (logo | partner | photo | video)
 filename: text
 bucket: text
-path: text
+path: text (может отсутствовать)
 alt: text
 width: int
 height: int
+position: int
 created_at: timestamp
 ```
 
@@ -174,7 +175,7 @@ export interface MediaAsset {
   id: string;
   category: MediaDomain;
   filename: string;
-  path: string;
+  path?: string;
   alt?: string;
   url?: string;
   link?: string;

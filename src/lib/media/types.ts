@@ -15,7 +15,7 @@ export interface MediaAsset {
   id: string;
   category: MediaDomain;
   filename: string;
-  path: string;
+  path?: string;
   alt?: string;
   url?: string;
   link?: string;

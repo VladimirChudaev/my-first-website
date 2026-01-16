@@ -31,7 +31,9 @@ export async function getMediaMap(
   const map: Record<string, string> = {};
 
   for (const asset of assets) {
-    map[asset.filename] = await getMediaUrl(asset.path);
+    if (asset.path) {
+      map[asset.filename] = await getMediaUrl(asset.path);
+    }
   }
 
   return map;
