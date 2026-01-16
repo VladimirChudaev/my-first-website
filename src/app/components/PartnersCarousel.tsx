@@ -107,7 +107,7 @@ export default function PartnersCarousel() {
                     alt={partner.name}
                     width={128}
                     height={64}
-                    className="h-16 w-auto object-contain"
+                    className="h-16 w-auto object-contain max-w-none"
                   />
                 ) : (
                   <Image
@@ -115,7 +115,7 @@ export default function PartnersCarousel() {
                     alt={partner.name}
                     width={128}
                     height={64}
-                    className="h-16 w-auto object-contain"
+                    className="h-16 w-auto object-contain max-w-none"
                   />
                 )}
               </a>

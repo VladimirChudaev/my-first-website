@@ -4,7 +4,7 @@ export type MediaDomain = 'video' | 'photo' | 'partner';
 
 export interface MediaAsset {
   id: string;
-  domain: MediaDomain;
+  category: MediaDomain;
   path: string;
   alt?: string;
   url?: string;
@@ -21,7 +21,7 @@ export function createMediaService() {
 
       return videos.map((video) => ({
         id: video.id,
-        domain: 'video',
+        category: 'video',
         path: video.cover, // ВАЖНО: используем cover как есть
         alt: video.title,
         url: video.url,
