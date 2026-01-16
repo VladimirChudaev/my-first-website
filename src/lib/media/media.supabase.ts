@@ -11,9 +11,9 @@ async function getMediaByDomainInternal(
   const { data, error } = await supabase
     .from('media')
     .select('*')
-    .eq('domain', domain)
+    .eq('category', domain)
     .eq('is_visible', true)
-    .order('order', { ascending: direction === 'asc' });
+    .order('position', { ascending: direction === 'asc' });
 
   if (error || !data) {
     console.warn(`[media.supabase] ${domain}`, error);

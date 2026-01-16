@@ -29,7 +29,7 @@ export interface MediaAsset {
   id: string;
 
   /** Домен использования */
-  domain: MediaDomain;
+  category: MediaDomain;
 
   /** Имя файла в storage */
   filename: string;
@@ -44,7 +44,7 @@ export interface MediaAsset {
   alt: string;
 
   /** Порядок отображения */
-  order: number;
+  position: number;
 
   /** Опциональная ссылка (видео, партнёр, проект и т.п.) */
   link?: string;

@@ -15,13 +15,13 @@ interface MediaRow {
 export function mapMediaRow(row: MediaRow): MediaAsset {
   return {
     id: row.id,
-    domain: row.domain as MediaDomain,
+    category: row.domain as MediaDomain,
     filename: row.filename,
     path: row.path,
     alt: row.alt ?? undefined,
     width: row.width ?? undefined,
     height: row.height ?? undefined,
-    order: row.order ?? 0,
+    position: row.order ?? 0,
     link: row.link ?? undefined,
   };
 }

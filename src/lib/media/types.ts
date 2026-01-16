@@ -13,13 +13,13 @@ export type MediaDomain =
 
 export interface MediaAsset {
   id: string;
-  domain: MediaDomain;
+  category: MediaDomain;
   filename: string;
   path: string;
   alt?: string;
   url?: string;
   link?: string;
-  order: number;          // ОБЯЗАТЕЛЬНО
+  position: number;          // ОБЯЗАТЕЛЬНО
   width?: number;
   height?: number;
 }

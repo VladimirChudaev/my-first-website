@@ -146,7 +146,7 @@ export { getMediaByDomain as getMediaByDomainSupabase, getMediaUrl as getMediaUr
 Таблица `media_assets`:
 ```
 id: uuid (PK)
-domain: text (logo | partner | photo | video)
+category: text (logo | partner | photo | video)
 filename: text
 bucket: text
 path: text
@@ -172,13 +172,13 @@ export type MediaDomain =
 
 export interface MediaAsset {
   id: string;
-  domain: MediaDomain;
+  category: MediaDomain;
   filename: string;
   path: string;
   alt?: string;
   url?: string;
   link?: string;
-  order: number;
+  position: number;
   width?: number;
   height?: number;
 }
