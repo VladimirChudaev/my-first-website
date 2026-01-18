@@ -38,15 +38,22 @@ export async function updateSession(request: NextRequest) {
   const { data } = await supabase.auth.getClaims()
   const user = data?.claims
 
+  // Убираем автоматическое перенаправление на страницу входа
+  // для публичных маршрутов, таких как главная страница, проекты, новости и т.д.
+  const publicPaths = ['/', '/projects', '/news', '/partners', '/film-reserve', '/privacy'];
+  const isPublicPath = publicPaths.some(path => request.nextUrl.pathname.startsWith(path));
+  
   if (
     !user &&
     !request.nextUrl.pathname.startsWith('/login') &&
-    !request.nextUrl.pathname.startsWith('/auth')
+    !request.nextUrl.pathname.startsWith('/auth') &&
+    !isPublicPath  // Не перенаправляем с публичных страниц
   ) {
     // no user, potentially respond by redirecting the user to the login page
-    const url = request.nextUrl.clone()
-    url.pathname = '/auth/login'
-    return NextResponse.redirect(url)
+    // Закомментировано, чтобы не перенаправлять со всех страниц
+    // const url = request.nextUrl.clone()
+    // url.pathname = '/auth/login'
+    // return NextResponse.redirect(url)
   }
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is.

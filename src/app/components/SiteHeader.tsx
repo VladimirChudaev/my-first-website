@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { HiMenuAlt3, HiX } from 'react-icons/hi';
 import { FaTelegram, FaVk, FaYoutube, FaEnvelope } from 'react-icons/fa6';
+import Logo from './Logo';
 
 export default function SiteHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -15,14 +16,7 @@ export default function SiteHeader() {
         <div className="container mx-auto px-4 md:px-10 h-24 md:h-32 flex justify-between items-center">
           <div className="flex-shrink-0">
             <Link href="/" className="relative block w-32 h-12 md:w-56 md:h-24">
-              <Image
-                src="/photo/logo.png"
-                alt="Logo"
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                className="object-contain"
-                priority
-              />
+              <Logo className="object-contain" />
             </Link>
           </div>
 

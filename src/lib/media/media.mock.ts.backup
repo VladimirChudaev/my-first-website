@@ -1,0 +1,203 @@
+import { MediaAsset, MediaDomain } from './types';
+
+// Мок-данные для различных категорий медиа
+const mockMediaData: Record<MediaDomain, MediaAsset[]> = {
+  video: [
+    {
+      id: '1',
+      category: 'video',
+      filename: 'video1.jpg',
+      path: '/d_doroga.png',
+      alt: 'Видео 1',
+      url: 'https://rutube.ru/video/f7236d5eba5afc6c560d51efb4da6be7/',
+      position: 1,
+    },
+    {
+      id: '2',
+      category: 'video',
+      filename: 'video2.jpg',
+      path: '/d_Muslumovo.png',
+      alt: 'Видео 2',
+      url: 'https://rutube.ru/video/550cf890df3c4b96e64582c84a7d1d2/',
+      position: 2,
+    },
+    {
+      id: '3',
+      category: 'video',
+      filename: 'video3.jpg',
+      path: '/d_tri_zhenyi.png',
+      alt: 'Видео 3',
+      url: 'https://rutube.ru/video/0e8ebff0f52e1b89f2dccc23ba7deb37/',
+      position: 3,
+    },
+    {
+      id: '4',
+      category: 'video',
+      filename: 'video4.jpg',
+      path: '/h_agitbrigada.png',
+      alt: 'Видео 4',
+      url: 'https://rutube.ru/video/ce0ca8ce4085bbbde2c4dcb9dfba11b5/',
+      position: 4,
+    },
+    {
+      id: '5',
+      category: 'video',
+      filename: 'video5.jpg',
+      path: '/b_kino_from_biz.png',
+      alt: 'Видео 5',
+      url: 'https://rutube.ru/video/8939de9e366c2064feac69681c54b29f/',
+      position: 5,
+    },
+    {
+      id: '6',
+      category: 'video',
+      filename: 'video6.jpg',
+      path: '/b_organs.png',
+      alt: 'Видео 6',
+      url: 'https://rutube.ru/video/98dc22b8f7bba68fcdddfc1468caea7e/',
+      position: 6,
+    },
+    {
+      id: '7',
+      category: 'video',
+      filename: 'video7.jpg',
+      path: '/b_Theater_projects.png',
+      alt: 'Видео 7',
+      url: 'https://rutube.ru/video/697f84970dfbc137a0a6d4dc88833a91/',
+      position: 7,
+    },
+    {
+      id: '8',
+      category: 'video',
+      filename: 'video8.jpg',
+      path: '/globe.svg',
+      alt: 'Видео 8',
+      url: 'https://rutube.ru/video/2534df451f31338409cec4d5fe0c5a9f/',
+      position: 8,
+    },
+  ],
+  photo: [
+    {
+      id: '9',
+      category: 'photo',
+      filename: 'photo1.jpg',
+      path: '/d_doroga.png',
+      alt: 'Фото 1',
+      position: 1,
+    },
+    {
+      id: '10',
+      category: 'photo',
+      filename: 'photo2.jpg',
+      path: '/d_Muslumovo.png',
+      alt: 'Фото 2',
+      position: 2,
+    },
+    {
+      id: '11',
+      category: 'photo',
+      filename: 'photo3.jpg',
+      path: '/d_tri_zhenyi.png',
+      alt: 'Фото 3',
+      position: 3,
+    },
+  ],
+  partner: [
+    {
+      id: '12',
+      category: 'partner',
+      filename: 'partner1.png',
+      path: '/h_agitbrigada.png',
+      alt: 'Партнер 1',
+      position: 1,
+    },
+    {
+      id: '13',
+      category: 'partner',
+      filename: 'partner2.png',
+      path: '/b_kino_from_biz.png',
+      alt: 'Партнер 2',
+      position: 2,
+    },
+  ],
+  award: [],
+  project: [],
+  news: [],
+  logo: [
+    {
+      id: 'logo-1',
+      category: 'logo',
+      filename: 'logo.png',
+      path: '/photo/logo.png',  // Этот путь уже правильный, оставлю как есть
+      alt: 'Логотип компании',
+      position: 1,
+    },
+  ],
+  header: [],
+  footer: [],
+};
+
+export async function getMediaByDomain(domain: MediaDomain): Promise<MediaAsset[]> {
+  // Имитация задержки сети
+  await new Promise(resolve => setTimeout(resolve, 100));
+  return mockMediaData[domain] || [];
+}
+
+export async function getMediaUrl(path: string): Promise<string> {
+  // В мок-версии возвращаем путь как есть, добавляя префикс
+  // Если путь уже содержит бакет (например, 'media/filename.jpg'), используем как есть
+  // Иначе добавляем префикс '/photo/'
+  if (!path) {
+    throw new Error('Path is required for getMediaUrl');
+  }
+  
+  if (path.includes('/')) {
+    // Путь уже содержит бакет, используем как есть
+    return path.startsWith('/') ? path : `/${path}`;
+  } else {
+    // Путь не содержит бакет, добавляем префикс '/photo/'
+    return `/photo/${path}`;
+  }
+}
+
+export async function getMediaById(id: string) {
+  for (const domain in mockMediaData) {
+    const item = mockMediaData[domain as MediaDomain].find(item => item.id === id);
+    if (item) return item;
+  }
+  return null;
+}
+
+export async function insertMedia(mediaData: Omit<MediaAsset, 'id'> & { id?: string }) {
+  console.log('Insert media (mock):', mediaData);
+  return {
+    id: mediaData.id || `mock-${Date.now()}`,
+    ...mediaData,
+  } as MediaAsset;
+}
+
+export async function updateMedia(id: string, updates: Partial<Omit<MediaAsset, 'id'>>) {
+  console.log('Update media (mock):', id, updates);
+  return;
+}
+
+export async function deleteMedia(id: string) {
+  console.log('Delete media (mock):', id);
+  return;
+}
+
+export async function updateMediaOrder(category: MediaDomain, orderedIds: string[]) {
+  console.log('Update media order (mock):', category, orderedIds);
+  return;
+}
+
+// Алиасы для соответствия архитектуре "единого источника истины"
+export {
+  getMediaByDomain as getMediaByDomainMock,
+  getMediaUrl as getMediaUrlMock,
+  getMediaById as getMediaByIdMock,
+  insertMedia as insertMediaMock,
+  updateMedia as updateMediaMock,
+  deleteMedia as deleteMediaMock,
+  updateMediaOrder as updateMediaOrderMock
+};

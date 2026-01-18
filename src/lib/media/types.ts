@@ -16,10 +16,12 @@ export interface MediaAsset {
   category: MediaDomain;
   filename: string;
   path?: string;
-  alt?: string;
+  alt_text?: string;
   url?: string;
+  title?: string;
   link?: string;
   position: number;          // ОБЯЗАТЕЛЬНО
   width?: number;
   height?: number;
+  is_visible?: boolean;
 }

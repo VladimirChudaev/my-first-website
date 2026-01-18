@@ -47,7 +47,12 @@ export class MediaService {
     }
     
     // Возвращаем URL через getMediaUrl
-    return await getMediaUrl(asset.path);
+    try {
+      return await getMediaUrl(asset.path);
+    } catch (error) {
+      console.error(`Error getting URL for ${domain}/${filename}:`, error);
+      return null;
+    }
   }
 }
 

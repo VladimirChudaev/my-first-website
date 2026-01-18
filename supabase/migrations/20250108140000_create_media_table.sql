@@ -2,7 +2,7 @@
 -- Purpose: create a table to store metadata for images used in the website (photos and partner logos)
 -- Affected tables: public.media
 -- Notes:
---   - This table supports two categories: 'photo' (for main page visuals) and 'partner' (for partner logos)
+--   - This table supports multiple categories: 'photo' (for main page visuals), 'partner' (for partner logos), and 'video' (for video thumbnails)
 --   - All files are expected to be stored in the 'media' bucket in Supabase Storage
 --   - Row Level Security (RLS) is enabled with granular policies for anon and authenticated users
 
@@ -14,7 +14,7 @@ create table public.media (
   id uuid primary key default gen_random_uuid(),
   filename text not null,
   bucket text not null default 'media',
-  category text not null check (category in ('photo', 'partner')),
+  category text not null check (category in ('photo', 'partner', 'video')),
   alt_text text,
   title text,
   created_at timestamptz default now()
@@ -55,10 +55,10 @@ create policy "media_delete_authenticated"
   using (true);
 
 -- Add table and column comments for documentation
-comment on table public.media is 'Stores metadata for images (photos and partner logos) used across the website.';
+comment on table public.media is 'Stores metadata for images (photos, partner logos, and video thumbnails) used across the website.';
 comment on column public.media.filename is 'Name of the file as stored in Supabase Storage (e.g., "logo.png").';
 comment on column public.media.bucket is 'Name of the Supabase Storage bucket (default: "media").';
-comment on column public.media.category is 'Category of the image: "photo" for main visuals, "partner" for partner logos.';
+comment on column public.media.category is 'Category of the image: "photo" for main visuals, "partner" for partner logos, "video" for video thumbnails.';
 comment on column public.media.alt_text is 'Alternative text for accessibility and SEO.';
 comment on column public.media.title is 'Human-readable title or label for the image.';
 comment on column public.media.created_at is 'Timestamp when the record was created.';

@@ -2,18 +2,33 @@
 
 import { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
-import { createMediaService, MediaAsset } from '@/lib/media/media.mock';
+import { mediaService } from '@/lib/services/MediaService';
+import { MediaAsset } from '@/lib/media/types';
 
 export default function VideoCarousel() {
   const [videos, setVideos] = useState<MediaAsset[]>([]);
+  const [imageUrls, setImageUrls] = useState<Record<string, string | null>>({});
   const [currentIndex, setCurrentIndex] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const load = async () => {
-      const media = createMediaService();
-      const data = await media.getVideos();
-      setVideos(data);
+      try {
+        const data = await mediaService.getByDomain('video');
+        setVideos(data);
+
+        // Загрузка URL изображений для видео
+        const urls: Record<string, string | null> = {};
+        for (const video of data) {
+          if (video.path) {
+            urls[video.id] = await mediaService.getUrlByFilename('video', video.filename);
+          }
+        }
+        setImageUrls(urls);
+      } catch (error) {
+        console.error('Error loading videos:', error);
+        setVideos([]); // Ensure videos is an empty array on error
+      }
     };
     load();
   }, []);
@@ -58,10 +73,10 @@ export default function VideoCarousel() {
                 rel="noopener noreferrer"
                 className="relative block w-full h-full"
               >
-                {video.path && (
+                {video.path && imageUrls[video.id] && (
                   <Image
-                    src={video.path}
-                    alt={video.alt || ''}
+                    src={imageUrls[video.id]!}
+                    alt={video.alt_text || ''}
                     fill
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     className="object-cover"

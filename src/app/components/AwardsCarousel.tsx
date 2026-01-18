@@ -2,32 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { mediaService } from '@/lib/services/MediaService';
+import { MediaAsset } from '@/lib/media/types';
 
-interface Award {
-  id: string;
+interface Award extends MediaAsset {
   title: string;
   status: string;
   festival: string;
-  logo: string;
 }
-
-const awardsData: Award[] = [
-  {
-    id: '1',
-    title: '«Агитбригада»',
-    status: 'участник конкурсного отбора в номинации «Фильмы на русском языке»',
-    festival: 'Short Shot Fest (Россия, Москва)',
-    logo: 'https://vtagency.ru/wp-content/uploads/2024/10/Frame-140.png',
-  },
-  {
-    id: '2',
-    title: '«Агитбригада»',
-    status: 'Лучший европейский фильм',
-    festival: 'The Reale Film Festival (Италия)',
-    logo: 'https://vtagency.ru/wp-content/uploads/2024/10/Frame-147.png',
-  },
-  // остальные — без изменений
-];
 
 const variants = {
   enter: (direction: number) => ({
@@ -45,21 +27,62 @@ const variants = {
 };
 
 export default function AwardsCarousel() {
-  const [awards] = useState<Award[]>(awardsData);
+  const [awards, setAwards] = useState<Award[]>([]);
   const [[page, direction], setPage] = useState<[number, number]>([0, 0]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  if (!awards.length) return null;
+  useEffect(() => {
+    const loadAwards = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const awardsList = await mediaService.getByDomain('award');
+        const filteredAwardsList = awardsList.filter((item: MediaAsset) =>
+          item.filename.startsWith('av_')
+        );
+        const mappedAwards = await Promise.all(
+          filteredAwardsList.map(async (asset) => {
+            const url = asset.path ? await mediaService.getUrlByFilename('award', asset.filename) : undefined;
+            return {
+              ...asset,
+              title: asset.title || '',
+              status: asset.alt_text || '', // Используем alt_text для статуса, если есть
+              festival: asset.link || '',   // Используем link для названия фестиваля, если есть
+              url: url || '',              // URL изображения
+            };
+          })
+        );
+        setAwards(mappedAwards);
+      } catch (error: any) {
+        setError(error.message || 'Failed to load awards.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  const index =
-    ((page % awards.length) + awards.length) % awards.length;
+    loadAwards();
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
       setPage(([p]) => [p + 1, 1]);
     }, 6000);
-
     return () => clearInterval(timer);
   }, []);
+
+  if (isLoading) {
+    return <section className="bg-white py-20 text-center">Loading awards...</section>;
+  }
+
+  if (error) {
+    return <section className="bg-white py-20 text-center text-red-500">Error: {error}</section>;
+  }
+
+  if (!awards.length) return null;
+
+  const index =
+    ((page % awards.length) + awards.length) % awards.length;
 
   return (
     <section className="bg-white py-20 overflow-hidden">
@@ -87,8 +110,8 @@ export default function AwardsCarousel() {
 
             <div className="md:w-1/2 flex justify-center">
               <img
-                src={awards[index].logo}
-                alt="Award logo"
+                src={awards[index].url}
+                alt={awards[index].alt_text || "Award logo"}
                 className="w-64 h-64 object-contain grayscale hover:grayscale-0 transition"
               />
             </div>
