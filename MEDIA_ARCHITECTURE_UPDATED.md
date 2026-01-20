@@ -403,5 +403,3 @@ export interface IMediaStorage {
 - [x] UI Components (VideoCarousel.tsx, PhotoCarousel.tsx)
 - [x] Configuration (next.config.ts)
 - [x] Utilities (media-dimensions.ts)
-
-Архитектура полностью реализована и готова к использованию.
