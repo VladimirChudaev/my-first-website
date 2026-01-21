@@ -18,14 +18,20 @@ export default function PhotoCarousel({ category = 'photo' }: PhotoCarouselProps
     const loadMedia = async () => {
       try {
         const mediaList = await mediaService.getByDomain(category as any);
-        setPhotos(mediaList);
         
-        // Создаем массив имен файлов
-        const filenamesArray = mediaList.map((item: any) => item.filename);
+        // <-- ИЗМЕНЕНО: Фильтруем только файлы с префиксом pc_
+        const filteredMediaList = mediaList.filter((item: any) => 
+          item.filename && item.filename.startsWith('pc_')
+        );
         
-        // Загружаем URL для каждого изображения
+        setPhotos(filteredMediaList); // <-- ИЗМЕНЕНО: Используем отфильтрованный список
+        
+        // Создаем массив имен файлов ИЗ ОТФИЛЬТРОВАННОГО СПИСКА
+        const filenamesArray = filteredMediaList.map((item: any) => item.filename); // <-- ИЗМЕНЕНО
+        
+        // Загружаем URL для каждого изображения ИЗ ОТФИЛЬТРОВАННОГО СПИСКА
         const urls: Record<string, string | null> = {};
-        for (const photo of mediaList) {
+        for (const photo of filteredMediaList) { // <-- ИЗМЕНЕНО: перебираем filteredMediaList
           if (photo.path) {
             urls[photo.filename] = await mediaService.getUrlByFilename(category as any, photo.filename);
           }
@@ -81,6 +87,8 @@ export default function PhotoCarousel({ category = 'photo' }: PhotoCarouselProps
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 className="object-cover"
                 priority={index === 0}
+                // <-- ДОБАВЛЕНО: Отключаем оптимизацию для SVG на всякий случай
+                unoptimized={imageUrl.endsWith('.svg')}
               />
             )}
           </div>
@@ -89,4 +97,3 @@ export default function PhotoCarousel({ category = 'photo' }: PhotoCarouselProps
     </div>
   );
 }
-
