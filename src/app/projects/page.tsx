@@ -1,9 +1,15 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import InnerPageHeader from '@/components/InnerPageHeader';
 import ProjectCarousel from '@/components/ProjectCarousel';
+import { mediaService } from '@/lib/services/MediaService';
 
 export default function ProjectsPage() {
-  // Данные проектов с правильной структурой
-  const projects = {
+  const [projectsWithUrls, setProjectsWithUrls] = useState<typeof staticProjects | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const staticProjects = {
     art: [
       {
         title: "Агитбригада",
@@ -26,7 +32,7 @@ export default function ProjectsPage() {
       {
         title: "Осторожно! Работает лифт!",
         author: "",
-        description: "Компания готовится к производству сериала, в основе которого лежит тема искусственного интеллекта. Фильм покажет, как люди приспосабливаются к новому явлению, как нейросети могут влиять на нашу жизнь. Завершается работа над сценарием, формируется съемочная группа, заканчиваются переговоры с инвесторами.",
+        description: "Компания готовится к производству сериала, в основе которого лежит тема искусственного интеллекта. Фильм покажет, как люди приспосабливаются к новому явление, как нейросети могут влиять на нашу жизнь. Заверяется работа над сценарием, формируется съемочная группа, заканчиваются переговоры с инвесторами.",
         image: "/h_lift.png"
       }
     ],
@@ -54,7 +60,7 @@ export default function ProjectsPage() {
       {
         title: "",
         author: "",
-        description: "Социальная проблематика — одно из основных направлений работы нашей команды. Наши усилия отмечены профессиональными наградами и премиями, в том числе «Профессия — репортер».",
+        description: "Социальная проблематика — одно из основных направлений работы нашей команда. Наши усилия отмечены профессиональными наградами и премиями, в том числе «Профессия — репортер».",
         image: "/t_reporter_pro.png"
       },
       {
@@ -92,12 +98,72 @@ export default function ProjectsPage() {
     ]
   };
 
+  useEffect(() => {
+    const loadAndMergeData = async () => {
+      try {
+        const allProjectMedia = await mediaService.getByDomain('project' as any);
+
+        if (!Array.isArray(allProjectMedia)) {
+          setProjectsWithUrls(staticProjects);
+          return;
+        }
+
+        const urlDictionary: Record<string, string> = {};
+        for (const mediaItem of allProjectMedia) {
+          if (mediaItem.filename) {
+            const publicUrl = await mediaService.getUrlByFilename('project' as any, mediaItem.filename);
+            if (publicUrl) {
+              urlDictionary[mediaItem.filename] = publicUrl;
+            }
+          }
+        }
+
+        const mergedData = {
+          art: staticProjects.art.map(project => ({
+            ...project,
+            image: urlDictionary[project.image.replace(/^\//, '')] || project.image
+          })),
+          documentary: staticProjects.documentary.map(project => ({
+            ...project,
+            image: urlDictionary[project.image.replace(/^\//, '')] || project.image
+          })),
+          tv: staticProjects.tv.map(project => ({
+            ...project,
+            image: urlDictionary[project.image.replace(/^\//, '')] || project.image
+          })),
+          business: staticProjects.business.map(project => ({
+            ...project,
+            image: urlDictionary[project.image.replace(/^\//, '')] || project.image
+          }))
+        };
+
+        setProjectsWithUrls(mergedData);
+      } catch (error) {
+        console.error('Ошибка загрузки изображений:', error);
+        setProjectsWithUrls(staticProjects);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadAndMergeData();
+  }, []);
+
+  if (isLoading || !projectsWithUrls) {
+    return (
+      <>
+        <InnerPageHeader />
+        <div className="min-h-screen bg-white flex items-center justify-center">
+          <p>Загрузка проектов...</p>
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
       <InnerPageHeader />
       <main className="min-h-screen bg-white py-12 md:py-24">
-
-        {/* Блок 1: Художественное кино */}
         <section id="art" className="mb-16 md:mb-24 bg-[#f0f7ff] py-12">
           <div className="container mx-auto px-4 max-w-7xl">
             <div className="flex flex-col md:flex-row items-start md:items-center mb-8 md:mb-12">
@@ -111,16 +177,14 @@ export default function ProjectsPage() {
                 </p>
               </div>
             </div>
-            
             <div className="flex justify-center">
               <div className="w-full max-w-5xl">
-                <ProjectCarousel projects={projects.art} />
+                <ProjectCarousel projects={projectsWithUrls.art} />
               </div>
             </div>
           </div>
         </section>
 
-        {/* Блок 2: Документальное кино */}
         <section id="documentary" className="mb-16 md:mb-24 bg-[#fffaf0] py-12">
           <div className="container mx-auto px-4 max-w-7xl">
             <div className="flex flex-col md:flex-row items-start md:items-center mb-8 md:mb-12">
@@ -134,16 +198,14 @@ export default function ProjectsPage() {
                 </p>
               </div>
             </div>
-            
             <div className="flex justify-center">
               <div className="w-full max-w-5xl">
-                <ProjectCarousel projects={projects.documentary} />
+                <ProjectCarousel projects={projectsWithUrls.documentary} />
               </div>
             </div>
           </div>
         </section>
 
-        {/* Блок 3: Телевизионные проекты */}
         <section id="tv" className="mb-16 md:mb-24 bg-[#f0fff4] py-12">
           <div className="container mx-auto px-4 max-w-7xl">
             <div className="flex flex-col md:flex-row items-start md:items-center mb-8 md:mb-12">
@@ -157,16 +219,14 @@ export default function ProjectsPage() {
                 </p>
               </div>
             </div>
-            
             <div className="flex justify-center">
               <div className="w-full max-w-5xl">
-                <ProjectCarousel projects={projects.tv} isTvCarousel={true} />
+                <ProjectCarousel projects={projectsWithUrls.tv} isTvCarousel={true} />
               </div>
             </div>
           </div>
         </section>
 
-        {/* Блок 4: Кино для бизнеса */}
         <section id="business" className="mb-16 md:mb-24 bg-[#f5f5f7] py-12">
           <div className="container mx-auto px-4 max-w-7xl">
             <div className="flex flex-col md:flex-row items-start md:items-center mb-8 md:mb-12">
@@ -180,15 +240,13 @@ export default function ProjectsPage() {
                 </p>
               </div>
             </div>
-            
             <div className="flex justify-center">
               <div className="w-full max-w-5xl">
-                <ProjectCarousel projects={projects.business} />
+                <ProjectCarousel projects={projectsWithUrls.business} />
               </div>
             </div>
           </div>
         </section>
-
       </main>
     </>
   );
