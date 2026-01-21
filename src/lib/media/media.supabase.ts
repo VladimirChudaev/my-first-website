@@ -12,8 +12,8 @@ async function getMediaByDomainInternal(
     .from('media')
     .select('id, filename, bucket, category, alt_text, title, created_at, is_visible, position, url, link, width, height, path')
     .eq('category', domain)
-    .is('is_visible', true)  // Только видимые элементы
-    .order('position', { ascending: true });  // Сортировка по позиции
+    .is('is_visible', true)
+    .order('position', { ascending: true });
 
   if (error || !data) {
     return [];
@@ -28,7 +28,6 @@ export async function getMediaByDomain(
   return getMediaByDomainInternal(domain, 'asc');
 }
 
-// Функция для получения информации о медиа-файле по ID
 async function getMediaById(id: string) {
   const supabase = createClient();
 
@@ -46,7 +45,6 @@ async function getMediaById(id: string) {
   return mapMediaRow(data);
 }
 
-// Функция для загрузки нового медиа-файла в базу данных
 export async function insertMedia(mediaData: Omit<MediaAsset, 'id'> & { id?: string }) {
   const supabase = createClient();
 
@@ -56,7 +54,7 @@ export async function insertMedia(mediaData: Omit<MediaAsset, 'id'> & { id?: str
       id: mediaData.id,
       category: mediaData.category,
       filename: mediaData.filename,
-      bucket: 'media', // все файлы хранятся в бакете 'media'
+      bucket: 'media',
       alt_text: mediaData.alt_text,
       title: mediaData.title,
       position: mediaData.position ?? 0,
@@ -76,7 +74,6 @@ export async function insertMedia(mediaData: Omit<MediaAsset, 'id'> & { id?: str
   return data ? mapMediaRow(data) : null;
 }
 
-// Функция для обновления метаданных медиа-файла
 export async function updateMedia(id: string, updates: Partial<Omit<MediaAsset, 'id'>>) {
   const supabase = createClient();
 
@@ -97,7 +94,6 @@ export async function updateMedia(id: string, updates: Partial<Omit<MediaAsset, 
   }
 }
 
-// Функция для удаления медиа-файла из базы данных
 export async function deleteMedia(id: string) {
   const supabase = createClient();
 
@@ -115,31 +111,40 @@ export async function deleteMedia(id: string) {
     throw new Error(`Database delete failed: ${error.message}`);
   }
 
-  return mediaToDelete.path; // возвращаем путь для удаления из хранилища
+  return mediaToDelete.path;
 }
 
-// Функция для переупорядочивания медиа-файлов
 export async function updateMediaOrder(category: MediaDomain, orderedIds: string[]) {
   const supabase = createClient();
-
-  // В текущей структуре базы данных нет поля position, поэтому функция временно не реализована
+  // Реализация временно отсутствует
 }
 
-// ИЗМЕНЕНО: Используем прокси-роут для обхода CORS и получения медиа-файлов из Supabase Storage
+// ИСПРАВЛЕНО: Возвращаем прямой публичный URL Supabase Storage вместо прокси-роута
 export async function getMediaUrl(path: string): Promise<string> {
   if (!path) {
     throw new Error('Path is required for getMediaUrl');
   }
   
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  if (!supabaseUrl) {
+    throw new Error('NEXT_PUBLIC_SUPABASE_URL is not defined in environment variables');
+  }
+  
   // Убедимся, что путь корректен - если он начинается с '/', удалим его
   const normalizedPath = path.startsWith('/') ? path.substring(1) : path;
-  // Путь уже содержит категорию (например, 'video/filename.png'), 
-  // поэтому используем его как есть без добавления префикса
-  const pathWithBucket = normalizedPath;
-  return `/api/supabase?path=${encodeURIComponent(pathWithBucket)}`;
+  
+  // Если путь уже содержит бакет (например, 'media/project/filename.png'), 
+  // используем его как есть. Если нет, добавляем бакет 'media'
+  const bucket = process.env.SUPABASE_BUCKET_NAME || 'media';
+  const fullPath = normalizedPath.startsWith(`${bucket}/`) 
+    ? normalizedPath 
+    : `${bucket}/${normalizedPath}`;
+  
+  // Прямой публичный URL Supabase Storage
+  return `${supabaseUrl}/storage/v1/object/public/${fullPath}`;
 }
 
-// Алиасы для соответствия архитектуре "единого источника истины"
+// Алиасы для соответствия архитектуре
 export {
   getMediaByDomain as getMediaByDomainSupabase,
   getMediaUrl as getMediaUrlSupabase,
