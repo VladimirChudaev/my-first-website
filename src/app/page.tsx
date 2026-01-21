@@ -15,14 +15,11 @@ const VideoCarousel = dynamic(
 );
 
 export default function Home() {
-  const images = ["izh_1920x1080.jpg", "chumazaya.jpg"];
-  const intervals = [5000, 5000];
-
   return (
     <main className="bg-white min-h-screen">
       <div className="max-w-[1920px] mx-auto relative overflow-hidden">
         <SiteHeader />
-        <PhotoCarousel images={images} intervals={intervals} />
+        <PhotoCarousel />
         <PartnersCarousel />
       </div>
 

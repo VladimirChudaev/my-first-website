@@ -18,17 +18,14 @@ export default function PhotoCarousel({ category = 'photo' }: PhotoCarouselProps
     const loadMedia = async () => {
       try {
         const mediaList = await mediaService.getByDomain(category as any);
-        const filteredMediaList = mediaList.filter((item: any) =>
-          item.filename.startsWith('pc_')
-        );
-        setPhotos(filteredMediaList);
-
+        setPhotos(mediaList);
+        
         // Создаем массив имен файлов
-        const filenamesArray = filteredMediaList.map((item: any) => item.filename);
+        const filenamesArray = mediaList.map((item: any) => item.filename);
         
         // Загружаем URL для каждого изображения
         const urls: Record<string, string | null> = {};
-        for (const photo of filteredMediaList) {
+        for (const photo of mediaList) {
           if (photo.path) {
             urls[photo.filename] = await mediaService.getUrlByFilename(category as any, photo.filename);
           }
@@ -92,3 +89,4 @@ export default function PhotoCarousel({ category = 'photo' }: PhotoCarouselProps
     </div>
   );
 }
+
