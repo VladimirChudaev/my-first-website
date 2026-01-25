@@ -1,14 +1,32 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { HiMenuAlt3, HiX } from 'react-icons/hi';
 import { FaTelegram, FaVk, FaYoutube, FaEnvelope } from 'react-icons/fa6';
 import Logo from './Logo';
+import { getMediaByDomain, getMediaUrl } from '@/lib/media/media';
 
 export default function SiteHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [zenUrl, setZenUrl] = useState<string>('');
+
+  useEffect(() => {
+    const loadZen = async () => {
+      try {
+        const assets = await getMediaByDomain('photo');
+        const zen = assets.find(a => a.filename === 'zen.svg');
+        if (!zen?.path) return;
+        const url = await getMediaUrl(zen.path);
+        setZenUrl(url);
+      } catch (e) {
+        console.error('Zen icon load error:', e);
+      }
+    };
+
+    loadZen();
+  }, []);
 
   return (
     <header className="absolute top-0 w-full z-[100]">
@@ -16,7 +34,7 @@ export default function SiteHeader() {
         <div className="container mx-auto px-4 md:px-10 h-24 md:h-32 flex justify-between items-center">
           <div className="flex-shrink-0">
             <Link href="/" className="relative block w-32 h-12 md:w-56 md:h-24">
-              <Logo className="object-contain" />
+              <Logo />
             </Link>
           </div>
 
@@ -47,15 +65,17 @@ export default function SiteHeader() {
               <a href="https://rutube.ru/channel/25381755/" target="_blank" rel="noopener noreferrer">
                 <FaYoutube />
               </a>
-              <a href="https://dzen.ru/vtagency" target="_blank" rel="noopener noreferrer">
-                <Image
-                  src="/photo/zen.svg"
-                  alt="Дзен"
-                  width={20}
-                  height={20}
-                  className="invert opacity-80"
-                />
-              </a>
+              {zenUrl && (
+                <a href="https://dzen.ru/vtagency" target="_blank" rel="noopener noreferrer">
+                  <Image
+                    src={zenUrl}
+                    alt="Дзен"
+                    width={20}
+                    height={20}
+                    className="invert opacity-80"
+                  />
+                </a>
+              )}
             </div>
 
             <button

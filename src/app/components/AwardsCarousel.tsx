@@ -2,13 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { mediaService } from '@/lib/services/MediaService';
+import { getMediaByDomain, getMediaUrl } from '@/lib/media/media';
 import { MediaAsset } from '@/lib/media/types';
 
 interface Award extends MediaAsset {
   title: string;
   status: string;
   festival: string;
+  url: string;
 }
 
 const variants = {
@@ -36,26 +37,27 @@ export default function AwardsCarousel() {
     const loadAwards = async () => {
       setIsLoading(true);
       setError(null);
+
       try {
-        const awardsList = await mediaService.getByDomain('award');
-        const filteredAwardsList = awardsList.filter((item: MediaAsset) =>
-          item.filename.startsWith('av_')
+        const assets = await getMediaByDomain('award');
+
+        const filtered = assets.filter(
+          a => a.filename?.startsWith('av_') && a.path
         );
-        const mappedAwards = await Promise.all(
-          filteredAwardsList.map(async (asset) => {
-            const url = asset.path ? await mediaService.getUrlByFilename('award', asset.filename) : undefined;
-            return {
-              ...asset,
-              title: asset.title || '',
-              status: asset.alt_text || '', // Используем alt_text для статуса, если есть
-              festival: asset.link || '',   // Используем link для названия фестиваля, если есть
-              url: url || '',              // URL изображения
-            };
-          })
+
+        const mapped: Award[] = await Promise.all(
+          filtered.map(async (a) => ({
+            ...a,
+            title: a.title || '',
+            status: a.alt_text || '',
+            festival: a.link || '',
+            url: await getMediaUrl(a.path!),
+          }))
         );
-        setAwards(mappedAwards);
-      } catch (error: any) {
-        setError(error.message || 'Failed to load awards.');
+
+        setAwards(mapped);
+      } catch (e: any) {
+        setError(e?.message || 'Failed to load awards');
       } finally {
         setIsLoading(false);
       }
@@ -81,42 +83,51 @@ export default function AwardsCarousel() {
 
   if (!awards.length) return null;
 
-  const index =
-    ((page % awards.length) + awards.length) % awards.length;
+  const index = ((page % awards.length) + awards.length) % awards.length;
 
   return (
     <section className="bg-white py-20 overflow-hidden">
-      <div className="container mx-auto max-w-6xl relative h-[320px]">
-        <AnimatePresence initial={false} custom={direction}>
-          <motion.div
-            key={page}
-            custom={direction}
-            variants={variants}
-            initial="enter"
-            animate="center"
-            exit="exit"
-            transition={{ duration: 0.6 }}
-            className="absolute inset-0 flex flex-col md:flex-row items-center gap-12"
-          >
-            <div className="md:w-1/2">
-              <h2 className="text-3xl mb-4">{awards[index].title}</h2>
-              <p className="text-gray-500 italic mb-6">
-                — {awards[index].status}
-              </p>
-              <p className="font-bold uppercase text-sm">
-                {awards[index].festival}
-              </p>
-            </div>
+      <div className="mx-auto w-full max-w-7xl px-12">
+        <div className="relative h-[320px] flex items-center justify-center">
 
-            <div className="md:w-1/2 flex justify-center">
-              <img
-                src={awards[index].url}
-                alt={awards[index].alt_text || "Award logo"}
-                className="w-64 h-64 object-contain grayscale hover:grayscale-0 transition"
-              />
-            </div>
-          </motion.div>
-        </AnimatePresence>
+          <AnimatePresence initial={false} custom={direction}>
+            <motion.div
+              key={page}
+              custom={direction}
+              variants={variants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ duration: 0.6 }}
+              className="w-full flex flex-col md:flex-row items-center justify-between gap-12"
+            >
+
+              <div className="md:w-1/2 text-center md:text-left">
+                <h2 className="text-3xl mb-4">
+                  {awards[index].title}
+                </h2>
+
+                <p className="text-gray-500 italic mb-6">
+                  — {awards[index].status}
+                </p>
+
+                <p className="font-bold uppercase text-sm">
+                  {awards[index].festival}
+                </p>
+              </div>
+
+              <div className="md:w-1/2 flex justify-center">
+                <img
+                  src={awards[index].url}
+                  alt={awards[index].alt_text || 'Award logo'}
+                  className="w-64 h-64 object-contain grayscale hover:grayscale-0 transition"
+                />
+              </div>
+
+            </motion.div>
+          </AnimatePresence>
+
+        </div>
       </div>
     </section>
   );

@@ -1,37 +1,39 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { mediaService } from '@/lib/services/MediaService';
+import { getMediaByDomain, getMediaUrl } from '@/lib/media/media';
 
 interface LogoProps {
   className?: string;
 }
 
 export default function Logo({ className }: LogoProps) {
-  const [logoUrl, setLogoUrl] = useState<string>('/photo/logo.png'); // fallback на старый путь
+  const [logoUrl, setLogoUrl] = useState<string>('');
   const [altText, setAltText] = useState<string>('Logo');
 
   useEffect(() => {
-    const fetchLogo = async () => {
+    const loadLogo = async () => {
       try {
-        const logoAssets = await mediaService.getByDomain('logo');
-        if (logoAssets.length > 0) {
-          const logo = logoAssets[0];
-          const url = await mediaService.getUrlByFilename('logo', logo.filename);
-          if (url) {
-            setLogoUrl(url);
-            setAltText(logo.alt_text || 'Logo');
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching logo:', error);
-        // Оставляем fallback значение
+        const assets = await getMediaByDomain('photo');
+        const logo = assets.find(a =>
+          a.filename?.toLowerCase().startsWith('logo')
+        );
+
+        if (!logo?.path) return;
+
+        const url = await getMediaUrl(logo.path);
+        setLogoUrl(url);
+        setAltText(logo.alt_text || 'Logo');
+      } catch (e) {
+        console.error('Logo load error:', e);
       }
     };
 
-    fetchLogo();
+    loadLogo();
   }, []);
+
+  if (!logoUrl) return null;
 
   return (
     <div className={`relative ${className}`} style={{ width: '100%', height: '100%' }}>

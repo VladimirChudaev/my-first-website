@@ -2,34 +2,39 @@
 
 import { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
-import { mediaService } from '@/lib/services/MediaService';
+import { getMediaByDomain, getMediaUrl } from '@/lib/media/media';
 import { MediaAsset } from '@/lib/media/types';
 
+interface VideoAsset extends MediaAsset {
+  previewUrl?: string;
+}
+
 export default function VideoCarousel() {
-  const [videos, setVideos] = useState<MediaAsset[]>([]);
-  const [imageUrls, setImageUrls] = useState<Record<string, string | null>>({});
+  const [videos, setVideos] = useState<VideoAsset[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const load = async () => {
       try {
-        const data = await mediaService.getByDomain('video');
-        setVideos(data);
+        const data = await getMediaByDomain('video');
 
-        // Загрузка URL изображений для видео
-        const urls: Record<string, string | null> = {};
-        for (const video of data) {
-          if (video.path) {
-            urls[video.id] = await mediaService.getUrlByFilename('video', video.filename);
-          }
-        }
-        setImageUrls(urls);
+        const filtered = data.filter(v => v.path);
+
+        const mapped: VideoAsset[] = await Promise.all(
+          filtered.map(async (video) => ({
+            ...video,
+            previewUrl: await getMediaUrl(video.path!),
+          }))
+        );
+
+        setVideos(mapped);
       } catch (error) {
         console.error('Error loading videos:', error);
-        setVideos([]); // Ensure videos is an empty array on error
+        setVideos([]);
       }
     };
+
     load();
   }, []);
 
@@ -45,7 +50,7 @@ export default function VideoCarousel() {
     };
   }, [videos.length]);
 
-  if (videos.length === 0) return null;
+  if (!videos.length) return null;
 
   const getVisibleSlides = () => {
     const total = videos.length;
@@ -53,6 +58,7 @@ export default function VideoCarousel() {
 
     const prev = (currentIndex - 1 + total) % total;
     const next = (currentIndex + 1) % total;
+
     return [videos[prev], videos[currentIndex], videos[next]];
   };
 
@@ -73,16 +79,18 @@ export default function VideoCarousel() {
                 rel="noopener noreferrer"
                 className="relative block w-full h-full"
               >
-                {video.path && imageUrls[video.id] && (
+                {video.previewUrl && (
                   <Image
-                    src={imageUrls[video.id]!}
+                    src={video.previewUrl}
                     alt={video.alt_text || ''}
                     fill
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     className="object-cover"
                     priority
+                    unoptimized={video.previewUrl.endsWith('.svg')}
                   />
                 )}
+
                 <div className="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/40 transition">
                   <span className="text-white text-2xl">▶</span>
                 </div>
