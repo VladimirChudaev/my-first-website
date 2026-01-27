@@ -14,3 +14,5 @@ export default function NewsPage() {
     </>
   );
 }
+
+export const __newsPage = true;
