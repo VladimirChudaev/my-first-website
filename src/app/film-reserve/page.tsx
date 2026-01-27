@@ -1,3 +1,5 @@
+'use client';
+
 import InnerPageHeader from '@/components/InnerPageHeader';
 
 export default function FilmReservePage() {
@@ -12,5 +14,3 @@ export default function FilmReservePage() {
     </>
   );
 }
-
-export const __filmReservePage = true;

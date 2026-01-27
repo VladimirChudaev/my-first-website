@@ -1,3 +1,5 @@
+'use client';
+
 import InnerPageHeader from '@/components/InnerPageHeader';
 
 export default function NewsPage() {
@@ -14,5 +16,3 @@ export default function NewsPage() {
     </>
   );
 }
-
-export const __newsPage = true;
