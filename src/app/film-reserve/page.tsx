@@ -1,3 +1,5 @@
+'use client';
+
 import InnerPageHeader from '@/components/InnerPageHeader';
 
 export default function FilmReservePage() {
