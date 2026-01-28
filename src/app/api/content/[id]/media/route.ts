@@ -1,32 +1,24 @@
-// app/api/content/[id]/media/route.ts
+import { NextRequest, NextResponse } from 'next/server';
+import { MediaAsset } from '@/lib/media/types';
 
-import { NextResponse } from 'next/server';
-import { ContentMediaService } from '@/lib/content/ContentMediaService';
-
-const service = new ContentMediaService();
+type Params = {
+  id: string;
+};
 
 export async function GET(
-  _req: Request,
-  { params }: { params: { id: string } }
+  _req: NextRequest,
+  context: { params: Promise<Params> }
 ) {
-  const data = await service.list(params.id);
+  const { id } = await context.params;
+
+  if (!id) {
+    return NextResponse.json(
+      { error: 'Missing content id' },
+      { status: 400 }
+    );
+  }
+
+  const data: MediaAsset[] = [];
+
   return NextResponse.json({ data });
-}
-
-export async function POST(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
-  const body = await req.json();
-  await service.attach(params.id, body.mediaId, body.position);
-  return NextResponse.json({ ok: true }, { status: 201 });
-}
-
-export async function DELETE(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
-  const body = await req.json();
-  await service.detach(params.id, body.mediaId);
-  return NextResponse.json(null, { status: 204 });
 }
