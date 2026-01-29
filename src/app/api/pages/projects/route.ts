@@ -1,29 +1,12 @@
-// app/api/pages/projects/route.ts
+import { NextRequest, NextResponse } from 'next/server';
 
-import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/server';
+type Params = {
+  id?: string;
+};
 
-export async function GET() {
-  const supabase = await createClient();
-
-  const { data, error } = await supabase
-    .from('content')
-    .select('*')
-    .eq('page', 'projects')
-    .order('position', { ascending: true });
-
-  if (error) throw error;
-  return NextResponse.json({ data });
-}
-
-export async function PATCH(req: Request) {
-  const supabase = await createClient();
-  const body = await req.json();
-
-  const { error } = await supabase
-    .from('content')
-    .upsert(body, { onConflict: 'id' });
-
-  if (error) throw error;
-  return NextResponse.json({ ok: true });
+export async function GET(
+  _req: NextRequest,
+  context: { params: Params }
+) {
+  return NextResponse.json({ data: null });
 }

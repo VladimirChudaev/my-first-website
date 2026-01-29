@@ -1,7 +1,12 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET() {
-  return NextResponse.json({
-    data: [],
-  });
+type Params = {
+  id?: string;
+};
+
+export async function GET(
+  _req: NextRequest,
+  context: { params: Params }
+) {
+  return NextResponse.json({ data: null });
 }

@@ -1,24 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { MediaAsset } from '@/lib/media/types';
 
 type Params = {
-  id: string;
+  id?: string;
 };
 
 export async function GET(
   _req: NextRequest,
-  context: { params: Promise<Params> }
+  context: { params: Params }
 ) {
-  const { id } = await context.params;
-
-  if (!id) {
-    return NextResponse.json(
-      { error: 'Missing content id' },
-      { status: 400 }
-    );
-  }
-
-  const data: MediaAsset[] = [];
-
-  return NextResponse.json({ data });
+  return NextResponse.json({ data: null });
 }
