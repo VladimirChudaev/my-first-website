@@ -1,12 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-type Params = {
-  id?: string;
-};
-
-export async function GET(
-  _req: NextRequest,
-  context: { params: Params }
-) {
+export async function GET(_req: NextRequest) {
   return NextResponse.json({ data: null });
 }
