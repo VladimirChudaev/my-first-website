@@ -1,6 +1,5 @@
-// src/app/api/pages/home/route.ts
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
-export async function GET(_req: NextRequest) {
+export async function GET() {
   return NextResponse.json({ data: null });
 }
