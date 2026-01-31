@@ -1,4 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
+import {
+  getNewsById,
+  updateNewsById,
+  deleteNewsById,
+} from '@/lib/news/service';
 
 type Params = {
   id: string;
@@ -9,15 +14,18 @@ export async function GET(
   context: { params: Promise<Params> }
 ) {
   const { id } = await context.params;
-  return NextResponse.json({ data: null });
+  const result = await getNewsById(id);
+  return NextResponse.json(result);
 }
 
 export async function PUT(
-  _req: NextRequest,
+  req: NextRequest,
   context: { params: Promise<Params> }
 ) {
   const { id } = await context.params;
-  return NextResponse.json({ data: null });
+  const body = await req.json();
+  const result = await updateNewsById(id, body);
+  return NextResponse.json(result);
 }
 
 export async function DELETE(
@@ -25,5 +33,6 @@ export async function DELETE(
   context: { params: Promise<Params> }
 ) {
   const { id } = await context.params;
+  await deleteNewsById(id);
   return NextResponse.json({ success: true });
 }

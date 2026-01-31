@@ -32,3 +32,6 @@ export async function deleteNews(
 ): Promise<{ success: true }> {
   return { success: true };
 }
+
+/* ADMIN aliases */
+export { updateNews as updateNewsById, deleteNews as deleteNewsById };
