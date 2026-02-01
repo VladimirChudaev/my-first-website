@@ -1,16 +1,17 @@
+// src/app/admin/news/page.tsx
 import Link from 'next/link';
 
-export default function AdminPagesListPage() {
+export default function AdminNewsListPage() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Pages</h1>
+        <h1 className="text-2xl font-semibold">News</h1>
 
         <Link
-          href="/admin/pages/new"
+          href="/admin/news/new"
           className="px-4 py-2 rounded bg-black text-white text-sm"
         >
-          Add page
+          Add news
         </Link>
       </div>
 
@@ -30,7 +31,9 @@ export default function AdminPagesListPage() {
               <td className="p-3">—</td>
               <td className="p-3">—</td>
               <td className="p-3">—</td>
-              <td className="p-3 text-gray-400">—</td>
+              <td className="p-3">
+                <span className="text-gray-400">—</span>
+              </td>
             </tr>
           </tbody>
         </table>

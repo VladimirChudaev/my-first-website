@@ -1,16 +1,16 @@
 import Link from 'next/link';
 
-export default function AdminPagesListPage() {
+export default function AdminContentListPage() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Pages</h1>
+        <h1 className="text-2xl font-semibold">Content</h1>
 
         <Link
-          href="/admin/pages/new"
+          href="/admin/content/new"
           className="px-4 py-2 rounded bg-black text-white text-sm"
         >
-          Add page
+          Add content
         </Link>
       </div>
 
@@ -20,6 +20,7 @@ export default function AdminPagesListPage() {
             <tr className="text-left">
               <th className="p-3">Title</th>
               <th className="p-3">Slug</th>
+              <th className="p-3">Scope</th>
               <th className="p-3">Visible</th>
               <th className="p-3 w-[120px]">Actions</th>
             </tr>
@@ -27,6 +28,7 @@ export default function AdminPagesListPage() {
 
           <tbody>
             <tr className="border-b last:border-0">
+              <td className="p-3">—</td>
               <td className="p-3">—</td>
               <td className="p-3">—</td>
               <td className="p-3">—</td>
