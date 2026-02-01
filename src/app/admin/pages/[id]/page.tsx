@@ -1,7 +1,7 @@
-export default function AdminContentEditPage() {
+export default function AdminPagesEditPage() {
   return (
     <div className="space-y-6 max-w-2xl">
-      <h1 className="text-2xl font-semibold">Edit content</h1>
+      <h1 className="text-2xl font-semibold">Edit page</h1>
 
       <form className="space-y-4">
         <input
@@ -13,13 +13,8 @@ export default function AdminContentEditPage() {
         <input
           className="w-full border rounded px-3 py-2"
           placeholder="Slug"
-          defaultValue="—"
+          defaultValue="/—"
         />
-
-        <select className="w-full border rounded px-3 py-2">
-          <option value="global">Global</option>
-          <option value="page">Page</option>
-        </select>
 
         <textarea
           className="w-full border rounded px-3 py-2 min-h-[120px]"
