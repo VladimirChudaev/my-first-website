@@ -1,5 +1,21 @@
-// src/app/admin/news/page.tsx
 import Link from 'next/link';
+
+type NewsRow = {
+  id: string;
+  title: string;
+  slug: string;
+  is_visible: boolean;
+};
+
+// временная заглушка
+const mockData: NewsRow[] = [
+  {
+    id: 'mock-id',
+    title: '—',
+    slug: '—',
+    is_visible: false,
+  },
+];
 
 export default function AdminNewsListPage() {
   return (
@@ -27,14 +43,30 @@ export default function AdminNewsListPage() {
           </thead>
 
           <tbody>
-            <tr className="border-b last:border-0">
-              <td className="p-3">—</td>
-              <td className="p-3">—</td>
-              <td className="p-3">—</td>
-              <td className="p-3">
-                <span className="text-gray-400">—</span>
-              </td>
-            </tr>
+            {mockData.map((row) => (
+              <tr key={row.id} className="border-b last:border-0">
+                <td className="p-3">{row.title}</td>
+                <td className="p-3">{row.slug}</td>
+                <td className="p-3">
+                  {row.is_visible ? 'Yes' : 'No'}
+                </td>
+                <td className="p-3 flex gap-2">
+                  <Link
+                    href={`/admin/news/${row.id}`}
+                    className="text-sm underline"
+                  >
+                    Edit
+                  </Link>
+
+                  <button
+                    className="text-sm text-red-600"
+                    disabled
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>

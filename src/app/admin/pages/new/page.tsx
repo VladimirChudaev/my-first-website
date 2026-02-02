@@ -1,33 +1,46 @@
-export default function AdminPagesNewPage() {
+import Link from 'next/link';
+
+export default function AdminPageCreatePage() {
   return (
-    <div className="space-y-6 max-w-2xl">
-      <h1 className="text-2xl font-semibold">New page</h1>
+    <div className="space-y-6 max-w-3xl">
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-semibold">New page</h1>
+
+        <Link href="/admin/pages" className="text-sm underline">
+          Back to list
+        </Link>
+      </div>
 
       <form className="space-y-4">
-        <input
-          className="w-full border rounded px-3 py-2"
-          placeholder="Title"
-        />
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Title
+          </label>
+          <input className="w-full border rounded px-3 py-2" />
+        </div>
 
-        <input
-          className="w-full border rounded px-3 py-2"
-          placeholder="Slug (/about)"
-        />
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Slug
+          </label>
+          <input className="w-full border rounded px-3 py-2" />
+        </div>
 
-        <textarea
-          className="w-full border rounded px-3 py-2 min-h-[120px]"
-          placeholder="Body"
-        />
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Body
+          </label>
+          <textarea className="w-full border rounded px-3 py-2 min-h-[200px]" />
+        </div>
 
-        <label className="flex items-center gap-2 text-sm">
-          <input type="checkbox" />
-          Visible
-        </label>
+        <div>
+          <label className="inline-flex items-center gap-2">
+            <input type="checkbox" defaultChecked />
+            Visible
+          </label>
+        </div>
 
-        <button
-          type="submit"
-          className="px-4 py-2 bg-black text-white rounded"
-        >
+        <button className="px-4 py-2 rounded bg-black text-white text-sm">
           Create
         </button>
       </form>
