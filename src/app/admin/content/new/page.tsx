@@ -1,46 +1,86 @@
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 export default function AdminContentCreatePage() {
+  const router = useRouter();
+
+  const [title, setTitle] = useState('');
+  const [slug, setSlug] = useState('');
+  const [body, setBody] = useState('');
+  const [scope, setScope] = useState<'global' | 'page'>('global');
+  const [isVisible, setIsVisible] = useState(true);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+
+    await fetch('/api/admin/content', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title,
+        slug,
+        body,
+        scope,
+        is_visible: isVisible,
+      }),
+    });
+
+    router.push('/admin/content');
+  }
+
   return (
-    <div className="max-w-2xl space-y-6">
+    <div className="space-y-6 max-w-3xl">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">New content</h1>
-
         <Link href="/admin/content" className="text-sm underline">
           Back to list
         </Link>
       </div>
 
-      <form className="space-y-4">
-        <div>
-          <label className="block text-sm mb-1">Title</label>
-          <input className="w-full border rounded px-3 py-2" />
-        </div>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <input
+          placeholder="Title"
+          className="w-full border rounded px-3 py-2"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          required
+        />
 
-        <div>
-          <label className="block text-sm mb-1">Slug</label>
-          <input className="w-full border rounded px-3 py-2" />
-        </div>
+        <input
+          placeholder="Slug"
+          className="w-full border rounded px-3 py-2"
+          value={slug}
+          onChange={(e) => setSlug(e.target.value)}
+          required
+        />
 
-        <div>
-          <label className="block text-sm mb-1">Scope</label>
-          <select className="w-full border rounded px-3 py-2">
-            <option value="global">Global</option>
-            <option value="page">Page</option>
-          </select>
-        </div>
+        <textarea
+          placeholder="Body"
+          className="w-full border rounded px-3 py-2 min-h-[200px]"
+          value={body}
+          onChange={(e) => setBody(e.target.value)}
+        />
 
-        <div>
-          <label className="block text-sm mb-1">Body</label>
-          <textarea className="w-full border rounded px-3 py-2 min-h-[160px]" />
-        </div>
+        <select
+          className="w-full border rounded px-3 py-2"
+          value={scope}
+          onChange={(e) => setScope(e.target.value as any)}
+        >
+          <option value="global">Global</option>
+          <option value="page">Page</option>
+        </select>
 
-        <div className="flex items-center gap-2">
-          <input type="checkbox" id="visible" />
-          <label htmlFor="visible" className="text-sm">
-            Visible
-          </label>
-        </div>
+        <label className="inline-flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={isVisible}
+            onChange={(e) => setIsVisible(e.target.checked)}
+          />
+          Visible
+        </label>
 
         <button className="px-4 py-2 rounded bg-black text-white text-sm">
           Create

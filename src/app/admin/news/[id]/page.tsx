@@ -1,64 +1,95 @@
-import Link from 'next/link';
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 type Props = {
-  params: {
-    id: string;
-  };
+  params: { id: string };
 };
 
 export default function AdminNewsEditPage({ params }: Props) {
-  const { id } = params;
+  const router = useRouter();
+
+  const [title, setTitle] = useState('');
+  const [slug, setSlug] = useState('');
+  const [body, setBody] = useState('');
+  const [isVisible, setIsVisible] = useState(true);
+  const [loading, setLoading] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+
+    await fetch(`/api/admin/news/${params.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title,
+        slug,
+        body,
+        is_visible: isVisible,
+      }),
+    });
+
+    setLoading(false);
+    router.push('/admin/news');
+  }
+
+  async function handleDelete() {
+    if (!confirm('Delete this news item?')) return;
+
+    await fetch(`/api/admin/news/${params.id}`, {
+      method: 'DELETE',
+    });
+
+    router.push('/admin/news');
+  }
 
   return (
-    <div className="max-w-2xl space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Edit news</h1>
+    <div className="space-y-6 max-w-3xl">
+      <h1 className="text-2xl font-semibold">Edit news</h1>
 
-        <Link
-          href="/admin/news"
-          className="text-sm underline"
-        >
-          Back to list
-        </Link>
-      </div>
-
-      <form className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-sm mb-1">Title</label>
           <input
-            type="text"
             className="w-full border rounded px-3 py-2"
-            placeholder="Title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
           />
         </div>
 
         <div>
           <label className="block text-sm mb-1">Slug</label>
           <input
-            type="text"
             className="w-full border rounded px-3 py-2"
-            placeholder="slug"
+            value={slug}
+            onChange={(e) => setSlug(e.target.value)}
           />
         </div>
 
         <div>
           <label className="block text-sm mb-1">Body</label>
           <textarea
-            className="w-full border rounded px-3 py-2 min-h-[160px]"
-            placeholder="Text"
+            className="w-full border rounded px-3 py-2 min-h-[200px]"
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
           />
         </div>
 
-        <div className="flex items-center gap-2">
-          <input type="checkbox" id="visible" />
-          <label htmlFor="visible" className="text-sm">
-            Visible
-          </label>
-        </div>
+        <label className="inline-flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={isVisible}
+            onChange={(e) => setIsVisible(e.target.checked)}
+          />
+          Visible
+        </label>
 
-        <div className="flex gap-3 pt-4">
+        <div className="flex items-center gap-3 pt-4">
           <button
             type="submit"
+            disabled={loading}
             className="px-4 py-2 rounded bg-black text-white text-sm"
           >
             Save
@@ -66,17 +97,13 @@ export default function AdminNewsEditPage({ params }: Props) {
 
           <button
             type="button"
+            onClick={handleDelete}
             className="px-4 py-2 rounded border text-sm"
-            disabled
           >
             Delete
           </button>
         </div>
       </form>
-
-      <div className="text-xs text-gray-400">
-        id: {id}
-      </div>
     </div>
   );
 }

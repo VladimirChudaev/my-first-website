@@ -1,83 +1,112 @@
 // src/app/admin/content/[id]/page.tsx
-import { notFound } from 'next/navigation';
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 type Props = {
   params: { id: string };
 };
 
-async function getContent(id: string) {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_SITE_URL}/api/admin/content/${id}`,
-    { cache: 'no-store' }
-  );
+export default function AdminContentEditPage({ params }: Props) {
+  const router = useRouter();
 
-  if (!res.ok) return null;
-  return res.json();
-}
+  const [title, setTitle] = useState('');
+  const [slug, setSlug] = useState('');
+  const [body, setBody] = useState('');
+  const [scope, setScope] = useState<'global' | 'page'>('global');
+  const [isVisible, setIsVisible] = useState(true);
 
-export default async function AdminContentEditPage({ params }: Props) {
-  const data = await getContent(params.id);
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
 
-  if (!data) {
-    notFound();
+    await fetch(`/api/admin/content/${params.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title,
+        slug,
+        body,
+        scope,
+        is_visible: isVisible,
+      }),
+    });
+
+    router.push('/admin/content');
+  }
+
+  async function handleDelete() {
+    if (!confirm('Delete content block?')) return;
+
+    await fetch(`/api/admin/content/${params.id}`, {
+      method: 'DELETE',
+    });
+
+    router.push('/admin/content');
   }
 
   return (
     <div className="space-y-6 max-w-3xl">
-      <h1 className="text-2xl font-semibold">Edit content</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-semibold">Edit content</h1>
+        <Link href="/admin/content" className="text-sm underline">
+          Back to list
+        </Link>
+      </div>
 
-      <form className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium mb-1">
-            Title
-          </label>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <input
+          placeholder="Title"
+          className="w-full border rounded px-3 py-2"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+
+        <input
+          placeholder="Slug"
+          className="w-full border rounded px-3 py-2"
+          value={slug}
+          onChange={(e) => setSlug(e.target.value)}
+        />
+
+        <textarea
+          placeholder="Body"
+          className="w-full border rounded px-3 py-2 min-h-[200px]"
+          value={body}
+          onChange={(e) => setBody(e.target.value)}
+        />
+
+        <select
+          className="w-full border rounded px-3 py-2"
+          value={scope}
+          onChange={(e) => setScope(e.target.value as any)}
+        >
+          <option value="global">Global</option>
+          <option value="page">Page</option>
+        </select>
+
+        <label className="inline-flex items-center gap-2">
           <input
-            defaultValue={data.title ?? ''}
-            className="w-full border rounded px-3 py-2"
+            type="checkbox"
+            checked={isVisible}
+            onChange={(e) => setIsVisible(e.target.checked)}
           />
-        </div>
+          Visible
+        </label>
 
-        <div>
-          <label className="block text-sm font-medium mb-1">
-            Slug
-          </label>
-          <input
-            defaultValue={data.slug ?? ''}
-            className="w-full border rounded px-3 py-2"
-          />
-        </div>
+        <div className="flex gap-3 pt-4">
+          <button className="px-4 py-2 rounded bg-black text-white text-sm">
+            Save
+          </button>
 
-        <div>
-          <label className="block text-sm font-medium mb-1">
-            Body
-          </label>
-          <textarea
-            defaultValue={data.body ?? ''}
-            className="w-full border rounded px-3 py-2 min-h-[200px]"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium mb-1">
-            Scope
-          </label>
-          <select
-            defaultValue={data.scope ?? 'global'}
-            className="w-full border rounded px-3 py-2"
+          <button
+            type="button"
+            onClick={handleDelete}
+            className="px-4 py-2 rounded border text-sm"
           >
-            <option value="global">Global</option>
-            <option value="page">Page</option>
-          </select>
-        </div>
-
-        <div>
-          <label className="inline-flex items-center gap-2">
-            <input
-              type="checkbox"
-              defaultChecked={Boolean(data.is_visible)}
-            />
-            Visible
-          </label>
+            Delete
+          </button>
         </div>
       </form>
     </div>
