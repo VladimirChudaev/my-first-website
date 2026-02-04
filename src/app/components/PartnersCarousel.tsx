@@ -1,14 +1,16 @@
-import { getPartners } from '@/lib/queries/partners';
+import { getPartners } from '@/lib/queries/partners'
 
 export default async function PartnersCarousel() {
-  const partners = await getPartners();
+  const partners = await getPartners()
+
+  if (!partners?.length) return null
 
   return (
     <div className="flex gap-6 overflow-x-auto">
       {partners.map((p) => {
-        const media = p.media[0]; // 👈 БЕРЁМ ПЕРВЫЙ ЭЛЕМЕНТ
+        const media = p.media?.[0]   // ← ВОТ ОН
 
-        if (!media) return null;
+        if (!media) return null
 
         return (
           <a
@@ -23,8 +25,8 @@ export default async function PartnersCarousel() {
               className="h-20 object-contain"
             />
           </a>
-        );
+        )
       })}
     </div>
-  );
+  )
 }
