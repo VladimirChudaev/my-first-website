@@ -16,10 +16,10 @@ export default async function PartnersPage() {
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7 gap-6 max-w-7xl mx-auto">
             {partners.map((p) => {
-              const media = p.media[0];
+              const media = p.media?.[0];
               if (!media) return null;
 
-              const Wrapper = p.url ? 'a' : 'div';
+              const Wrapper: any = p.url ? 'a' : 'div';
 
               return (
                 <Wrapper
