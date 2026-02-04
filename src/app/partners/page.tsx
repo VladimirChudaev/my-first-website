@@ -1,26 +1,8 @@
 import InnerPageHeader from '@/components/InnerPageHeader';
-import { getMediaByDomain, getMediaUrl } from '@/lib/media/media';
-import { MediaAsset } from '@/lib/media/types';
-
-interface Partner {
-  name: string;
-  url?: string;
-  logo: string;
-}
+import { getPartners } from '@/lib/queries/partners';
 
 export default async function PartnersPage() {
-  const assets = await getMediaByDomain('partner');
-
-  const partners: Partner[] = await Promise.all(
-    assets
-      .filter(a => a.is_visible !== false && a.path)
-      .sort((a, b) => a.position - b.position)
-      .map(async (a) => ({
-        name: a.title || '',
-        url: a.link || undefined,
-        logo: await getMediaUrl(a.path!),
-      }))
-  );
+  const partners = await getPartners();
 
   return (
     <>
@@ -33,25 +15,28 @@ export default async function PartnersPage() {
           </h1>
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7 gap-6 max-w-7xl mx-auto">
-            {partners.map((partner, index) => {
-              const Wrapper = partner.url ? 'a' : 'div';
+            {partners.map((p) => {
+              const media = p.media[0];
+              if (!media) return null;
+
+              const Wrapper = p.url ? 'a' : 'div';
 
               return (
                 <Wrapper
-                  key={index}
-                  {...(partner.url
+                  key={p.id}
+                  {...(p.url
                     ? {
-                        href: partner.url,
+                        href: p.url,
                         target: '_blank',
                         rel: 'noopener noreferrer',
                       }
                     : {})}
                   className="flex items-center justify-center p-4 opacity-90 hover:opacity-100 transition-opacity"
-                  aria-label={partner.name}
+                  aria-label={p.name}
                 >
                   <img
-                    src={partner.logo}
-                    alt={partner.name}
+                    src={media.url}
+                    alt={media.alt_text ?? p.name}
                     className="max-h-16 w-auto object-contain"
                     loading="lazy"
                   />
