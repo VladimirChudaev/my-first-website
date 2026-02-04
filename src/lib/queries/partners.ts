@@ -1,17 +1,16 @@
-import { createClient } from '@/lib/server';
+import { createClient } from '@/lib/supabase/client'
 
 export async function getPartners() {
-  const supabase = await createClient();
+  const supabase = createClient() // ← ВАЖНО: ВЫЗОВ
 
   const { data, error } = await supabase
     .from('partners')
     .select('*')
-    .order('position', { ascending: true });
+    .order('position')
 
   if (error) {
-    console.error('getPartners error:', error);
-    return [];
+    throw error
   }
 
-  return data ?? [];
+  return data
 }
