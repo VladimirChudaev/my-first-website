@@ -1,24 +1,18 @@
-import { createClient } from '@/lib/server';
+import { createClient } from '@/lib/supabase/browser'
 
 export async function getPartners() {
-  const supabase = await createClient();
+  const supabase = createClient()
 
   const { data, error } = await supabase
-    .from('partners')
-    .select(`
-      id,
-      name,
-      url,
-      position,
-      media:media_id (
-        url,
-        alt_text
-      )
-    `)
+    .from('partners_view') // или partners
+    .select('*')
     .eq('is_visible', true)
-    .order('position', { ascending: true });
+    .order('position')
 
-  if (error) throw error;
+  if (error) {
+    console.error('getPartners error', error)
+    return []
+  }
 
-  return data;
+  return data
 }
