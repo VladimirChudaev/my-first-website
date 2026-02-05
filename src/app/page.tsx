@@ -1,13 +1,15 @@
 'use client';
 
-import dynamic from 'next/dynamic';
+export const dynamic = 'force-dynamic';
+
+import nextDynamic from 'next/dynamic';
 
 import PhotoCarousel from './components/PhotoCarousel';
 import PartnersCarousel from './components/PartnersCarousel';
 import AwardsCarousel from './components/AwardsCarousel';
 import CompanyProjects from './components/CompanyProjects';
 
-const VideoCarousel = dynamic(
+const VideoCarousel = nextDynamic(
   () => import('./components/VideoCarousel'),
   { ssr: false }
 );

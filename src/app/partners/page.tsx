@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import InnerPageHeader from '@/components/InnerPageHeader';
 import { getPartners } from '@/lib/queries/partners';
 
