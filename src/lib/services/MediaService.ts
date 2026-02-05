@@ -21,18 +21,28 @@ export class MediaService {
     return MediaService.getPublicUrl(`${category}/${filename}`);
   }
 
-  // НОВЫЙ МЕТОД: Создает объект-карту { filename: url }
   static async getMediaMap(category: string) {
     const items = await MediaService.getByDomain(category);
     const map: Record<string, string> = {};
-    
     items.forEach(item => {
       if (item.filename) {
         map[item.filename] = MediaService.getPublicUrl(`${category}/${item.filename}`);
       }
     });
-    
     return map;
+  }
+
+  // ТОТ САМЫЙ МЕТОД, который просит тест
+  static async findByFilename(category: string, filename: string) {
+    const { data, error } = await supabase
+      .from('media')
+      .select('*')
+      .eq('category', category)
+      .eq('filename', filename)
+      .single();
+
+    if (error) return null;
+    return data;
   }
 }
 
@@ -40,6 +50,7 @@ export const mediaService = {
   getPublicUrl: (path: string | null, bucket?: string) => MediaService.getPublicUrl(path, bucket),
   getByDomain: (domainValue: string) => MediaService.getByDomain(domainValue),
   getUrlByFilename: (category: string, filename: string) => MediaService.getUrlByFilename(category, filename),
-  // Добавляем сюда:
-  getMediaMap: (category: string) => MediaService.getMediaMap(category)
+  getMediaMap: (category: string) => MediaService.getMediaMap(category),
+  // Добавляем в экспорт:
+  findByFilename: (category: string, filename: string) => MediaService.findByFilename(category, filename)
 };
