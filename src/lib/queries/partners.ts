@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
+import { getMediaUrl } from '@/lib/media/media';
 
 export interface Partner {
   id: string;
@@ -23,8 +24,7 @@ export async function getPartners(): Promise<Partner[]> {
       position,
       media:media_id (
         path,
-        alt_text,
-        bucket
+        alt_text
       )
     `)
     .eq('is_visible', true)
@@ -35,24 +35,29 @@ export async function getPartners(): Promise<Partner[]> {
     return [];
   }
 
-  return data.map((p: any) => {
-    const media = Array.isArray(p.media) ? p.media[0] : null;
+  const partners = await Promise.all(
+    data.map(async (p: any) => {
+      const mediaRow = Array.isArray(p.media) ? p.media[0] : null;
 
-    return {
-      id: p.id,
-      name: p.name,
-      url: p.url,
-      position: p.position,
-      media: media
+      const media = mediaRow?.path
         ? [
             {
-              url: supabase.storage
-                .from(media.bucket)
-                .getPublicUrl(media.path).data.publicUrl,
-              alt_text: media.alt_text ?? p.name,
+              url: await getMediaUrl(mediaRow.path),
+              alt_text: mediaRow.alt_text ?? p.name,
             },
           ]
-        : [],
-    };
-  });
+        : [];
+
+      return {
+        id: p.id,
+        name: p.name,
+        url: p.url,
+        position: p.position,
+        media,
+      };
+    })
+  );
+
+  return partners;
 }
+

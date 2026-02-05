@@ -1,31 +1,42 @@
-import { getPartners } from '@/lib/queries/partners';
+'use client';
 
-export default async function PartnersCarousel() {
-  const partners = await getPartners();
+import { useEffect, useState } from 'react';
+import { PartnersService, PartnerDTO } from '@/lib/services/PartnersService';
+import Image from 'next/image';
+
+export default function PartnersCarousel() {
+  const [partners, setPartners] = useState<PartnerDTO[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadPartners = async () => {
+      try {
+        const data = await PartnersService.getVisiblePartners();
+        setPartners(data);
+      } catch (err) {
+        console.error('Failed to load partners for carousel:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadPartners();
+  }, []);
+
+  if (loading || partners.length === 0) {
+    return <div className="h-20" />; // Заглушка, пока грузятся данные
+  }
 
   return (
-    <div className="flex gap-6 overflow-x-auto">
-      {partners.map((p) => {
-        const media = p.media?.[0];
-        if (!media) return null;
-
-        return (
-          <a
-            key={p.id}
-            href={p.url ?? undefined}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center opacity-90 hover:opacity-100 transition-opacity"
-          >
-            <img
-              src={media.url}
-              alt={media.alt_text ?? p.name}
-              className="h-20 object-contain"
-              loading="lazy"
-            />
-          </a>
-        );
-      })}
+    <div className="flex space-x-8 animate-scroll">
+      {partners.map((partner) => (
+        <div key={partner.id} className="flex-shrink-0 w-32 h-16 relative">
+          <img
+            src={partner.logoUrl}
+            alt={partner.name}
+            className="object-contain w-full h-full filter grayscale hover:grayscale-0 transition-all"
+          />
+        </div>
+      ))}
     </div>
   );
 }
