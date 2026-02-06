@@ -1,3 +1,4 @@
+// src/app/components/PartnersCarousel.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -11,10 +12,10 @@ export default function PartnersCarousel() {
     const loadPartners = async () => {
       try {
         const data = await PartnersService.getVisible();
-        // Дублируем массив для бесконечного скролла
-        setPartners([...data, ...data]); 
+        // Дублируем для бесшовности
+        setPartners([...data, ...data]);
       } catch (err) {
-        console.error('Carousel error:', err);
+        console.error(err);
       } finally {
         setLoading(false);
       }
@@ -25,18 +26,31 @@ export default function PartnersCarousel() {
   if (loading || partners.length === 0) return <div className="h-24" />;
 
   return (
-    <div className="overflow-hidden whitespace-nowrap py-10">
-      <div className="inline-flex animate-scroll">
+    <div className="overflow-hidden w-full bg-white py-4">
+      <div 
+        className="flex w-max animate-scroll"
+        style={{ animation: 'scroll 30s linear infinite' }}
+      >
         {partners.map((partner, idx) => (
-          <div key={`${partner.id}-${idx}`} className="mx-8 flex-shrink-0 w-32 h-16 relative">
+          <div key={`${partner.id}-${idx}`} className="mx-12 w-32 h-16 flex-shrink-0">
             <img
               src={partner.imageUrl || '/placeholder.png'} 
               alt={partner.name}
-              className="object-contain w-full h-full filter grayscale hover:grayscale-0 transition-all"
+              className="object-contain w-full h-full grayscale hover:grayscale-0 transition-all"
             />
           </div>
         ))}
       </div>
+      <style jsx>{`
+        @keyframes scroll {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        .animate-scroll {
+          display: flex;
+          width: max-content;
+        }
+      `}</style>
     </div>
   );
 }

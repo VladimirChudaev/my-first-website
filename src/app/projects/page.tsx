@@ -6,140 +6,70 @@ import ProjectCarousel from '@/components/ProjectCarousel';
 import { mediaService } from '@/lib/services/MediaService';
 
 export default function ProjectsPage() {
-  const [projectsWithUrls, setProjectsWithUrls] = useState<typeof staticProjects | null>(null);
+  const [projectsWithUrls, setProjectsWithUrls] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const staticProjects = {
     art: [
-      {
-        title: "Агитбригада",
-        author: "Александр Борисов",
-        description: "Короткометражная драма, открывающая серию фильмов, повествующих об истории агитбригад, действовавших в период Великой Отечественной войны на различных участках советско-германского фронта. Фильм посвящен истории любви молодых ребят, на пути у которых встала война.",
-        image: "/h_agitbrigada.png"
-      },
-      {
-        title: "Угрюмка",
-        author: "Екатерина Тимошенко",
-        description: "Комедийная драма, раскрывающая сложные аспекты отношений людей и животных, а также затрагивающая актуальные проблемы российской повседневности, которые при определенных обстоятельствах могут вылиться в мощный социальный конфликт. Выход из него можно найти только если поймешь, кто твой истинный друг.",
-        image: "/h_ugryumka.png"
-      },
-      {
-        title: "Волшебные валенки Деда Мороза",
-        author: "Вероника Новоселова",
-        description: "Это добрая история для самых юных зрителей, о том как старинные герои новогодних праздников: Дед Мороз, Снегурочка, Волк и Лиса, а также примкрувшие к ним братцы Кролики встречаются с современными детьми, живущими в мире, где на помощь приходит голосовой помощник \"Алиса\".",
-        image: "/h_valenki.png"
-      },
-      {
-        title: "Осторожно! Работает лифт!",
-        author: "",
-        description: "Компания готовится к производству сериала, в основе которого лежит тема искусственного интеллекта. Фильм покажет, как люди приспосабливаются к новому явление, как нейросети могут влиять на нашу жизнь. Заверяется работа над сценарием, формируется съемочная группа, заканчиваются переговоры с инвесторами.",
-        image: "/h_lift.png"
-      }
+      { title: "Агитбригада", author: "Александр Борисов", description: "Короткометражная драма...", image: "/h_agitbrigada.png" },
+      { title: "Угрюмка", author: "Екатерина Тимошенко", description: "Комедийная драма...", image: "/h_ugryumka.png" },
+      { title: "Волшебные валенки Деда Мороза", author: "Вероника Новоселова", description: "Это добрая история...", image: "/h_valenki.png" },
+      { title: "Осторожно! Работает лифт!", author: "", description: "Компания готовится...", image: "/h_lift.png" }
     ],
     documentary: [
-      {
-        title: "Муслюмовский эксперимент",
-        author: "Роберт Карапетян",
-        description: "Муслюмово - расселенная деревня в Челябинской области на берегу смертельно опасной реки Теча. Постоянные болезни местных жителей привели к созданию специализированного научного центра только через несколько десятков лет. Муслюмовцы задаются вопросом: это умышленные опыты над людьми или преступная халатность чиновников? Работа отмечена премией \"ТЭФИ Регион\".",
-        image: "/d_Muslumovo.png"
-      },
-      {
-        title: "Дорога Жизни",
-        author: "Роберт Карапетян",
-        description: "Фильм про Алапаевскую узкоколейную железную дорогу, которая считается самой протяженной пассажирской узкоколейкой в России. Власти датируют убыточный проект, так как железная дорога в этих местах остается единственным путем в цивилизацию для нескольких тысяч жителей Урала. Авторы проехали в самые отдаленные поселки, куда невозможно добраться другим транспортом, чтобы встретиться с обитателями этих мест.",
-        image: "/d_doroga.png"
-      },
-      {
-        title: "Три жены",
-        author: "Юлия Ершова",
-        description: "Фильм рассказывает о женах служителей трех конфессий. Традиционные устои их семей не мешают им добиваться успеха в общественной жизни. Жена священника учит детей музыке, жена раввина — успешная бизнес-вумен, жена муллы — модельер. Любовь и уважение — источник силы и залог успеха. Фильм награжден в 2019 году специальным призом в рамках кинофестиваля \"Человек, познающий мир\" в Крыму.",
-        image: "/d_tri_zhenyi.png"
-      }
+      { title: "Муслюмовский эксперимент", author: "Роберт Карапетян", description: "Муслюмово - расселенная деревня...", image: "/d_Muslumovo.png" },
+      { title: "Дорога Жизни", author: "Роберт Карапетян", description: "Фильм про Алапаевскую узкоколейку...", image: "/d_doroga.png" },
+      { title: "Три жены", author: "Юлия Ершова", description: "Фильм рассказывает о женах...", image: "/d_tri_zhenyi.png" }
     ],
     tv: [
-      {
-        title: "",
-        author: "",
-        description: "Социальная проблематика — одно из основных направлений работы нашей команда. Наши усилия отмечены профессиональными наградами и премиями, в том числе «Профессия — репортер».",
-        image: "/t_reporter_pro.png"
-      },
-      {
-        title: "",
-        author: "",
-        description: "В рамках развития проектов в сфере культуры компания активно сотрудничает с государственными и частными организациями: музеями, театрами для которых снято множество фильмов и передач, многие из которых высоко оценены заказчиками.",
-        image: "/t_diploms.png"
-      },
-      {
-        title: "",
-        author: "",
-        description: "Материалы о культурных событиях уральского региона, подготовленные нами, регулярно выходят в эфире ведущих федеральных телевизионных каналов, вызывая интерес зрителей и признание профессионального сообщества.",
-        image: "/t_TEFI_r.png"
-      }
+      { title: "", author: "", description: "Социальная проблематика...", image: "/t_reporter_pro.png" },
+      { title: "", author: "", description: "В сфере культуры...", image: "/t_diploms.png" },
+      { title: "", author: "", description: "Материалы о культурных событиях...", image: "/t_TEFI_r.png" }
     ],
     business: [
-      {
-        title: "Государственные учреждения",
-        author: "",
-        description: "Компания много лет работает с государственными учреждениями и организациями, создавая различный видеоконтент для корпоративных задач партнеров.",
-        image: "/b_organs.png"
-      },
-      {
-        title: "Презентационные фильмы",
-        author: "",
-        description: "Презентационные фильмы, снятые нами, используются заказчиками из различных отраслей экономики для демонстрации на выставках и для внутренних мероприятий.",
-        image: "/b_kino_from_biz.png"
-      },
-      {
-        title: "Культурные проекты",
-        author: "",
-        description: "Проекты, подготовленные для учреждений культуры, в том числе и частных — одно из основных направлений нашей деятельности.",
-        image: "/b_Theater_projects.png"
-      }
+      { title: "Государственные учреждения", author: "", description: "Компания много лет работает...", image: "/b_organs.png" },
+      { title: "Презентационные фильмы", author: "", description: "Презентационные фильмы...", image: "/b_kino_from_biz.png" },
+      { title: "Культурные проекты", author: "", description: "Проекты для учреждений культуры...", image: "/b_Theater_projects.png" }
     ]
   };
 
   useEffect(() => {
     const loadAndMergeData = async () => {
       try {
-        const allProjectMedia = await mediaService.getByDomain('project' as any);
+        // 1. Получаем все медиа из категории 'project'
+        const allProjectMedia = await mediaService.getByDomain('project');
 
-        if (!Array.isArray(allProjectMedia)) {
-          setProjectsWithUrls(staticProjects);
-          return;
-        }
-
+        // 2. Создаем словарь: "имя_файла" -> "публичный_URL"
         const urlDictionary: Record<string, string> = {};
-        for (const mediaItem of allProjectMedia) {
-          if (mediaItem.filename) {
-            const publicUrl = await mediaService.getUrlByFilename('project' as any, mediaItem.filename);
-            if (publicUrl) {
-              urlDictionary[mediaItem.filename] = publicUrl;
+        
+        if (Array.isArray(allProjectMedia)) {
+          allProjectMedia.forEach(item => {
+            // Извлекаем имя файла (н-р: "project/h_agitbrigada.png" -> "h_agitbrigada.png")
+            const fileName = item.path.split('/').pop();
+            if (fileName) {
+              urlDictionary[fileName] = mediaService.getPublicUrl(item.path);
             }
-          }
+          });
         }
 
-        const mergedData = {
-          art: staticProjects.art.map(project => ({
+        // 3. Функция для объединения статики и данных из БД
+        const merge = (list: any[]) => list.map(project => {
+          const fileName = project.image.replace(/^\//, ''); // убираем "/" из "/h_agitbrigada.png"
+          return {
             ...project,
-            image: urlDictionary[project.image.replace(/^\//, '')] || project.image
-          })),
-          documentary: staticProjects.documentary.map(project => ({
-            ...project,
-            image: urlDictionary[project.image.replace(/^\//, '')] || project.image
-          })),
-          tv: staticProjects.tv.map(project => ({
-            ...project,
-            image: urlDictionary[project.image.replace(/^\//, '')] || project.image
-          })),
-          business: staticProjects.business.map(project => ({
-            ...project,
-            image: urlDictionary[project.image.replace(/^\//, '')] || project.image
-          }))
-        };
+            // Если нашли в БД — берем URL оттуда, иначе оставляем локальный путь
+            image: urlDictionary[fileName] || project.image 
+          };
+        });
 
-        setProjectsWithUrls(mergedData);
+        setProjectsWithUrls({
+          art: merge(staticProjects.art),
+          documentary: merge(staticProjects.documentary),
+          tv: merge(staticProjects.tv),
+          business: merge(staticProjects.business)
+        });
       } catch (error) {
-        console.error('Ошибка загрузки изображений:', error);
+        console.error('Ошибка маппинга проектов:', error);
         setProjectsWithUrls(staticProjects);
       } finally {
         setIsLoading(false);
@@ -151,12 +81,9 @@ export default function ProjectsPage() {
 
   if (isLoading || !projectsWithUrls) {
     return (
-      <>
-        <InnerPageHeader />
-        <div className="min-h-screen bg-white flex items-center justify-center">
-          <p>Загрузка проектов...</p>
-        </div>
-      </>
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <p className="text-gray-500 animate-pulse">Загрузка проектов...</p>
+      </div>
     );
   }
 
@@ -164,87 +91,67 @@ export default function ProjectsPage() {
     <>
       <InnerPageHeader />
       <main className="min-h-screen bg-white py-12 md:py-24">
+        {/* Секция: Художественное кино */}
         <section id="art" className="mb-16 md:mb-24 bg-[#f0f7ff] py-12">
           <div className="container mx-auto px-4 max-w-7xl">
-            <div className="flex flex-col md:flex-row items-start md:items-center mb-8 md:mb-12">
-              <div className="md:w-1/2 pr-0 md:pr-8">
-                <h2 className="text-3xl font-bold">ХУДОЖЕСТВЕННОЕ КИНО</h2>
+            <div className="flex flex-col md:flex-row items-start md:items-center mb-12">
+              <div className="md:w-1/2 pr-8">
+                <h2 className="text-3xl font-bold uppercase tracking-wider">Художественное кино</h2>
               </div>
-              <div className="hidden md:block w-px bg-black mx-4 my-2 h-12"></div>
-              <div className="md:w-1/2 pl-0 md:pl-8 mt-4 md:mt-0 border-t md:border-t-0 pt-4 md:pt-0">
-                <p className="text-lg leading-relaxed">
-                  Мы специализируемся на создании художественных фильмов и сериалов — социальных драм до исторических альманахов. Наша цель — снимать фильмы, которые затрагивают душу зрителя и становятся событием в киномире.
-                </p>
+              <div className="hidden md:block w-px bg-black mx-4 h-12"></div>
+              <div className="md:w-1/2 pl-8">
+                <p className="text-lg text-gray-700">Мы специализируемся на создании художественных фильмов и сериалов — от социальных драм до исторических альманахов.</p>
               </div>
             </div>
-            <div className="flex justify-center">
-              <div className="w-full max-w-5xl">
-                <ProjectCarousel projects={projectsWithUrls.art} />
-              </div>
-            </div>
+            <ProjectCarousel projects={projectsWithUrls.art} />
           </div>
         </section>
 
+        {/* Секция: Документальное кино */}
         <section id="documentary" className="mb-16 md:mb-24 bg-[#fffaf0] py-12">
           <div className="container mx-auto px-4 max-w-7xl">
-            <div className="flex flex-col md:flex-row items-start md:items-center mb-8 md:mb-12">
-              <div className="md:w-1/2 pr-0 md:pr-8">
-                <h2 className="text-3xl font-bold">ДОКУМЕНТАЛЬНОЕ КИНО</h2>
+            <div className="flex flex-col md:flex-row items-start md:items-center mb-12">
+              <div className="md:w-1/2 pr-8">
+                <h2 className="text-3xl font-bold uppercase tracking-wider">Документальное кино</h2>
               </div>
-              <div className="hidden md:block w-px bg-black mx-4 my-2 h-12"></div>
-              <div className="md:w-1/2 pl-0 md:pl-8 mt-4 md:mt-0 border-t md:border-t-0 pt-4 md:pt-0">
-                <p className="text-lg leading-relaxed">
-                  За время творческой деятельности нашей командой снято более двух десятков документальных лент, демонстрировавшихся в кинозалах и в телеэфире. Наша документальная линейка посвящена важным социальным, историческим и культурным темам. Мы стремимся к глубокому, всестороннему исследованию вопросов и представлению их с новой, неожиданной точки зрения.
-                </p>
+              <div className="hidden md:block w-px bg-black mx-4 h-12"></div>
+              <div className="md:w-1/2 pl-8">
+                <p className="text-lg text-gray-700">За время деятельности снято более двух десятков документальных лент, отмеченных премиями.</p>
               </div>
             </div>
-            <div className="flex justify-center">
-              <div className="w-full max-w-5xl">
-                <ProjectCarousel projects={projectsWithUrls.documentary} />
-              </div>
-            </div>
+            <ProjectCarousel projects={projectsWithUrls.documentary} />
           </div>
         </section>
 
+        {/* Секция: ТВ */}
         <section id="tv" className="mb-16 md:mb-24 bg-[#f0fff4] py-12">
           <div className="container mx-auto px-4 max-w-7xl">
-            <div className="flex flex-col md:flex-row items-start md:items-center mb-8 md:mb-12">
-              <div className="md:w-1/2 pr-0 md:pr-8">
-                <h2 className="text-3xl font-bold">ТЕЛЕВИЗИОННЫЕ ПРОЕКТЫ</h2>
+            <div className="flex flex-col md:flex-row items-start md:items-center mb-12">
+              <div className="md:w-1/2 pr-8">
+                <h2 className="text-3xl font-bold uppercase tracking-wider">Телевизионные проекты</h2>
               </div>
-              <div className="hidden md:block w-px bg-black mx-4 my-2 h-12"></div>
-              <div className="md:w-1/2 pl-0 md:pl-8 mt-4 md:mt-0 border-t md:border-t-0 pt-4 md:pt-0">
-                <p className="text-lg leading-relaxed">
-                  Мы имеем богатый опыт работы в производстве телевизионного контента для ведущих телекомпаний России. Всего было сделано несколько сотен репортажей и телепередач. В их числе — работы, получившие премию ТЭФИ. Наша команда креативных специалистов создаёт яркий и запоминающийся видеоконтент.
-                </p>
+              <div className="hidden md:block w-px bg-black mx-4 h-12"></div>
+              <div className="md:w-1/2 pl-8">
+                <p className="text-lg text-gray-700">Богатый опыт производства контента для ведущих телеканалов России, включая работы ТЭФИ.</p>
               </div>
             </div>
-            <div className="flex justify-center">
-              <div className="w-full max-w-5xl">
-                <ProjectCarousel projects={projectsWithUrls.tv} isTvCarousel={true} />
-              </div>
-            </div>
+            <ProjectCarousel projects={projectsWithUrls.tv} isTvCarousel={true} />
           </div>
         </section>
 
-        <section id="business" className="mb-16 md:mb-24 bg-[#f5f5f7] py-12">
+        {/* Секция: Бизнес */}
+        <section id="business" className="bg-[#f5f5f7] py-12">
           <div className="container mx-auto px-4 max-w-7xl">
-            <div className="flex flex-col md:flex-row items-start md:items-center mb-8 md:mb-12">
-              <div className="md:w-1/2 pr-0 md:pr-8">
-                <h2 className="text-3xl font-bold">КИНО ДЛЯ БИЗНЕСА</h2>
+            <div className="flex flex-col md:flex-row items-start md:items-center mb-12">
+              <div className="md:w-1/2 pr-8">
+                <h2 className="text-3xl font-bold uppercase tracking-wider">Кино для бизнеса</h2>
               </div>
-              <div className="hidden md:block w-px bg-black mx-4 my-2 h-12"></div>
-              <div className="md:w-1/2 pl-0 md:pl-8 mt-4 md:mt-0 border-t md:border-t-0 pt-4 md:pt-0">
-                <p className="text-lg leading-relaxed">
-                  Презентационные фильмы — еще одно направление работы нашей компании. Наши фильмы регулярно используются на презентационных площадках в ходе различных выставок на стендах предприятий и корпораций.
-                </p>
+              <div className="hidden md:block w-px bg-black mx-4 h-12"></div>
+              <div className="md:w-1/2 pl-8">
+                <p className="text-lg text-gray-700">Презентационные фильмы для выставок и корпоративных задач наших партнеров.</p>
               </div>
             </div>
-            <div className="flex justify-center">
-              <div className="w-full max-w-5xl">
-                <ProjectCarousel projects={projectsWithUrls.business} />
-              </div>
-            </div>
+            <ProjectCarousel projects={projectsWithUrls.business} />
           </div>
         </section>
       </main>
