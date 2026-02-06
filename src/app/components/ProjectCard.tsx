@@ -8,49 +8,31 @@ export interface ProjectCardProps {
   isTvProject?: boolean;
 }
 
-export default function ProjectCard({ 
-  title, 
-  author, 
-  image, 
-  description, 
-  isTvProject = false 
-}: ProjectCardProps) {
+export default function ProjectCard({ title, author, image, description, isTvProject = false }: ProjectCardProps) {
   return (
-    <div className="w-full bg-white border border-gray-100 shadow-sm overflow-hidden">
-      <div className="flex flex-col md:flex-row w-full min-h-[400px]">
-        
-        {/* Левая часть: Текст (50%) */}
-        <div className="w-full md:w-1/2 p-6 md:p-12 flex flex-col justify-center">
-          <div className="max-w-md mx-auto md:mx-0">
-            <p className="text-gray-600 text-sm md:text-base leading-relaxed mb-8">
-              {description}
-            </p>
-            
+    <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+      <div className="flex flex-col md:flex-row">
+        {/* Текст (слева) */}
+        <div className="md:w-1/2 p-8 flex flex-col justify-between">
+          <div>
+            <p className="text-base leading-relaxed mb-6">{description}</p>
+            <hr className="border-t border-gray-300 my-6" />
             {!isTvProject && (
-              <div className="space-y-1">
-                <h3 className="text-xl md:text-2xl font-bold text-gray-900">
-                  {title}
-                </h3>
-                {author && (
-                  <p className="text-gray-500 text-sm md:text-md italic">
-                    {author}
-                  </p>
-                )}
-              </div>
+              <>
+                <h3 className="text-2xl font-bold mb-3">{title}</h3>
+                {author && <p className="text-lg text-gray-600">{author}</p>}
+              </>
             )}
           </div>
         </div>
 
-        {/* Правая часть: Изображение (50%) */}
-        <div className="w-full md:w-1/2 relative bg-gray-50 h-[300px] md:h-auto">
+        {/* Изображение (справа) */}
+        <div className="md:w-1/2 flex items-center justify-center bg-gray-50">
           <img
             src={image}
             alt={title}
-            className="absolute inset-0 w-full h-full object-cover"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              if (target.src !== '/placeholder.png') target.src = '/placeholder.png';
-            }}
+            className="w-full h-full object-cover min-h-[300px]"
+            onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.png'; }}
           />
         </div>
       </div>
