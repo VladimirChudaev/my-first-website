@@ -1,17 +1,16 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import ProjectCard, { ProjectCardProps } from './ProjectCard';
+import ProjectCard, { type ProjectCardProps } from './ProjectCard';
 
 interface ProjectCarouselProps {
   projects: ProjectCardProps[];
-  isTvCarousel?: boolean; // Добавляем опциональный пропс
+  isTvCarousel?: boolean;
 }
 
 export default function ProjectCarousel({ projects, isTvCarousel = false }: ProjectCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Автопрокрутка каждые 5 секунд
   useEffect(() => {
     if (projects.length <= 1) return;
     
@@ -28,7 +27,7 @@ export default function ProjectCarousel({ projects, isTvCarousel = false }: Proj
     <div className="relative w-full bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm mx-auto">
       <ProjectCard 
         {...projects[currentIndex]} 
-        isTvProject={isTvCarousel} // Передаем пропс в карточку
+        isTvProject={isTvCarousel}
       />
     </div>
   );
