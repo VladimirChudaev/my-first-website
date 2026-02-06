@@ -1,62 +1,68 @@
-export const dynamic = 'force-dynamic';
+'use client';
 
-import InnerPageHeader from '@/components/InnerPageHeader';
+import { useEffect, useState } from 'react';
 import { PartnersService, PartnerDTO } from '@/lib/services/PartnersService';
 
-export default async function PartnersPage() {
-  console.log('--- [UI] Запрос страницы партнеров начат ---');
+export default function PartnersPage() {
+  const [partners, setPartners] = useState<PartnerDTO[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  let partners: PartnerDTO[] = [];
-  
-  try {
-    partners = await PartnersService.getVisiblePartners();
-    console.log(`--- [UI] Успешно получено партнеров: ${partners.length} ---`);
-  } catch (error) {
-    console.error('--- [UI] Ошибка при загрузке партнеров:', error);
-  }
+  useEffect(() => {
+    const fetchPartners = async () => {
+      try {
+        // ИСПРАВЛЕНО: метод называется getVisible()
+        const data = await PartnersService.getVisible();
+        setPartners(data);
+      } catch (error) {
+        console.error('Error fetching partners:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPartners();
+  }, []);
+
+  if (loading) return <div className="p-8 text-center">Загрузка...</div>;
 
   return (
-    <>
-      <InnerPageHeader />
-
-      <main className="min-h-screen bg-white py-16 md:py-24">
-        <div className="container mx-auto px-4">
-          <h1 className="text-3xl md:text-4xl font-bold text-center mb-16">
-            Наши партнеры
-          </h1>
-
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7 gap-6 max-w-7xl mx-auto">
-            {partners.map((p: PartnerDTO) => {
-              const Wrapper: any = p.websiteUrl ? 'a' : 'div';
-
-              return (
-                <Wrapper
-                  key={p.id}
-                  {...(p.websiteUrl
-                    ? {
-                        href: p.websiteUrl,
-                        target: '_blank',
-                        rel: 'noopener noreferrer',
-                      }
-                    : {})}
-                  className="flex items-center justify-center p-4 opacity-90 hover:opacity-100 transition-opacity"
-                  aria-label={p.name}
+    <div className="container mx-auto py-12 px-4">
+      <h1 className="text-4xl font-bold mb-12 text-center">Наши партнеры</h1>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+        {partners.map((partner) => (
+          <div key={partner.id} className="flex flex-col items-center group">
+            <div className="w-full h-32 relative mb-4 p-4 border rounded-lg hover:shadow-lg transition-shadow bg-white">
+              {/* ИСПРАВЛЕНО: проверяем partner.url вместо websiteUrl */}
+              {partner.url ? (
+                <a 
+                  href={partner.url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
                 >
                   <img
-                    src={p.logoUrl}
-                    alt={p.name}
-                    className="max-h-16 w-auto object-contain"
-                    loading="lazy"
+                    // ИСПРАВЛЕНО: imageUrl вместо logoUrl
+                    src={partner.imageUrl || '/placeholder.png'}
+                    alt={partner.name}
+                    className="object-contain w-full h-full filter grayscale group-hover:grayscale-0 transition-all"
                   />
-                </Wrapper>
-              );
-            })}
+                </a>
+              ) : (
+                <img
+                  src={partner.imageUrl || '/placeholder.png'}
+                  alt={partner.name}
+                  className="object-contain w-full h-full filter grayscale"
+                />
+              )}
+            </div>
+            <h3 className="text-lg font-medium text-gray-800">{partner.name}</h3>
+            {/* ИСПРАВЛЕНО: используем partner.url */}
+            {partner.url && (
+              <p className="text-sm text-blue-600 truncate max-w-full">
+                {new URL(partner.url).hostname}
+              </p>
+            )}
           </div>
-          {partners.length === 0 && (
-            <p className="text-center text-gray-500">Партнеры не найдены или загружаются...</p>
-          )}
-        </div>
-      </main>
-    </>
+        ))}
+      </div>
+    </div>
   );
 }

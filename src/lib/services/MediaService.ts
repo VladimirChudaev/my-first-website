@@ -13,8 +13,14 @@ export class MediaService {
   }
 
   /**
+   * Алиас для удобства работы с объектами медиа (используется в PartnersService).
+   */
+  static getMediaUrl(media: { path: string } | null): string {
+    return media ? this.getPublicUrl(media.path) : '/placeholder.png';
+  }
+
+  /**
    * Получает список всех медиа-файлов для конкретной категории (domain).
-   * Используется на странице Проектов и в Каруселях.
    */
   static async getByDomain(domainValue: string) {
     const { data, error } = await supabase
@@ -30,7 +36,40 @@ export class MediaService {
   }
 
   /**
-   * Вспомогательный метод для совместимости со старым кодом страницы Проектов.
+   * Загружает файл в Storage и создает запись в таблице media.
+   * Обязательно принимает категорию (partner, project и т.д.)
+   */
+  static async upload(file: File, category: string) {
+    // Генерируем уникальное имя файла, чтобы избежать конфликтов
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
+    const filePath = `${category}/${fileName}`;
+
+    // 1. Загрузка в Storage
+    const { error: uploadError } = await supabase.storage
+      .from('media')
+      .upload(filePath, file);
+
+    if (uploadError) throw uploadError;
+
+    // 2. Создание записи в БД
+    const { data: mediaData, error: dbError } = await supabase
+      .from('media')
+      .insert({
+        path: filePath,
+        category: category,
+        alt_text: file.name
+      })
+      .select()
+      .single();
+
+    if (dbError) throw dbError;
+
+    return mediaData;
+  }
+
+  /**
+   * Вспомогательный метод для совместимости.
    */
   static async getUrlByFilename(category: string, filename: string) {
     return MediaService.getPublicUrl(`${category}/${filename}`);
@@ -38,10 +77,12 @@ export class MediaService {
 }
 
 /**
- * Экспорт объекта для удобного импорта: import { mediaService } from ...
+ * Экспорт объекта для удобного импорта
  */
 export const mediaService = {
   getPublicUrl: (path: string | null, bucket?: string) => MediaService.getPublicUrl(path, bucket),
+  getMediaUrl: (media: { path: string } | null) => MediaService.getMediaUrl(media),
   getByDomain: (domainValue: string) => MediaService.getByDomain(domainValue),
+  upload: (file: File, category: string) => MediaService.upload(file, category),
   getUrlByFilename: (category: string, filename: string) => MediaService.getUrlByFilename(category, filename),
 };

@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { PartnersService, PartnerDTO } from '@/lib/services/PartnersService';
-import Image from 'next/image';
 
 export default function PartnersCarousel() {
   const [partners, setPartners] = useState<PartnerDTO[]>([]);
@@ -11,7 +10,8 @@ export default function PartnersCarousel() {
   useEffect(() => {
     const loadPartners = async () => {
       try {
-        const data = await PartnersService.getVisiblePartners();
+        // ИСПОРАВЛЕНО: используем корректный метод из PartnersService
+        const data = await PartnersService.getVisible();
         setPartners(data);
       } catch (err) {
         console.error('Failed to load partners for carousel:', err);
@@ -31,7 +31,8 @@ export default function PartnersCarousel() {
       {partners.map((partner) => (
         <div key={partner.id} className="flex-shrink-0 w-32 h-16 relative">
           <img
-            src={partner.logoUrl}
+            // ИСПРАВЛЕНО: используем imageUrl из PartnerDTO
+            src={partner.imageUrl || '/placeholder.png'} 
             alt={partner.name}
             className="object-contain w-full h-full filter grayscale hover:grayscale-0 transition-all"
           />
