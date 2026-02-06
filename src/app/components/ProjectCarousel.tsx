@@ -19,10 +19,10 @@ export default function ProjectCarousel({ projects, isTvCarousel = false }: Proj
     return () => clearInterval(interval);
   }, [projects.length]);
 
-  if (projects.length === 0) return null;
+  if (!projects || projects.length === 0) return null;
 
   return (
-    <div className="relative w-full bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm mx-auto">
+    <div className="w-full">
       <ProjectCard 
         {...projects[currentIndex]} 
         isTvProject={isTvCarousel} 
