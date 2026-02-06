@@ -1,6 +1,5 @@
 'use client';
 
-// Добавляем export прямо перед интерфейсом
 export interface ProjectCardProps {
   title: string;
   author: string;
@@ -17,26 +16,33 @@ export default function ProjectCard({
   isTvProject = false 
 }: ProjectCardProps) {
   return (
-    <div className="bg-white rounded-lg overflow-hidden h-full">
-      <div className="flex flex-col md:flex-row min-h-[450px]">
-        {/* Текст */}
-        <div className="md:w-1/2 p-6 md:p-10 flex flex-col justify-between">
-          <div>
-            <p className="text-gray-700 text-base md:text-lg leading-relaxed mb-6">
+    <div className="w-full bg-white border border-gray-100 shadow-sm overflow-hidden">
+      <div className="flex flex-col md:flex-row w-full min-h-[400px]">
+        
+        {/* Левая часть: Текст (50%) */}
+        <div className="w-full md:w-1/2 p-6 md:p-12 flex flex-col justify-center">
+          <div className="max-w-md mx-auto md:mx-0">
+            <p className="text-gray-600 text-sm md:text-base leading-relaxed mb-8">
               {description}
             </p>
-            <hr className="border-t border-gray-200 my-6" />
+            
             {!isTvProject && (
-              <div className="mt-auto">
-                <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">{title}</h3>
-                {author && <p className="text-lg text-gray-500 italic">{author}</p>}
+              <div className="space-y-1">
+                <h3 className="text-xl md:text-2xl font-bold text-gray-900">
+                  {title}
+                </h3>
+                {author && (
+                  <p className="text-gray-500 text-sm md:text-md italic">
+                    {author}
+                  </p>
+                )}
               </div>
             )}
           </div>
         </div>
 
-        {/* Изображение */}
-        <div className="md:w-1/2 relative bg-gray-50 min-h-[300px]">
+        {/* Правая часть: Изображение (50%) */}
+        <div className="w-full md:w-1/2 relative bg-gray-50 h-[300px] md:h-auto">
           <img
             src={image}
             alt={title}
@@ -51,4 +57,3 @@ export default function ProjectCard({
     </div>
   );
 }
-// Убираем отдельную строку export type { ... } внизу, так как добавили export выше
