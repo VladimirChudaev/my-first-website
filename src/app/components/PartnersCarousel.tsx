@@ -10,11 +10,11 @@ export default function PartnersCarousel() {
   useEffect(() => {
     const loadPartners = async () => {
       try {
-        // ИСПОРАВЛЕНО: используем корректный метод из PartnersService
         const data = await PartnersService.getVisible();
-        setPartners(data);
+        // Дублируем массив для бесконечного скролла
+        setPartners([...data, ...data]); 
       } catch (err) {
-        console.error('Failed to load partners for carousel:', err);
+        console.error('Carousel error:', err);
       } finally {
         setLoading(false);
       }
@@ -22,22 +22,21 @@ export default function PartnersCarousel() {
     loadPartners();
   }, []);
 
-  if (loading || partners.length === 0) {
-    return <div className="h-20" />; // Заглушка, пока грузятся данные
-  }
+  if (loading || partners.length === 0) return <div className="h-24" />;
 
   return (
-    <div className="flex space-x-8 animate-scroll">
-      {partners.map((partner) => (
-        <div key={partner.id} className="flex-shrink-0 w-32 h-16 relative">
-          <img
-            // ИСПРАВЛЕНО: используем imageUrl из PartnerDTO
-            src={partner.imageUrl || '/placeholder.png'} 
-            alt={partner.name}
-            className="object-contain w-full h-full filter grayscale hover:grayscale-0 transition-all"
-          />
-        </div>
-      ))}
+    <div className="overflow-hidden whitespace-nowrap py-10">
+      <div className="inline-flex animate-scroll">
+        {partners.map((partner, idx) => (
+          <div key={`${partner.id}-${idx}`} className="mx-8 flex-shrink-0 w-32 h-16 relative">
+            <img
+              src={partner.imageUrl || '/placeholder.png'} 
+              alt={partner.name}
+              className="object-contain w-full h-full filter grayscale hover:grayscale-0 transition-all"
+            />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
