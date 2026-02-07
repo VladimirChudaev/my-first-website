@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { PartnersService } from '@/lib/services/PartnersService';
-import { MediaService } from '@/lib/services/MediaService';
+import { mediaService } from '@/lib/services/MediaService';
 
 export default function NewPartnerPage() {
   const router = useRouter();
@@ -24,8 +24,8 @@ export default function NewPartnerPage() {
       let mediaId = null;
 
       if (file) {
-        // Загрузка через MediaService с принудительной категорией 'partner'
-        const uploadedMedia = await MediaService.upload(file, 'partner');
+        // Исправлен импорт и вызов на mediaService (с маленькой буквы)
+        const uploadedMedia = await mediaService.upload(file, 'partner');
         mediaId = uploadedMedia.id;
       }
 
@@ -71,6 +71,7 @@ export default function NewPartnerPage() {
           <input
             type="file"
             accept="image/*"
+            required={true}
             onChange={e => setFile(e.target.files?.[0] || null)}
             className="w-full"
           />
@@ -82,7 +83,7 @@ export default function NewPartnerPage() {
               type="number"
               className="w-full border rounded p-2"
               value={formData.position}
-              onChange={e => setFormData({ ...formData, position: parseInt(e.target.value) })}
+              onChange={e => setFormData({ ...formData, position: parseInt(e.target.value) || 0 })}
             />
           </div>
           <div className="flex items-end pb-2">

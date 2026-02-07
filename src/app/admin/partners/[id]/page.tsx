@@ -3,7 +3,7 @@
 import { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { PartnersService, PartnerDTO } from '@/lib/services/PartnersService';
-import { MediaService } from '@/lib/services/MediaService';
+import { mediaService } from '@/lib/services/MediaService';
 
 export default function EditPartnerPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -41,11 +41,12 @@ export default function EditPartnerPage({ params }: { params: Promise<{ id: stri
     
     setSaving(true);
     try {
-      let mediaId = formData.id; // сохраняем текущий, если файл не меняли
+      let currentMediaId = formData.media_id;
 
       if (file) {
-        const uploadedMedia = await MediaService.upload(file, 'partner');
-        mediaId = uploadedMedia.id;
+        // Вызов метода upload с маленькой буквы, как в mediaService.ts
+        const uploadedMedia = await mediaService.upload(file, 'partner');
+        currentMediaId = uploadedMedia.id;
       }
 
       await PartnersService.update(id, {
@@ -53,7 +54,7 @@ export default function EditPartnerPage({ params }: { params: Promise<{ id: stri
         url: formData.url,
         position: formData.position,
         is_visible: formData.is_visible,
-        media_id: file ? mediaId : undefined // обновляем ID медиа только если загружен новый файл
+        media_id: currentMediaId
       });
 
       router.push('/admin/partners');
@@ -102,13 +103,16 @@ export default function EditPartnerPage({ params }: { params: Promise<{ id: stri
               className="object-contain w-full h-full"
             />
           </div>
-          <label className="block text-sm font-medium mb-1 text-blue-600">Заменить логотип</label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={e => setFile(e.target.files?.[0] || null)}
-            className="w-full"
-          />
+          <label className="block text-sm font-medium mb-1 text-blue-600 font-bold cursor-pointer">
+            Заменить логотип
+            <input
+              type="file"
+              accept="image/*"
+              onChange={e => setFile(e.target.files?.[0] || null)}
+              className="hidden"
+            />
+          </label>
+          {file && <span className="text-xs text-green-600 mt-1 block">Выбран файл: {file.name}</span>}
         </div>
 
         <div className="flex gap-4">
