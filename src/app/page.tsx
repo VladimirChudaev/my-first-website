@@ -1,8 +1,8 @@
-'use client';
-
 export const dynamic = 'force-dynamic';
 
 import nextDynamic from 'next/dynamic';
+import { PartnersService } from '@/lib/services/PartnersService';
+import { ProjectsService } from '@/lib/services/ProjectsService';
 
 import PhotoCarousel from './components/PhotoCarousel';
 import PartnersCarousel from './components/PartnersCarousel';
@@ -14,12 +14,17 @@ const VideoCarousel = nextDynamic(
   { ssr: false }
 );
 
-export default function Home() {
+export default async function Home() {
+  const partners = await PartnersService.getAll();
+  const projects = await ProjectsService.getProjectsWithMedia();
+
   return (
     <main className="bg-white min-h-screen">
       <div className="max-w-[1920px] mx-auto relative overflow-hidden">
         <PhotoCarousel />
-        <PartnersCarousel />
+        
+        {/* Передаем projects, потому что PartnersCarousel их требует (согласно твоей ошибке) */}
+        <PartnersCarousel projects={projects} />
       </div>
 
       <AwardsCarousel />
