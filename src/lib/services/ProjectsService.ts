@@ -5,23 +5,25 @@ export const ProjectsService = {
     const supabase = createClient();
     
     const { data, error } = await supabase
-      .from('media') // Твоя основная таблица
+      .from('media')
       .select('*')
-      .order('created_at', { ascending: false });
+      .eq('category', 'project')
+      .eq('is_visible', true)
+      .order('position', { ascending: true });
 
     if (error) {
       console.error('Error fetching projects:', error);
       return [];
     }
 
-    // Возвращаем плоский массив, без всяких выдуманных категорий
-    return data.map(item => ({
+    return (data || []).map(item => ({
       id: item.id,
-      title: item.title || 'Без названия',
-      description: item.description || '',
-      author: item.author || '',
-      imageUrl: item.path ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/media/${item.path}` : '/placeholder.png',
-      category: item.category
+      title: item.title || '',
+      description: item.alt_text || '', // Добавляем, чтобы не было ошибки типа
+      author: '',                       // Добавляем заглушку для типа Project
+      filename: item.filename || '', 
+      imageUrl: item.url || '',      
+      position: item.position
     }));
   }
 };
