@@ -1,44 +1,37 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import Image from 'next/image'
+import { mediaService } from '@/lib/services/MediaService'
 
-export interface InnerPageHeaderProps {
-  backgroundUrl?: string
-  title?: string
-}
+export default function InnerPageHeader() {
+  const [bgUrl, setBgUrl] = useState<string>('')
 
-export default function InnerPageHeader({
-  backgroundUrl,
-  title,
-}: InnerPageHeaderProps) {
-  if (!backgroundUrl) {
-    return (
-      <section className="w-full h-[240px] bg-gray-200 flex items-center justify-center">
-        {title && (
-          <h1 className="text-2xl font-semibold text-gray-700">
-            {title}
-          </h1>
-        )}
-      </section>
-    )
-  }
+  useEffect(() => {
+    const loadBg = async () => {
+      try {
+        const assets = await mediaService.getByCategory('photo')
+        const bg = assets.find(a => a.filename.toLowerCase().includes('header_bg'))
+        if (bg) {
+          setBgUrl(mediaService.getPublicUrl(bg.path ?? null))
+        }
+      } catch (e) {
+        console.error('Ошибка фона:', e)
+      }
+    }
+    loadBg()
+  }, [])
 
   return (
-    <section className="relative w-full h-[240px] overflow-hidden">
-      <Image
-        src={backgroundUrl}
-        alt={title ?? 'Page header'}
-        fill
-        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-        priority
-        className="object-cover"
-      />
-      {title && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/40">
-          <h1 className="text-3xl font-bold text-white">
-            {title}
-          </h1>
-        </div>
+    <section className="relative w-full h-[160px] md:h-[200px] bg-gray-200 overflow-hidden">
+      {bgUrl && (
+        <Image
+          src={bgUrl}
+          alt="header background"
+          fill
+          priority
+          className="object-cover object-center"
+        />
       )}
     </section>
   )

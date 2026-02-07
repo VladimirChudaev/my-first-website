@@ -1,7 +1,6 @@
-// Используем абсолютный путь через @
 import { PartnersRepository, PartnerRecord } from '@/lib/repositories/PartnersRepository';
-import { MediaService } from './MediaService'; 
-// (MediaService оставляем так, если он лежит в той же папке services)
+import { mediaService } from './MediaService'; // Импортируем объект (с маленькой буквы)
+import { MediaAsset } from '../media/types';
 
 export interface PartnerDTO {
   id: string;
@@ -15,12 +14,13 @@ export interface PartnerDTO {
 
 export class PartnersService {
   private static async enrich(partners: PartnerRecord[]): Promise<PartnerDTO[]> {
-    // Получаем все медиа для категории 'partner' один раз, чтобы не спамить запросами
-    const mediaMap = await MediaService.getByDomain('partner');
+    // 1. Исправлено: используем getByCategory вместо getByDomain
+    const mediaMap: MediaAsset[] = await mediaService.getByCategory('partner');
 
     return partners.map((partner) => {
+      // Ищем соответствующий медиа-файл по media_id
       const media = partner.media_id
-        ? mediaMap.find((m: any) => m.id === partner.media_id)
+        ? mediaMap.find((m) => m.id === partner.media_id)
         : null;
 
       return {
@@ -29,7 +29,8 @@ export class PartnersService {
         url: partner.url,
         position: partner.position,
         is_visible: partner.is_visible,
-        imageUrl: media ? MediaService.getPublicUrl(media.path) : null,
+        // 2. Исправлено: вызываем метод у объекта mediaService
+        imageUrl: media ? mediaService.getPublicUrl(media.path || media.filename) : null,
         media_id: partner.media_id
       };
     });
@@ -40,7 +41,6 @@ export class PartnersService {
     return this.enrich(partners);
   }
 
-  // ТОТ САМЫЙ МЕТОД, КОТОРОГО НЕ ХВАТАЛО БИЛДУ
   static async getAll(): Promise<PartnerDTO[]> {
     const partners = await PartnersRepository.getAll();
     return this.enrich(partners);
@@ -61,8 +61,8 @@ export class PartnersService {
       media_id: payload.media_id ?? null,
     });
 
-    const [enriched] = await this.enrich([partner]);
-    return enriched;
+    const enriched = await this.enrich([partner]);
+    return enriched[0];
   }
 
   static async update(
@@ -76,8 +76,8 @@ export class PartnersService {
     }
   ): Promise<PartnerDTO> {
     const partner = await PartnersRepository.update(id, payload);
-    const [enriched] = await this.enrich([partner]);
-    return enriched;
+    const enriched = await this.enrich([partner]);
+    return enriched[0];
   }
 
   static async delete(id: string): Promise<void> {

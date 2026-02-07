@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { PartnersService, PartnerDTO } from '@/lib/services/PartnersService';
+import InnerPageHeader from '@/app/components/InnerPageHeader';
 
 export default function PartnersPage() {
   const [partners, setPartners] = useState<PartnerDTO[]>([]);
@@ -10,7 +11,6 @@ export default function PartnersPage() {
   useEffect(() => {
     const fetchPartners = async () => {
       try {
-        // ИСПРАВЛЕНО: метод называется getVisible()
         const data = await PartnersService.getVisible();
         setPartners(data);
       } catch (error) {
@@ -22,47 +22,46 @@ export default function PartnersPage() {
     fetchPartners();
   }, []);
 
-  if (loading) return <div className="p-8 text-center">Загрузка...</div>;
-
   return (
-    <div className="container mx-auto py-12 px-4">
-      <h1 className="text-4xl font-bold mb-12 text-center">Наши партнеры</h1>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-        {partners.map((partner) => (
-          <div key={partner.id} className="flex flex-col items-center group">
-            <div className="w-full h-32 relative mb-4 p-4 border rounded-lg hover:shadow-lg transition-shadow bg-white">
-              {/* ИСПРАВЛЕНО: проверяем partner.url вместо websiteUrl */}
-              {partner.url ? (
-                <a 
-                  href={partner.url} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                >
-                  <img
-                    // ИСПРАВЛЕНО: imageUrl вместо logoUrl
-                    src={partner.imageUrl || '/placeholder.png'}
-                    alt={partner.name}
-                    className="object-contain w-full h-full filter grayscale group-hover:grayscale-0 transition-all"
-                  />
-                </a>
-              ) : (
-                <img
-                  src={partner.imageUrl || '/placeholder.png'}
-                  alt={partner.name}
-                  className="object-contain w-full h-full filter grayscale"
-                />
-              )}
+    <>
+      {/* Теперь просто плашка без текста внутри */}
+      <InnerPageHeader />
+
+      <main className="min-h-screen bg-white">
+        <div className="container mx-auto px-6 py-10 md:py-16 max-w-6xl">
+          
+          {/* Заголовок теперь здесь — точно как в news/page.tsx */}
+          <h1 className="text-2xl md:text-3xl font-bold text-black text-center mb-12 uppercase tracking-[0.3em]">
+            Наши партнеры
+          </h1>
+
+          {loading ? (
+            <div className="text-center py-10 text-gray-400">Загрузка...</div>
+          ) : (
+            <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-8 items-center justify-items-center">
+              {partners.map((partner) => (
+                <div key={partner.id} className="w-full flex items-center justify-center">
+                  {partner.url ? (
+                    <a href={partner.url} target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity">
+                      <img
+                        src={partner.imageUrl || '/placeholder.png'}
+                        alt={partner.name}
+                        className="max-w-full max-h-12 md:max-h-16 object-contain"
+                      />
+                    </a>
+                  ) : (
+                    <img
+                      src={partner.imageUrl || '/placeholder.png'}
+                      alt={partner.name}
+                      className="max-w-full max-h-12 md:max-h-16 object-contain"
+                    />
+                  )}
+                </div>
+              ))}
             </div>
-            <h3 className="text-lg font-medium text-gray-800">{partner.name}</h3>
-            {/* ИСПРАВЛЕНО: используем partner.url */}
-            {partner.url && (
-              <p className="text-sm text-blue-600 truncate max-w-full">
-                {new URL(partner.url).hostname}
-              </p>
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
+          )}
+        </div>
+      </main>
+    </>
   );
 }

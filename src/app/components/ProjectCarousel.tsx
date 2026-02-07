@@ -1,10 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import ProjectCard, { type ProjectCardProps } from './ProjectCard';
+import ProjectCard from './ProjectCard';
 
 interface ProjectCarouselProps {
-  projects: ProjectCardProps[];
+  projects: any[];
   isTvCarousel?: boolean;
 }
 
@@ -23,10 +23,30 @@ export default function ProjectCarousel({ projects, isTvCarousel = false }: Proj
 
   return (
     <div className="w-full">
-      <ProjectCard 
-        {...projects[currentIndex]} 
-        isTvProject={isTvCarousel} 
-      />
+      <div className="transition-all duration-500 ease-in-out">
+        <ProjectCard 
+          key={projects[currentIndex].id}
+          title={projects[currentIndex].title}
+          description={projects[currentIndex].description}
+          author={projects[currentIndex].author}
+          imageUrl={projects[currentIndex].imageUrl}
+          isTvProject={isTvCarousel} 
+        />
+      </div>
+      
+      {projects.length > 1 && (
+        <div className="flex justify-center gap-2 mt-6">
+          {projects.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => setCurrentIndex(idx)}
+              className={`h-2 transition-all duration-300 rounded-full ${
+                idx === currentIndex ? 'w-8 bg-gray-800' : 'w-2 bg-gray-300'
+              }`}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
