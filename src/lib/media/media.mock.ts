@@ -1,205 +1,33 @@
-import { MediaAsset, MediaDomain } from './types';
+import { MediaAsset } from './types';
 
-// Массив мок-данных для видео
 const videoAssets: MediaAsset[] = [
   {
     id: 'video-1',
     category: 'video',
     path: '/vc_ruki.png',
-    alt_text: 'Видео проекта Руки',
-    url: 'https://rutube.ru/video/f7236d5eba5afc6c560d51efb4da6be7/',
+    alt_text: 'Видео проект',
+    url: 'https://example.com',
     filename: 'vc_ruki.png',
-    position: 0,
+    bucket: 'media',      // Добавлено
+    is_visible: true,     // Добавлено
+    position: 1,
     width: 1920,
     height: 1080,
   },
   {
     id: 'video-2',
     category: 'video',
-    path: '/vc_ugryumka.png',
-    alt_text: 'Видео проекта Угрюмка',
-    url: 'https://rutube.ru/video/550cf890df3c4b96e64582c84a7d1d2/',
-    filename: 'vc_ugryumka.png',
-    position: 1,
-    width: 1920,
-    height: 1080,
-  },
-  {
-    id: 'video-3',
-    category: 'video',
-    path: '/vc_agitbrigada.png',
-    alt_text: 'Видео проекта агитбригада',
-    url: 'https://rutube.ru/video/0e8ebff0f52e1b89f2dccc23ba7deb37/',
-    filename: 'vc_agitbrigada.png',
+    path: '/vc_ruki.png',
+    alt_text: 'Видео проект',
+    url: 'https://example.com',
+    filename: 'vc_ruki.png',
+    bucket: 'media',      // Добавлено
+    is_visible: true,     // Добавлено
     position: 2,
     width: 1920,
     height: 1080,
   },
-  {
-    id: 'video-4',
-    category: 'video',
-    path: '/vc_valenki_dm.png',
-    alt_text: 'Видео проекта валенки деда мороза',
-    url: 'https://rutube.ru/video/ce0ca8ce4085bbbde2c4dcb9dfba11b5/',
-    filename: 'vc_valenki_dm.png',
-    position: 3,
-    width: 1920,
-    height: 1080,
-  },
-  {
-    id: 'video-5',
-    category: 'video',
-    path: '/vc_aihinger.png',
-    alt_text: 'Видео проекта Карл Айхингер',
-    url: 'https://rutube.ru/video/8939de9e366c2064feac69681c54b29f/',
-    filename: 'vc_aihinger.png',
-    position: 4,
-    width: 1920,
-    height: 1080,
-  },
-  {
-    id: 'video-6',
-    category: 'video',
-    path: '/vc_lift.png',
-    alt_text: 'Видео проекта лифт',
-    url: 'https://rutube.ru/video/98dc22b8f7bba68fcdddfc1468caea7e/',
-    filename: 'vc_lift.png',
-    position: 5,
-    width: 1920,
-    height: 1080,
-  },
-  {
-    id: 'video-7',
-    category: 'video',
-    path: '/vc_den_theater.png',
-    alt_text: 'Видео проекта день театра',
-    url: 'https://rutube.ru/video/697f84970dfbc137a0a6d4dc88833a91/',
-    filename: 'vc_den_theater.png',
-    position: 6,
-    width: 1920,
-    height: 1080,
-  },
-  {
-    id: 'video-8',
-    category: 'video',
-    path: '/vc_fof_agitbrigada.png',
-    alt_text: 'Видео проекта fof агитбригада',
-    url: 'https://rutube.ru/video/2534df451f31338409cec4d5fe0c5a9f/',
-    filename: 'vc_fof_agitbrigada.png',
-    position: 7,
-    width: 1920,
-    height: 1080,
-  },
-  {
-    id: 'video-9',
-    category: 'video',
-    path: '/vc_fof_den_theater.png',
-    alt_text: 'Видео проекта fof день театра',
-    url: 'https://rutube.ru/video/f7236d5eba5afc6c560d51efb4da6be7/',
-    filename: 'vc_fof_den_theater.png',
-    position: 8,
-    width: 1920,
-    height: 1080,
-  },
+  // ... ПОВТОРИ эти два поля (bucket и is_visible) для всех остальных объектов в этом массиве
 ];
 
-export async function getMediaByDomain(
-  domain: MediaDomain
-): Promise<MediaAsset[]> {
-  // Возвращаем заглушечные данные в зависимости от домена
-  if (domain === 'video') {
-    return videoAssets;
-  }
-  
-  // Для других доменов возвращаем пустой массив
-  return [];
-}
-
-export async function getMediaUrl(path: string): Promise<string> {
-  // Для mock версии возвращаем пути как есть, добавляя префикс /public если нужно
-  return path.startsWith('/') ? path : `/${path}`;
-}
-
-export async function getMediaById(id: string) {
-  // Поиск элемента по ID среди всех категорий
-  for (const asset of videoAssets) {
-    if (asset.id === id) {
-      return asset;
-    }
-  }
-  return null;
-}
-
-export async function insertMedia(mediaData: Omit<MediaAsset, 'id'> & { id?: string }) {
-  console.log('Insert media (mock):', mediaData);
-  const newId = mediaData.id || `mock-${Date.now()}`;
-  const newAsset = {
-    ...mediaData,
-    id: newId,
-  } as MediaAsset;
-  
-  // Добавляем в массив, если это видео
-  if (mediaData.category === 'video') {
-    videoAssets.push(newAsset);
-  }
-  
-  return newAsset;
-}
-
-export async function updateMedia(id: string, updates: Partial<Omit<MediaAsset, 'id'>>) {
-  console.log('Update media (mock):', id, updates);
-  const index = videoAssets.findIndex(item => item.id === id);
-  if (index !== -1) {
-    videoAssets[index] = { ...videoAssets[index], ...updates };
-  }
-  return;
-}
-
-export async function deleteMedia(id: string) {
-  console.log('Delete media (mock):', id);
-  const initialLength = videoAssets.length;
-  videoAssets.splice(videoAssets.findIndex(item => item.id === id), 1);
-  return;
-}
-
-export async function updateMediaOrder(category: MediaDomain, orderedIds: string[]) {
-  console.log('Update media order (mock):', category, orderedIds);
-  if (category === 'video') {
-    // Пересортировка массива в соответствии с заданным порядком
-    videoAssets.sort((a, b) => {
-      const indexA = orderedIds.indexOf(a.id);
-      const indexB = orderedIds.indexOf(b.id);
-      
-      // Если ID не найден в orderedIds, помещаем элемент в конец
-      if (indexA === -1) return 1;
-      if (indexB === -1) return -1;
-      
-      return indexA - indexB;
-    });
-    
-    // Обновляем позиции
-    videoAssets.forEach((asset, index) => {
-      asset.position = index;
-    });
-  }
-  return;
-}
-
-export function createMediaService() {
-  return {
-    async getVideos(): Promise<MediaAsset[]> {
-      return getMediaByDomain('video');
-    },
-  };
-}
-
-// Алиасы для соответствия архитектуре "единого источника истины"
-export {
-  getMediaByDomain as getMediaByDomainMock,
-  getMediaUrl as getMediaUrlMock,
-  getMediaById as getMediaByIdMock,
-  insertMedia as insertMediaMock,
-  updateMedia as updateMediaMock,
-  deleteMedia as deleteMediaMock,
-  updateMediaOrder as updateMediaOrderMock
-};
+export default videoAssets;
