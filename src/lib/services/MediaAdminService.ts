@@ -13,7 +13,6 @@ import {
 export interface UploadMediaInput {
   file: File;
   category: MediaDomain;
-
   filename?: string;
   alt_text?: string;
   link?: string;
@@ -60,10 +59,12 @@ export class MediaAdminService implements IMediaAdminService {
     const { path } = await this.storage.upload(storageInput);
     
     // Затем сохраняем запись в базе данных
+    // ИСПРАВЛЕНО: добавлено обязательное поле 'bucket'
     await insertMedia({
       category: input.category,
       filename: input.filename || input.file.name,
       path,
+      bucket: 'media', // Значение по умолчанию для вашего хранилища
       alt_text: input.alt_text,
       link: input.link,
       url: input.url,
