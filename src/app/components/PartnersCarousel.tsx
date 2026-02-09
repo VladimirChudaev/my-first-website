@@ -12,7 +12,10 @@ export default function PartnersCarousel() {
     async function loadPartners() {
       try {
         const data = await PartnersService.getVisible();
-        setPartners(data);
+        if (data && data.length > 0) {
+          // Дублируем для плавности
+          setPartners([...data, ...data, ...data]);
+        }
       } catch (error) {
         console.error('Error loading partners:', error);
       } finally {
@@ -25,16 +28,14 @@ export default function PartnersCarousel() {
   if (loading || partners.length === 0) return null;
 
   return (
-    <section className="py-12 bg-white">
-      <div className="max-w-7xl mx-auto px-4">
-        <h2 className="text-2xl font-bold mb-8 text-center text-gray-800">
-          Наши партнеры
-        </h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 items-center justify-items-center">
-          {partners.map((partner) => (
+    <section className="py-6 bg-white overflow-hidden">
+      {/* Заголовок удален */}
+      <div className="relative flex overflow-hidden group">
+        <div className="flex animate-marquee whitespace-nowrap items-center">
+          {partners.map((partner, idx) => (
             <div 
-              key={partner.id} 
-              className="relative w-full h-20 grayscale hover:grayscale-0 transition-all duration-300"
+              key={`${partner.id}-${idx}`} 
+              className="mx-12 relative w-32 h-20 grayscale hover:grayscale-0 transition-all duration-300 flex-shrink-0"
             >
               {partner.imageUrl && (
                 <Image
@@ -42,13 +43,28 @@ export default function PartnersCarousel() {
                   alt={partner.name || 'Partner'}
                   fill
                   className="object-contain"
-                  sizes="(max-width: 768px) 50vw, 15vw"
+                  sizes="128px"
                 />
               )}
             </div>
           ))}
         </div>
       </div>
+
+      <style jsx>{`
+        @keyframes marquee {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-33.33%); }
+        }
+        .animate-marquee {
+          display: flex;
+          width: max-content;
+          animation: marquee 40s linear infinite;
+        }
+        .group:hover .animate-marquee {
+          animation-play-state: paused;
+        }
+      `}</style>
     </section>
   );
 }

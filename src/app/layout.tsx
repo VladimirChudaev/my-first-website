@@ -30,10 +30,10 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}
       >
         <SiteHeader />
-        {/* Добавляем main с отступом pt-24 или pt-32 и flex-grow для футера */}
-        <main className="pt-24 flex-grow">
+        {/* Контент начинается от самого верха страницы, без отступа pt-24 */}
+        <div className="flex-grow">
           {children}
-        </main>
+        </div>
         <Footer />
       </body>
     </html>

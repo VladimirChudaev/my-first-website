@@ -1,5 +1,5 @@
 import { PartnersRepository, PartnerRecord } from '@/lib/repositories/PartnersRepository';
-import { mediaService } from './MediaService'; // Импортируем объект (с маленькой буквы)
+import { mediaService } from './MediaService'; 
 import { MediaAsset } from '../media/types';
 
 export interface PartnerDTO {
@@ -14,11 +14,9 @@ export interface PartnerDTO {
 
 export class PartnersService {
   private static async enrich(partners: PartnerRecord[]): Promise<PartnerDTO[]> {
-    // 1. Исправлено: используем getByCategory вместо getByDomain
     const mediaMap: MediaAsset[] = await mediaService.getByCategory('partner');
 
     return partners.map((partner) => {
-      // Ищем соответствующий медиа-файл по media_id
       const media = partner.media_id
         ? mediaMap.find((m) => m.id === partner.media_id)
         : null;
@@ -29,7 +27,6 @@ export class PartnersService {
         url: partner.url,
         position: partner.position,
         is_visible: partner.is_visible,
-        // 2. Исправлено: вызываем метод у объекта mediaService
         imageUrl: media ? mediaService.getPublicUrl(media.path || media.filename) : null,
         media_id: partner.media_id
       };
