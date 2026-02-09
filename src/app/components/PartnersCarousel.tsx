@@ -1,35 +1,39 @@
 'use client';
 
-import ProjectCard from './ProjectCard';
+import Image from 'next/image';
 
-interface Project {
-  id: string;
-  title: string;
-  description: string;
-  author?: string;
-  imageUrl?: string;
+interface Partner {
+  id: string | number;
+  imageUrl: string;
+  name?: string;
 }
 
-interface ProjectCarouselProps {
-  projects: Project[];
-  isTvCarousel?: boolean;
+interface PartnersCarouselProps {
+  // Делаем пропс необязательным (?), чтобы не было ошибок в page.tsx
+  partners?: Partner[];
 }
 
-export default function ProjectCarousel({ projects, isTvCarousel = false }: ProjectCarouselProps) {
-  if (!projects || projects.length === 0) return null;
+export default function PartnersCarousel({ partners = [] }: PartnersCarouselProps) {
+  // Если партнеров нет, компонент просто не отображается, не ломая сайт
+  if (!partners || partners.length === 0) return null;
 
   return (
-    <div className="flex flex-col gap-12">
-      {projects.map((project) => (
-        <ProjectCard
-          key={project.id}
-          title={project.title}
-          description={project.description}
-          author={project.author}
-          imageUrl={project.imageUrl}
-          isTvProject={isTvCarousel}
-        />
-      ))}
-    </div>
+    <section className="py-12 bg-white">
+      <div className="max-w-7xl mx-auto px-4">
+        <h2 className="text-2xl font-bold mb-8 text-center text-gray-800">Наши партнеры</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 items-center justify-items-center">
+          {partners.map((partner) => (
+            <div key={partner.id} className="relative w-full h-20 grayscale hover:grayscale-0 transition-all duration-300">
+              <Image
+                src={partner.imageUrl}
+                alt={partner.name || 'Partner'}
+                fill
+                className="object-contain"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }

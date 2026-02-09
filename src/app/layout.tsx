@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import SiteHeader from './components/SiteHeader';  // ← добавлено
-import Footer from './components/Footer';          // ← добавлено
+import SiteHeader from './components/SiteHeader';
+import Footer from './components/Footer';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,11 +27,14 @@ export default function RootLayout({
   return (
     <html lang="ru">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}
       >
-        <SiteHeader />   {/* ← добавлено */}
-        {children}
-        <Footer />       {/* ← добавлено */}
+        <SiteHeader />
+        {/* Добавляем main с отступом pt-24 или pt-32 и flex-grow для футера */}
+        <main className="pt-24 flex-grow">
+          {children}
+        </main>
+        <Footer />
       </body>
     </html>
   );

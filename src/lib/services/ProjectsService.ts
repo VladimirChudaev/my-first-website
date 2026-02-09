@@ -12,18 +12,13 @@ export const ProjectsService = {
       .order('position', { ascending: true });
 
     if (error) {
-      console.error('Error fetching projects:', error);
+      console.error('Ошибка при загрузке проектов:', error);
       return [];
     }
 
-    return (data || []).map(item => ({
-      id: item.id,
-      title: item.title || '',
-      description: item.alt_text || '', // Добавляем, чтобы не было ошибки типа
-      author: '',                       // Добавляем заглушку для типа Project
-      filename: item.filename || '', 
-      imageUrl: item.url || '',      
-      position: item.position
-    }));
+    // Возвращаем чистые данные. 
+    // Маппинг под конкретные карточки (imageUrl, автор и т.д.) 
+    // лучше делать уже там, где данные потребляются.
+    return data || [];
   }
 };
