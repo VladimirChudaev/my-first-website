@@ -4,6 +4,11 @@ import Link from 'next/link';
 
 const items = [
   {
+    title: 'Партнеры',
+    description: 'Управление логотипами и ссылками партнеров',
+    href: '/admin/partners',
+  },
+  {
     title: 'Content',
     description: 'Manage page blocks and structured content',
     href: '/admin/content',
@@ -38,17 +43,17 @@ const items = [
 export default function AdminDashboardPage() {
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-semibold mb-6">Admin dashboard</h1>
+      <h1 className="text-2xl font-semibold mb-6">Панель управления</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {items.map((item) => (
           <Link
             key={item.href}
             href={item.href}
-            className="border rounded-lg p-4 hover:bg-muted transition"
+            className="border rounded-lg p-4 hover:bg-gray-50 hover:shadow-sm transition"
           >
-            <div className="text-lg font-medium">{item.title}</div>
-            <div className="text-sm text-muted-foreground">
+            <div className="text-lg font-medium text-blue-600">{item.title}</div>
+            <div className="text-sm text-gray-600">
               {item.description}
             </div>
           </Link>

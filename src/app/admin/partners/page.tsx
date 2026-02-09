@@ -1,10 +1,9 @@
-// src/app/admin/partners/page.tsx
 import Link from 'next/link';
 import { PartnersService } from '@/lib/services/PartnersService';
-import PartnersTable from '@/components/admin/tables/PartnersTable'; // Создадим этот компонент
+// Исправленный импорт: убираем лишний /app/ из пути алиаса
+import PartnersTable from '@/components/admin/tables/PartnersTable'; 
 
 export default async function AdminPartnersPage() {
-  // Данные загружаются на сервере через сервис [cite: 10, 69]
   const initialPartners = await PartnersService.getAll();
 
   return (
@@ -19,7 +18,6 @@ export default async function AdminPartnersPage() {
         </Link>
       </div>
 
-      {/* Передаем данные в клиентский компонент для интерактивности */}
       <PartnersTable initialData={initialPartners} />
     </div>
   );
