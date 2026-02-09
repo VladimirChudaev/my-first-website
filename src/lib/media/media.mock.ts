@@ -1,13 +1,12 @@
 import { MediaAsset, MediaDomain } from './types';
 
-// 1. Сами данные
 export const videoAssets: MediaAsset[] = [
   {
-    id: 'video-1',
+    id: '1',
     category: 'video',
     path: '/vc_ruki.png',
-    alt_text: 'Видео проект',
-    url: 'https://example.com',
+    alt_text: 'Hands project',
+    url: 'https://example.com/1',
     filename: 'vc_ruki.png',
     bucket: 'media',
     is_visible: true,
@@ -15,25 +14,50 @@ export const videoAssets: MediaAsset[] = [
     width: 1920,
     height: 1080,
   },
-  // ... добавь остальные объекты сюда, если они были, 
-  // но обязательно с bucket и is_visible
+  {
+    id: '2',
+    category: 'video',
+    path: '/design_system.png',
+    alt_text: 'Design System',
+    url: 'https://example.com/2',
+    filename: 'design_system.png',
+    bucket: 'media',
+    is_visible: true,
+    position: 2,
+    width: 1920,
+    height: 1080,
+  }
 ];
 
-// 2. ТЕ САМЫЕ ФУНКЦИИ, КОТОРЫЕ ИЩЕТ СИСТЕМА:
+// Функции-заглушки с корректными сигнатурами
 export const getMediaByDomainMock = async (domain: MediaDomain): Promise<MediaAsset[]> => {
-  return videoAssets; 
+  return videoAssets.filter(asset => asset.category === domain);
 };
 
-export const getMediaUrlMock = (path: string) => path;
+export const getMediaUrlMock = (path: string): string => {
+  return path;
+};
 
 export const getMediaByIdMock = async (id: string): Promise<MediaAsset | null> => {
   return videoAssets.find(a => a.id === id) || null;
 };
 
-export const insertMediaMock = async (asset: any) => asset;
-export const updateMediaMock = async (id: string, asset: any) => asset;
-export const deleteMediaMock = async (id: string) => ({ id });
-export const updateMediaOrderMock = async (updates: any[]) => updates;
+export const insertMediaMock = async (asset: Omit<MediaAsset, 'id'>): Promise<MediaAsset> => {
+  const newAsset = { ...asset, id: Math.random().toString(36).substr(2, 9) } as MediaAsset;
+  return newAsset;
+};
 
-// Дефолтный экспорт для совместимости, если он где-то нужен
+export const updateMediaMock = async (id: string, asset: Partial<MediaAsset>): Promise<MediaAsset> => {
+  return { ...videoAssets[0], ...asset, id };
+};
+
+export const deleteMediaMock = async (id: string): Promise<void> => {
+  return Promise.resolve();
+};
+
+// Исправлено: теперь принимает 2 аргумента согласно вызову в media.ts
+export const updateMediaOrderMock = async (category: MediaDomain, orderedIds: string[]): Promise<void> => {
+  return Promise.resolve();
+};
+
 export default videoAssets;
