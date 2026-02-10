@@ -1,139 +1,130 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { createClient } from '@/lib/client'; // Важно: используем клиентский конфиг
+import { createClient } from '@/lib/client';
+import DataTable, { DataTableColumn } from '@/components/admin/DataTable';
+import { Pencil, Trash2, Eye, EyeOff } from 'lucide-react';
 
-export default function AdminMediaListPage() {
-  const [mediaItems, setMediaItems] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+export default function AdminMediaPage() {
+  const [media, setMedia] = useState<any[]>([]);
   const supabase = createClient();
 
-  // Загрузка данных
   useEffect(() => {
-    fetchMedia();
+    loadData();
   }, []);
 
-  async function fetchMedia() {
+  async function loadData() {
     const { data } = await supabase
       .from('media')
       .select('*')
       .order('created_at', { ascending: false });
-    if (data) setMediaItems(data);
-    setLoading(false);
-  }
+    
+    if (data) {
+      const mediaWithUrls = data.map(item => {
+        const { data: { publicUrl } } = supabase.storage
+          .from('media')
+          .getPublicUrl(item.filename);
 
-  // Функция удаления
-  async function handleDelete(item: any) {
-    if (!confirm(`Удалить файл ${item.filename}?`)) return;
-
-    try {
-      // 1. Удаляем из хранилища (Storage)
-      await supabase.storage.from(item.bucket).remove([item.filename]);
-      // 2. Удаляем запись из базы (Database)
-      await supabase.from('media').delete().eq('id', item.id);
+        return { ...item, full_url: publicUrl };
+      });
       
-      setMediaItems(mediaItems.filter(i => i.id !== item.id));
-    } catch (error) {
-      alert('Ошибка при удалении');
+      setMedia(mediaWithUrls);
     }
   }
 
-  // Переключение видимости
-  async function toggleVisible(item: any) {
-    const nextStatus = !item.is_visible;
-    const { error } = await supabase
-      .from('media')
-      .update({ is_visible: nextStatus })
-      .eq('id', item.id);
+  // Функция быстрого переключения видимости
+  const toggleVisibility = async (item: any) => {
+    try {
+      const newStatus = !item.is_visible;
+      const { error } = await supabase
+        .from('media')
+        .update({ is_visible: newStatus })
+        .eq('id', item.id);
 
-    if (!error) {
-      setMediaItems(mediaItems.map(i => i.id === item.id ? { ...i, is_visible: nextStatus } : i));
+      if (error) throw error;
+
+      setMedia(prev => prev.map(m => 
+        m.id === item.id ? { ...m, is_visible: newStatus } : m
+      ));
+    } catch (err) {
+      console.error(err);
+      alert('Ошибка при обновлении статуса');
     }
-  }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Удалить проект?')) return;
+    try {
+      const response = await fetch(`/api/admin/media/${id}`, { method: 'DELETE' });
+      if (response.ok) {
+        setMedia(prev => prev.filter(item => item.id !== id));
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const columns: DataTableColumn<any>[] = [
+    {
+      key: 'full_url', 
+      title: 'Превью',
+      className: 'w-24',
+      render: (url) => (
+        <div className="w-16 h-10 bg-gray-100 rounded overflow-hidden border border-gray-100 flex items-center justify-center">
+          {url ? (
+            <img src={url} alt="preview" className="w-full h-full object-cover" 
+                 onError={(e) => {(e.target as HTMLImageElement).src = 'https://placehold.co/64x40?text=Error'}} />
+          ) : (
+            <div className="text-[10px] text-gray-400">Нет фото</div>
+          )}
+        </div>
+      )
+    },
+    { key: 'title', title: 'Название проекта' },
+    { key: 'credits', title: 'Создатели' },
+    { 
+      key: 'is_visible', 
+      title: 'Статус',
+      className: 'text-center w-32',
+      render: (_, row) => (
+        <button 
+          onClick={() => toggleVisibility(row)}
+          className={`p-2 rounded-full transition-colors ${
+            row.is_visible ? 'text-blue-600 hover:bg-blue-50' : 'text-gray-300 hover:bg-gray-50'
+          }`}
+          title={row.is_visible ? 'Скрыть' : 'Показать'}
+        >
+          {row.is_visible ? <Eye size={20} /> : <EyeOff size={20} />}
+        </button>
+      )
+    },
+    {
+      key: 'actions',
+      title: 'Действия',
+      className: 'text-right w-24',
+      render: (_, row) => (
+        <div className="flex justify-end gap-3">
+          <Link href={`/admin/media/${row.id}`} className="text-gray-400 hover:text-green-600 transition-colors">
+            <Pencil size={20} />
+          </Link>
+          <button onClick={() => handleDelete(row.id)} className="text-gray-400 hover:text-red-600 transition-colors">
+            <Trash2 size={20} />
+          </button>
+        </div>
+      ),
+    },
+  ];
 
   return (
-    <div className="p-8 space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-800">Медиабиблиотека</h1>
-        <Link
-          href="/admin/media/new"
-          className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white text-sm transition-colors shadow-sm"
-        >
-          + Добавить медиа
+    <div className="p-6">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-gray-800">Проекты (Медиа)</h1>
+        <Link href="/admin/media/new" className="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700 transition-colors">
+          + Добавить проект
         </Link>
       </div>
-
-      <div className="bg-white border rounded-xl shadow-sm overflow-hidden">
-        <table className="w-full text-sm text-left">
-          <thead className="bg-gray-50 border-b text-gray-500 uppercase text-[10px] font-bold tracking-wider">
-            <tr>
-              <th className="p-4">Превью</th>
-              <th className="p-4">Название / Файл</th>
-              <th className="p-4">Категория</th>
-              <th className="p-4 text-center">Статус</th>
-              <th className="p-4 text-right">Действия</th>
-            </tr>
-          </thead>
-
-          <tbody className="divide-y divide-gray-100">
-            {!loading && mediaItems.map((item) => (
-              <tr key={item.id} className={`hover:bg-gray-50/50 transition-colors ${!item.is_visible ? 'opacity-60' : ''}`}>
-                <td className="p-4 w-24">
-                  <div className="w-16 h-10 rounded border bg-gray-100 overflow-hidden shadow-sm">
-                    <img 
-                      src={`https://hdrxoowpnhrschlonivc.supabase.co/storage/v1/object/public/${item.bucket}/${item.filename}`}
-                      alt=""
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                </td>
-                <td className="p-4">
-                  <div className="font-medium text-gray-900">{item.title || 'Без названия'}</div>
-                  <div className="text-xs text-gray-400 mt-0.5">{item.filename}</div>
-                </td>
-                <td className="p-4">
-                  <span className="px-2 py-0.5 bg-gray-100 border rounded-full text-[10px] font-bold text-gray-500 uppercase">
-                    {item.category}
-                  </span>
-                </td>
-                <td className="p-4 text-center">
-                  <button 
-                    onClick={() => toggleVisible(item)}
-                    className={`inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold uppercase transition-colors ${
-                      item.is_visible 
-                        ? 'bg-green-50 text-green-700 border border-green-200' 
-                        : 'bg-gray-100 text-gray-500 border border-gray-200'
-                    }`}
-                  >
-                    {item.is_visible ? 'Виден' : 'Скрыт'}
-                  </button>
-                </td>
-                <td className="p-4 text-right">
-                  <div className="flex justify-end gap-3 items-center">
-                    <Link
-                      href={`/admin/media/${item.id}`}
-                      className="text-indigo-600 hover:text-indigo-900 font-bold text-[11px] uppercase"
-                    >
-                      Изменить
-                    </Link>
-                    <button
-                      onClick={() => handleDelete(item)}
-                      className="text-red-500 hover:text-red-700 font-bold text-[11px] uppercase"
-                    >
-                      Удалить
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        
-        {mediaItems.length === 0 && !loading && (
-          <div className="p-12 text-center text-gray-400 italic">Медиафайлы не найдены.</div>
-        )}
-      </div>
+      <DataTable columns={columns} data={media} />
     </div>
   );
 }

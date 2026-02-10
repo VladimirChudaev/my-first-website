@@ -12,7 +12,7 @@ export default function EditPartnerPage({ params }: { params: Promise<{ id: stri
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [file, setFile] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string | null>(null); // Для превью нового файла
+  const [preview, setPreview] = useState<string | null>(null);
   const [formData, setFormData] = useState<PartnerDTO | null>(null);
 
   useEffect(() => {
@@ -36,7 +36,6 @@ export default function EditPartnerPage({ params }: { params: Promise<{ id: stri
     loadPartner();
   }, [id, router]);
 
-  // Обработка выбора файла
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0] || null;
     setFile(selectedFile);
@@ -56,7 +55,6 @@ export default function EditPartnerPage({ params }: { params: Promise<{ id: stri
       let currentMediaId = formData.media_id;
 
       if (file) {
-        // Загрузка нового логотипа
         const uploadedMedia = await mediaService.upload(file, 'partner');
         currentMediaId = uploadedMedia.id;
       }
@@ -79,18 +77,18 @@ export default function EditPartnerPage({ params }: { params: Promise<{ id: stri
     }
   };
 
-  if (loading || !formData) return <div className="p-8">Загрузка данных...</div>;
+  if (loading || !formData) return <div className="p-8 text-center text-gray-500">Загрузка данных...</div>;
 
   return (
     <div className="p-6 max-w-2xl">
-      <h1 className="text-2xl font-bold mb-6">Редактировать партнёра</h1>
+      <h1 className="text-2xl font-bold mb-6 text-gray-800">Редактировать партнёра</h1>
       
-      <form onSubmit={handleSubmit} className="space-y-4 bg-white p-6 rounded shadow">
+      <form onSubmit={handleSubmit} className="space-y-4 bg-white p-6 rounded-lg shadow-sm border border-gray-200">
         <div>
           <label className="block text-sm font-medium mb-1 text-gray-700">Название организации</label>
           <input
             required
-            className="w-full border rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none"
+            className="w-full border border-gray-300 rounded p-2 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
             value={formData.name}
             onChange={e => setFormData({ ...formData, name: e.target.value })}
           />
@@ -100,7 +98,7 @@ export default function EditPartnerPage({ params }: { params: Promise<{ id: stri
           <label className="block text-sm font-medium mb-1 text-gray-700">URL сайта</label>
           <input
             type="url"
-            className="w-full border rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none"
+            className="w-full border border-gray-300 rounded p-2 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
             value={formData.url || ''}
             onChange={e => setFormData({ ...formData, url: e.target.value })}
             placeholder="https://example.com"
@@ -110,8 +108,9 @@ export default function EditPartnerPage({ params }: { params: Promise<{ id: stri
         <div>
           <label className="block text-sm font-medium mb-1 text-gray-700">Логотип</label>
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-24 h-24 border-2 border-dashed rounded bg-gray-50 flex items-center justify-center overflow-hidden">
+            <div className="w-24 h-24 border border-gray-200 rounded bg-gray-50 flex items-center justify-center overflow-hidden">
               <img 
+                // Исправлено: используем imageUrl вместо logo_url
                 src={preview || formData.imageUrl || '/placeholder.png'} 
                 alt="Preview" 
                 className="object-contain w-full h-full p-1"
@@ -128,7 +127,7 @@ export default function EditPartnerPage({ params }: { params: Promise<{ id: stri
               />
             </label>
           </div>
-          {file && <span className="text-xs text-green-600 block">Новый файл подготовлен: {file.name}</span>}
+          {file && <span className="text-xs text-green-600 block">Новый файл готов: {file.name}</span>}
         </div>
 
         <div className="flex gap-4">
@@ -136,7 +135,7 @@ export default function EditPartnerPage({ params }: { params: Promise<{ id: stri
             <label className="block text-sm font-medium mb-1 text-gray-700">Порядок (позиция)</label>
             <input
               type="number"
-              className="w-full border rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none"
+              className="w-full border border-gray-300 rounded p-2 outline-none focus:border-blue-500"
               value={formData.position}
               onChange={e => setFormData({ ...formData, position: parseInt(e.target.value) || 0 })}
             />
@@ -154,7 +153,7 @@ export default function EditPartnerPage({ params }: { params: Promise<{ id: stri
           </div>
         </div>
 
-        <div className="pt-6 flex gap-3">
+        <div className="pt-6 flex gap-3 border-t border-gray-100 mt-6">
           <button
             type="submit"
             disabled={saving}
