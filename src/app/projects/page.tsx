@@ -1,8 +1,21 @@
 import { ProjectsService } from '@/lib/services/ProjectsService';
 import ProjectCarousel from '../components/ProjectCarousel';
+import InnerPageHeader from '@/app/components/InnerPageHeader';
+import { createClient } from '@/lib/server'; // Проверь путь к серверному клиенту Supabase
 
 export default async function ProjectsPage() {
+  const supabase = await createClient();
+  
+  // 1. Загружаем проекты из Media
   const allMedia = await ProjectsService.getProjectsWithMedia();
+  
+  // 2. Загружаем тексты и настройки из новой таблицы page_content
+  const { data: contentBlocks } = await supabase
+    .from('page_content')
+    .select('*')
+    .eq('page', 'projects');
+
+  const getBlock = (key: string) => contentBlocks?.find(b => b.section_key === key) || {};
 
   const transformProject = (item: any) => ({
     id: String(item.id),
@@ -14,45 +27,48 @@ export default async function ProjectsPage() {
 
   const projectsOnly = allMedia.filter(m => m.category === 'project');
 
-  const artData = projectsOnly.filter(m => m.filename?.startsWith('h_')).map(transformProject);
-  const docData = projectsOnly.filter(m => m.filename?.startsWith('d_')).map(transformProject);
-  const tvData = projectsOnly.filter(m => m.filename?.startsWith('t_')).map(transformProject);
-  const bizData = projectsOnly.filter(m => m.filename?.startsWith('b_')).map(transformProject);
+  // Группируем данные
+  const sections = [
+    { key: 'h', data: projectsOnly.filter(m => m.filename?.startsWith('h_')).map(transformProject) },
+    { key: 'd', data: projectsOnly.filter(m => m.filename?.startsWith('d_')).map(transformProject) },
+    { key: 't', data: projectsOnly.filter(m => m.filename?.startsWith('t_')).map(transformProject), isTv: true },
+    { key: 'b', data: projectsOnly.filter(m => m.filename?.startsWith('b_')).map(transformProject) },
+  ];
 
   return (
-    // Заменили py-10 на pt-32 (отступ сверху) и pb-10 (отступ снизу)
-    <main className="bg-white pt-32 pb-10">
-      <div className="max-w-[1440px] mx-auto space-y-20 px-6">
-        
-        {artData.length > 0 && (
-          <section>
-            <h2 className="text-3xl font-bold mb-6">Художественные проекты</h2>
-            <ProjectCarousel projects={artData} />
-          </section>
-        )}
+    <>
+      <InnerPageHeader />
+      <main className="bg-white min-h-screen">
+        {sections.map((section) => {
+          const block = getBlock(section.key);
+          if (section.data.length === 0) return null;
 
-        {docData.length > 0 && (
-          <section>
-            <h2 className="text-3xl font-bold mb-6">Документальные проекты</h2>
-            <ProjectCarousel projects={docData} />
-          </section>
-        )}
-
-        {tvData.length > 0 && (
-          <section>
-            <h2 className="text-3xl font-bold mb-6">Телепроекты</h2>
-            <ProjectCarousel projects={tvData} />
-          </section>
-        )}
-
-        {bizData.length > 0 && (
-          <section>
-            <h2 className="text-3xl font-bold mb-6">Кино для бизнеса</h2>
-            <ProjectCarousel projects={bizData} />
-          </section>
-        )}
-
-      </div>
-    </main>
+          return (
+            <section 
+              key={section.key} 
+              id={section.key} 
+              className={`${block.bg_color || 'bg-white'} py-16 md:py-24 border-b border-gray-100`}
+            >
+              <div className="max-w-[1440px] mx-auto px-6">
+                <div className="flex flex-col md:flex-row gap-8 md:gap-16 items-start mb-16">
+                  <div className="w-full md:w-1/3">
+                    <h2 className="text-3xl md:text-4xl font-black uppercase tracking-widest text-gray-900 leading-tight">
+                      {block.title || 'Заголовок не задан'}
+                    </h2>
+                  </div>
+                  <div className="hidden md:block w-px h-20 bg-gray-300 self-center"></div>
+                  <div className="w-full md:w-2/3">
+                    <p className="text-base md:text-lg text-gray-700 leading-relaxed font-light">
+                      {block.body || 'Описание не заполнено в админке.'}
+                    </p>
+                  </div>
+                </div>
+                <ProjectCarousel projects={section.data} isTvCarousel={section.isTv} />
+              </div>
+            </section>
+          );
+        })}
+      </main>
+    </>
   );
 }
