@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import Image from 'next/image';
 import { getMediaByDomain, getMediaUrl } from '@/lib/media/media';
 import { MediaAsset } from '@/lib/media/types';
 
@@ -18,82 +17,62 @@ export default function VideoCarousel() {
     const load = async () => {
       try {
         const data = await getMediaByDomain('video');
-
         const filtered = data.filter(v => v.path);
-
         const mapped: VideoAsset[] = await Promise.all(
           filtered.map(async (video) => ({
             ...video,
             previewUrl: await getMediaUrl(video.path!),
           }))
         );
-
         setVideos(mapped);
       } catch (error) {
-        console.error('Error loading videos:', error);
-        setVideos([]);
+        console.error('Video load error:', error);
       }
     };
-
     load();
   }, []);
 
   useEffect(() => {
-    if (videos.length < 2) return;
-
+    if (videos.length <= 3) return;
     intervalRef.current = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % videos.length);
     }, 5000);
-
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
   }, [videos.length]);
 
   if (!videos.length) return null;
 
-  const getVisibleSlides = () => {
-    const total = videos.length;
-    if (total <= 3) return videos;
-
-    const prev = (currentIndex - 1 + total) % total;
-    const next = (currentIndex + 1) % total;
-
-    return [videos[prev], videos[currentIndex], videos[next]];
-  };
-
-  const visibleSlides = getVisibleSlides();
+  const visibleSlides = [];
+  for (let i = 0; i < 3; i++) {
+    visibleSlides.push(videos[(currentIndex + i) % videos.length]);
+  }
 
   return (
-    <section className="bg-white py-20 overflow-hidden">
-      <div className="container mx-auto max-w-7xl px-6">
-        <div className="flex justify-center gap-8">
-          {visibleSlides.map((video) => (
-            <div
-              key={video.id}
-              className="w-1/3 aspect-video rounded-xl overflow-hidden shadow-lg"
+    // Уменьшил вертикальные отступы py-8 вместо py-20, чтобы не было дыр
+    <section className="bg-white py-8">
+      {/* max-w-[1440px] или full сделает карточки максимально крупными, как на скрине main */}
+      <div className="container mx-auto max-w-[1400px] px-4">
+        
+        {/* Сетка с фиксированным gap, чтобы размер карточек был стабильным */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {visibleSlides.map((video, idx) => (
+            <div 
+              key={`${video.id}-${idx}`} 
+              className="relative aspect-video bg-gray-100 overflow-hidden shadow-sm"
             >
-              <a
-                href={video.url || '#'}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="relative block w-full h-full"
+              <a 
+                href={video.url || '#'} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="block w-full h-full"
               >
                 {video.previewUrl && (
-                  <Image
+                  <img
                     src={video.previewUrl}
                     alt={video.alt_text || ''}
-                    fill
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    className="object-cover"
-                    priority
-                    unoptimized={video.previewUrl.endsWith('.svg')}
+                    className="w-full h-full object-cover"
                   />
                 )}
-
-                <div className="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/40 transition">
-                  <span className="text-white text-2xl">▶</span>
-                </div>
               </a>
             </div>
           ))}

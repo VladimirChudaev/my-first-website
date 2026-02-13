@@ -82,7 +82,7 @@ export default function AwardsCarousel() {
     <section className="bg-white py-16 md:py-24 overflow-hidden">
       <div className="mx-auto w-full max-w-5xl px-8">
         
-        {/* ОТКЛЮЧАЕМЫЙ ХЕДЕР СЕКЦИИ */}
+        {/* Заголовок секции */}
         {intro.is_visible && (
           <div className="text-center mb-16">
             <h2 className="text-2xl md:text-3xl font-black mb-3 uppercase tracking-tighter text-gray-900">
@@ -94,17 +94,22 @@ export default function AwardsCarousel() {
           </div>
         )}
 
-        <div className="relative">
-          <AnimatePresence initial={false} custom={direction} mode="wait">
+        {/* СТАБИЛЬНЫЙ КОНТЕЙНЕР: 
+            min-h фиксирует высоту, чтобы страница не дергалась при смене слайдов.
+        */}
+        <div className="relative min-h-[550px] md:min-h-[420px] w-full">
+          <AnimatePresence initial={false} mode="wait">
             <motion.div
               key={page}
-              custom={direction}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.5 }}
-              className="w-full flex flex-col md:flex-row items-stretch justify-center gap-12 md:gap-20"
+              initial={{ opacity: 0, x: 10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -10 }}
+              transition={{ duration: 0.4, ease: "easeInOut" }}
+              // absolute гарантирует, что один слайд не "выталкивает" другой физически
+              className="absolute inset-0 w-full flex flex-col md:flex-row items-stretch justify-center gap-12 md:gap-20"
             >
+              
+              {/* Левая часть: Текст */}
               <div className="flex-1 flex flex-col justify-between py-2 text-center md:text-left">
                 <div className="space-y-4">
                   <h3 className="text-xl md:text-2xl font-black text-gray-900 leading-tight uppercase">
@@ -114,7 +119,9 @@ export default function AwardsCarousel() {
                     <p className="text-blue-600 font-bold uppercase tracking-[0.2em] text-[10px] md:text-xs">
                       {awards[index].festival}
                     </p>
-                    <p className="text-gray-400 italic text-sm md:text-base">— {awards[index].status}</p>
+                    <p className="text-gray-400 italic text-sm md:text-base">
+                      — {awards[index].status}
+                    </p>
                   </div>
                 </div>
 
@@ -127,15 +134,17 @@ export default function AwardsCarousel() {
                 )}
               </div>
 
-              <div className="w-full md:w-[320px] lg:w-[400px]">
-                <div className="w-full h-full flex items-center justify-center bg-gray-50/30 rounded-lg p-4">
+              {/* Правая часть: Логотип */}
+              <div className="w-full md:w-[320px] lg:w-[400px] flex-shrink-0 flex items-center justify-center">
+                <div className="w-full h-full min-h-[250px] flex items-center justify-center bg-gray-50/30 rounded-lg p-8">
                   <img
                     src={awards[index].url}
                     alt={awards[index].alt_text || 'Award'}
-                    className="w-full h-full object-contain grayscale hover:grayscale-0 transition-all duration-700"
+                    className="max-w-full max-h-[300px] object-contain grayscale hover:grayscale-0 transition-all duration-700 select-none"
                   />
                 </div>
               </div>
+
             </motion.div>
           </AnimatePresence>
         </div>
