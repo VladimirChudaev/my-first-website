@@ -17,7 +17,7 @@ interface Award {
 
 export default function AwardsCarousel() {
   const [awards, setAwards] = useState<Award[]>([]);
-  const [intro, setIntro] = useState({ title: '', body: '' });
+  const [intro, setIntro] = useState({ title: '', body: '', is_visible: true });
   const [[page, direction], setPage] = useState<[number, number]>([0, 0]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -38,7 +38,11 @@ export default function AwardsCarousel() {
         const introData = jsonHome.data?.find((b: any) => b.section_key === 'awards_intro');
         
         if (isMounted && introData) {
-          setIntro({ title: introData.title, body: introData.body });
+          setIntro({ 
+            title: introData.title || '', 
+            body: introData.body || '', 
+            is_visible: introData.is_visible !== false 
+          });
         }
 
         const mapped: Award[] = await Promise.all(
@@ -78,17 +82,18 @@ export default function AwardsCarousel() {
     <section className="bg-white py-16 md:py-24 overflow-hidden">
       <div className="mx-auto w-full max-w-5xl px-8">
         
-        {/* Хедер всей секции */}
-        <div className="text-center mb-16">
-          <h2 className="text-2xl md:text-3xl font-black mb-3 uppercase tracking-tighter text-gray-900">
-            {intro.title || 'Наши награды'}
-          </h2>
-          <p className="text-base text-gray-400 font-light max-w-xl mx-auto italic">
-            {intro.body || 'Проекты компании отмечены призами ведущих кинофестивалей'}
-          </p>
-        </div>
+        {/* ОТКЛЮЧАЕМЫЙ ХЕДЕР СЕКЦИИ */}
+        {intro.is_visible && (
+          <div className="text-center mb-16">
+            <h2 className="text-2xl md:text-3xl font-black mb-3 uppercase tracking-tighter text-gray-900">
+              {intro.title}
+            </h2>
+            <p className="text-base text-gray-400 font-light max-w-xl mx-auto italic">
+              {intro.body}
+            </p>
+          </div>
+        )}
 
-        {/* Контент карусели */}
         <div className="relative">
           <AnimatePresence initial={false} custom={direction} mode="wait">
             <motion.div
@@ -98,12 +103,9 @@ export default function AwardsCarousel() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.5 }}
-              // ВАЖНО: items-stretch растягивает обе колонки на одну высоту
               className="w-full flex flex-col md:flex-row items-stretch justify-center gap-12 md:gap-20"
             >
-              
-              {/* ЛЕВАЯ ЧАСТЬ: Текст */}
-              <div className="flex-1 flex flex-col justify-between py-2">
+              <div className="flex-1 flex flex-col justify-between py-2 text-center md:text-left">
                 <div className="space-y-4">
                   <h3 className="text-xl md:text-2xl font-black text-gray-900 leading-tight uppercase">
                     {awards[index].title}
@@ -112,13 +114,10 @@ export default function AwardsCarousel() {
                     <p className="text-blue-600 font-bold uppercase tracking-[0.2em] text-[10px] md:text-xs">
                       {awards[index].festival}
                     </p>
-                    <p className="text-gray-400 italic text-sm md:text-base">
-                      — {awards[index].status}
-                    </p>
+                    <p className="text-gray-400 italic text-sm md:text-base">— {awards[index].status}</p>
                   </div>
                 </div>
 
-                {/* Описание прижато к низу колонки через justify-between выше */}
                 {awards[index].description && (
                   <div className="pt-6 border-t border-gray-100 mt-8">
                     <p className="text-gray-600 text-sm md:text-lg leading-relaxed font-medium italic opacity-80">
@@ -128,19 +127,15 @@ export default function AwardsCarousel() {
                 )}
               </div>
 
-              {/* ПРАВАЯ ЧАСТЬ: Логотип */}
               <div className="w-full md:w-[320px] lg:w-[400px]">
-                {/* aspect-square или фиксированное соотношение, чтобы логотип был крупным */}
                 <div className="w-full h-full flex items-center justify-center bg-gray-50/30 rounded-lg p-4">
                   <img
                     src={awards[index].url}
                     alt={awards[index].alt_text || 'Award'}
-                    // h-full заставляет логотип заполнять всю высоту, которую задает текст слева
                     className="w-full h-full object-contain grayscale hover:grayscale-0 transition-all duration-700"
                   />
                 </div>
               </div>
-
             </motion.div>
           </AnimatePresence>
         </div>

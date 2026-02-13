@@ -16,18 +16,18 @@ export async function GET() {
 export async function PATCH(request: Request) {
   try {
     const supabase = await createClient();
-    const { id, title, body } = await request.json();
+    const { id, title, body, is_visible } = await request.json();
 
     if (!id) {
       return NextResponse.json({ error: 'Missing ID' }, { status: 400 });
     }
 
-    // Оставляем только те поля, которые точно есть в твоей таблице
     const { data, error } = await supabase
       .from('page_content')
       .update({ 
         title, 
-        body
+        body,
+        is_visible 
       })
       .eq('id', id)
       .select();
