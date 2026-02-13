@@ -5,11 +5,7 @@ import Link from 'next/link';
 import { useEffect, useState, use } from 'react';
 import { createClient } from '@/lib/client';
 
-type Props = {
-  params: Promise<{ id: string }>;
-};
-
-export default function AdminMediaEditPage({ params }: Props) {
+export default function AdminMediaEditPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
   const supabase = createClient();
   const { id } = use(params);
@@ -23,32 +19,27 @@ export default function AdminMediaEditPage({ params }: Props) {
     title: '',
     description: '',
     credits: '',
+    alt_text: '',
+    link: '',
     is_visible: true,
-    filename: '' // Храним имя текущего файла
+    filename: '' 
   });
 
   useEffect(() => {
     async function loadMedia() {
-      const { data } = await supabase
-        .from('media')
-        .select('*')
-        .eq('id', id)
-        .single();
-
+      const { data } = await supabase.from('media').select('*').eq('id', id).single();
       if (data) {
         setFormData({
           title: data.title || '',
           description: data.description || '',
           credits: data.credits || '',
+          alt_text: data.alt_text || '',
+          link: data.link || '',
           is_visible: data.is_visible ?? true,
           filename: data.filename || ''
         });
-
-        // Получаем текущее изображение для превью
         if (data.filename) {
-          const { data: { publicUrl } } = supabase.storage
-            .from('media')
-            .getPublicUrl(data.filename);
+          const { data: { publicUrl } } = supabase.storage.from('media').getPublicUrl(data.filename);
           setPreviewUrl(publicUrl);
         }
       }
@@ -60,147 +51,91 @@ export default function AdminMediaEditPage({ params }: Props) {
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
-
-    let currentFilename = formData.filename;
-
-    // 1. Если выбран новый файл, загружаем его
-    if (file) {
-      const fileExt = file.name.split('.').pop();
-      const newFilename = `${Math.random()}.${fileExt}`;
-      
-      const { error: uploadError } = await supabase.storage
-        .from('media')
-        .upload(newFilename, file);
-
-      if (uploadError) {
-        alert('Error uploading image: ' + uploadError.message);
-        setSaving(false);
-        return;
+    try {
+      let currentFilename = formData.filename;
+      if (file) {
+        const fileExt = file.name.split('.').pop();
+        const newFilename = `${Math.random()}.${fileExt}`;
+        const { error: upErr } = await supabase.storage.from('media').upload(newFilename, file);
+        if (upErr) throw upErr;
+        currentFilename = newFilename;
       }
-      currentFilename = newFilename;
-    }
 
-    // 2. Обновляем данные в таблице
-    const { error } = await supabase
-      .from('media')
-      .update({
-        title: formData.title,
-        description: formData.description,
-        credits: formData.credits,
-        is_visible: formData.is_visible,
-        filename: currentFilename // Сохраняем имя файла
-      })
-      .eq('id', id);
+      const response = await fetch('/api/admin/media', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, ...formData, filename: currentFilename }),
+        cache: 'no-store',
+      });
 
-    setSaving(false);
-    if (!error) {
+      if (!response.ok) throw new Error('Ошибка сохранения');
+
       router.push('/admin/media');
       router.refresh();
-    } else {
-      alert('Error saving: ' + error.message);
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setSaving(false);
     }
   }
 
-  if (loading) return <div className="pt-24 px-8 text-gray-500 font-medium">Loading...</div>;
+  if (loading) return <div className="p-10 font-bold">ЗАГРУЗКА...</div>;
 
   return (
-    <div className="pt-24 px-8 pb-12 max-w-4xl space-y-6">
-      <div className="flex items-center justify-between border-b pb-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800">Edit Media Item</h1>
-          <p className="text-sm text-gray-400 font-mono mt-1">ID: {id}</p>
-        </div>
-        <Link href="/admin/media" className="text-sm font-medium text-blue-600 hover:text-blue-800">
-          ← Back to Library
-        </Link>
+    <div className="pt-24 px-8 pb-12 max-w-4xl mx-auto">
+      <div className="flex justify-between border-b-2 pb-4 mb-8">
+        <h1 className="text-2xl font-black uppercase">Редактировать проект</h1>
+        <Link href="/admin/media" className="text-blue-600 font-bold">← НАЗАД</Link>
       </div>
 
-      <form onSubmit={handleSave} className="bg-white border rounded-xl p-8 shadow-sm space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <label className="text-sm font-semibold text-gray-700">Project Title</label>
-            <input
-              type="text"
-              className="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
-              value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-semibold text-gray-700">Credits (Director, DOP)</label>
-            <input
-              type="text"
-              className="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
-              value={formData.credits}
-              onChange={(e) => setFormData({ ...formData, credits: e.target.value })}
-            />
-          </div>
+      <form onSubmit={handleSave} className="bg-white border p-8 rounded-3xl shadow-xl space-y-6">
+        <div className="grid grid-cols-2 gap-6">
+          <input
+            className="p-4 bg-gray-50 rounded-xl outline-none border-2 focus:border-blue-500"
+            placeholder="Название проекта"
+            value={formData.title}
+            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+          />
+          <input
+            className="p-4 bg-gray-50 rounded-xl outline-none border-2 focus:border-blue-500"
+            placeholder="Создатели"
+            value={formData.credits}
+            onChange={(e) => setFormData({ ...formData, credits: e.target.value })}
+          />
         </div>
 
-        {/* НОВЫЙ БЛОК: Загрузка изображения */}
-        <div className="space-y-2">
-          <label className="text-sm font-semibold text-gray-700">Project Image</label>
-          <div className="flex items-center gap-4 p-4 border rounded-lg bg-gray-50">
-            {previewUrl && (
-              <img src={previewUrl} alt="Preview" className="w-20 h-20 object-cover rounded border" />
-            )}
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => {
-                const selectedFile = e.target.files?.[0];
-                if (selectedFile) {
-                  setFile(selectedFile);
-                  setPreviewUrl(URL.createObjectURL(selectedFile));
-                }
-              }}
-              className="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-            />
-          </div>
+        <div className="grid grid-cols-2 gap-6 p-6 bg-blue-50 rounded-2xl">
+          <input
+            className="p-4 bg-white rounded-xl outline-none border-2 focus:border-blue-500 font-bold"
+            placeholder="Номинация (alt_text)"
+            value={formData.alt_text}
+            onChange={(e) => setFormData({ ...formData, alt_text: e.target.value })}
+          />
+          <input
+            className="p-4 bg-white rounded-xl outline-none border-2 focus:border-blue-500 font-bold"
+            placeholder="Фестиваль (link)"
+            value={formData.link}
+            onChange={(e) => setFormData({ ...formData, link: e.target.value })}
+          />
         </div>
 
-        <div className="space-y-2">
-          <label className="text-sm font-semibold text-gray-700">Description</label>
+        <div className="flex flex-col gap-2">
+          <label className="text-xs font-black uppercase text-gray-400">Описание (SEO)</label>
           <textarea
             rows={4}
-            className="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+            className="p-4 bg-gray-50 rounded-xl outline-none border-2 focus:border-blue-500 resize-none"
             value={formData.description}
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
           />
         </div>
 
-        <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg border">
-          <input
-            type="checkbox"
-            id="visible"
-            className="w-4 h-4 cursor-pointer"
-            checked={formData.is_visible}
-            onChange={(e) => setFormData({ ...formData, is_visible: e.target.checked })}
-          />
-          <label htmlFor="visible" className="text-sm font-medium cursor-pointer">
-            Publicly visible on website
-          </label>
-        </div>
-
-        <div className="pt-6 flex items-center justify-between border-t">
-          <div className="flex gap-3">
-            <button
-              type="submit"
-              disabled={saving}
-              className="px-8 py-2.5 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:bg-blue-300 transition-all"
-            >
-              {saving ? 'Saving...' : 'Save Changes'}
-            </button>
-            <button
-              type="button"
-              onClick={() => router.back()}
-              className="px-6 py-2.5 bg-gray-100 text-gray-600 font-medium rounded-lg hover:bg-gray-200"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
+        <button
+          type="submit"
+          disabled={saving}
+          className="w-full py-5 bg-blue-600 text-white font-black rounded-2xl hover:bg-blue-700 transition-all uppercase"
+        >
+          {saving ? 'СОХРАНЕНИЕ...' : 'СОХРАНИТЬ ИЗМЕНЕНИЯ'}
+        </button>
       </form>
     </div>
   );

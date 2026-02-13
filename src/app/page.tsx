@@ -1,20 +1,24 @@
-// src/app/page.tsx
+// Директивы для отключения кэширования всей страницы
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 import PhotoCarousel from './components/PhotoCarousel';
 import PartnersCarousel from './components/PartnersCarousel';
 import AwardsCarousel from './components/AwardsCarousel';
 import CompanyProjects from './components/CompanyProjects';
 import VideoCarousel from './components/VideoCarousel';
 
+/**
+ * Главная страница сайта.
+ * Благодаря директивам dynamic и revalidate, сервер будет заново 
+ * запрашивать данные из Supabase при каждом посещении пользователем.
+ */
 export default async function Home() {
   return (
-    // Убираем все лишние отступы у main
     <main className="bg-white min-h-screen">
-      {/* ВАЖНО: PhotoCarousel должна быть ПЕРВЫМ элементом без оберток, 
-        чтобы она ушла под абсолютный хедер.
-      */}
+      {/* PhotoCarousel находится вне контейнера для корректного отображения под хедером */}
       <PhotoCarousel />
       
-      {/* Остальной контент уже может быть в ограничителе */}
       <div className="max-w-[1920px] mx-auto relative overflow-hidden">
         <PartnersCarousel /> 
       </div>

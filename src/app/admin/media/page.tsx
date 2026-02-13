@@ -33,7 +33,6 @@ export default function AdminMediaPage() {
     }
   }
 
-  // Функция быстрого переключения видимости
   const toggleVisibility = async (item: any) => {
     try {
       const newStatus = !item.is_visible;
@@ -82,6 +81,16 @@ export default function AdminMediaPage() {
       )
     },
     { key: 'title', title: 'Название проекта' },
+    // ДОБАВЛЕНО ПОЛЕ ОПИСАНИЯ
+    { 
+      key: 'description', 
+      title: 'Описание (SEO)',
+      render: (text) => (
+        <div className="max-w-[200px] truncate text-sm text-gray-500">
+          {text || <span className="text-gray-300 italic">Пусто</span>}
+        </div>
+      )
+    },
     { key: 'credits', title: 'Создатели' },
     { 
       key: 'is_visible', 
