@@ -2,13 +2,26 @@
 
 import React, { useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { HiOutlineChevronLeft, HiOutlineHome, HiOutlineUsers, HiOutlineViewGrid, HiOutlineNewspaper } from 'react-icons/hi';
+import { 
+  HiOutlineChevronLeft, 
+  HiOutlineHome, 
+  HiOutlineUsers, 
+  HiOutlineViewGrid, 
+  HiOutlineNewspaper,
+  HiOutlineStar,         // Замена для Trophy (Награды)
+  HiOutlineFilm,         // Замена для проектов/медиа
+  HiOutlineDocumentText, // Для контента
+  HiOutlineInbox          // Для заявок
+} from 'react-icons/hi';
 
 const menuItems = [
   { title: 'Главная', href: '/admin', icon: HiOutlineHome },
-  { title: 'Партнеры', href: '/admin/partners', icon: HiOutlineUsers },
-  { title: 'Медиа', href: '/admin/media', icon: HiOutlineViewGrid },
+  { title: 'Проекты', href: '/admin/media', icon: HiOutlineFilm },
   { title: 'Новости', href: '/admin/news', icon: HiOutlineNewspaper },
+  { title: 'Награды', href: '/admin/awards', icon: HiOutlineStar },
+  { title: 'Партнеры', href: '/admin/partners', icon: HiOutlineUsers },
+  { title: 'Контент', href: '/admin/content', icon: HiOutlineDocumentText },
+  { title: 'Заявки', href: '/admin/film-reserve', icon: HiOutlineInbox },
 ];
 
 export default function AdminSidebar() {
@@ -29,10 +42,12 @@ export default function AdminSidebar() {
       </div>
 
       {/* Список ссылок */}
-      <nav className="flex-grow p-4 space-y-2">
+      <nav className="flex-grow p-4 space-y-2 overflow-y-auto">
         {menuItems.map((item) => {
-          const isActive = pathname === item.href;
+          // Активность: точное совпадение или начало пути (кроме главной)
+          const isActive = pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href));
           const Icon = item.icon;
+          
           return (
             <a
               key={item.href}
