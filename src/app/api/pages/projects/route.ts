@@ -15,14 +15,27 @@ export async function GET() {
 
 export async function PATCH(request: Request) {
   const supabase = await createClient();
-  const { id, title, body, bg_color } = await request.json();
+  const body = await request.json();
+  const { id, title, body: contentBody, bg_color } = body;
+
+  // Если строка пустая после обрезки пробелов, записываем null
+  const updateData = {
+    title: title?.trim() || null,
+    body: contentBody?.trim() || null,
+    bg_color: bg_color || null,
+    updated_at: new Date().toISOString(),
+  };
 
   const { data, error } = await supabase
     .from('page_content')
-    .update({ title, body, bg_color, updated_at: new Date() })
+    .update(updateData)
     .eq('id', id)
     .select();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) {
+    console.error('PATCH PROJECTS ERROR:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+  
   return NextResponse.json({ data });
 }
