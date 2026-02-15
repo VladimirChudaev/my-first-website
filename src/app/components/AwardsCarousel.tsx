@@ -9,9 +9,12 @@ type Award = {
   festival: string;
   status: string;
   description: string | null;
-  image_url: string | null;
+  image_url: string | null; // Оставляем для совместимости, если где-то еще есть старые данные
   position: number;
   is_visible: boolean;
+  media?: {
+    filename: string;
+  } | null;
 };
 
 export default function AwardsCarousel() {
@@ -51,6 +54,11 @@ export default function AwardsCarousel() {
 
   const current = awards[page % awards.length];
 
+  // Формируем URL картинки: приоритет новому полю media.filename
+  const displayImageUrl = current.media?.filename
+    ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/media/${current.media.filename}`
+    : current.image_url;
+
   return (
     <section className="bg-white py-20 border-t border-gray-100 text-black overflow-hidden">
       <div className="max-w-6xl mx-auto px-8">
@@ -85,12 +93,12 @@ export default function AwardsCarousel() {
                 )}
               </div>
 
-              {current.image_url && (
+              {displayImageUrl && (
                 <div className="w-72 h-72 flex-shrink-0 flex items-center justify-center">
                   <img
-                    src={current.image_url}
+                    src={displayImageUrl}
                     alt={current.title}
-                    className="max-w-full max-h-full object-contain grayscale"
+                    className="max-w-full max-h-full object-contain"
                     onError={(e) => {
                       console.error(
                         'Ошибка загрузки картинки:',
