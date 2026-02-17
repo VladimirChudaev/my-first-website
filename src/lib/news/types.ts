@@ -2,24 +2,24 @@ export interface NewsItem {
   id: string;
   slug: string;
   title: string;
-  body?: string;
-  is_visible?: boolean;
-  published_at?: string | null;
-  created_at?: string;
-  updated_at?: string;
+  body: string | null;
+  cover_image_url: string | null; // Добавлено
+  is_visible: boolean;
+  created_at: string;
 }
 
 export interface CreateNewsInput {
   slug: string;
   title: string;
   body?: string;
+  cover_image_url?: string;
   is_visible?: boolean;
-  published_at?: string | null;
 }
 
 export interface UpdateNewsInput {
+  slug?: string;
   title?: string;
   body?: string;
+  cover_image_url?: string;
   is_visible?: boolean;
-  published_at?: string | null;
 }

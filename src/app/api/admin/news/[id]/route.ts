@@ -5,34 +5,56 @@ import {
   deleteNewsById,
 } from '@/lib/news/service';
 
-type Params = {
-  id: string;
-};
+type Params = { id: string };
 
 export async function GET(
   _req: NextRequest,
-  context: { params: Promise<Params> }
+  { params }: { params: Promise<Params> }
 ) {
-  const { id } = await context.params;
+  const { id } = await params;
   const result = await getNewsById(id);
+  
+  if (!result.data) {
+    return NextResponse.json({ error: 'News not found' }, { status: 404 });
+  }
+  
   return NextResponse.json(result);
 }
 
-export async function PUT(
+// Используем PATCH для частичного обновления
+export async function PATCH(
   req: NextRequest,
-  context: { params: Promise<Params> }
+  { params }: { params: Promise<Params> }
 ) {
-  const { id } = await context.params;
-  const body = await req.json();
-  const result = await updateNewsById(id, body);
-  return NextResponse.json(result);
+  try {
+    const { id } = await params;
+    const body = await req.json();
+    const result = await updateNewsById(id, body);
+    
+    if (!result.data) {
+      return NextResponse.json({ error: 'Update failed' }, { status: 400 });
+    }
+    
+    return NextResponse.json(result);
+  } catch (error) {
+    return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
+  }
 }
 
 export async function DELETE(
   _req: NextRequest,
-  context: { params: Promise<Params> }
+  { params }: { params: Promise<Params> }
 ) {
-  const { id } = await context.params;
-  await deleteNewsById(id);
-  return NextResponse.json({ success: true });
+  try {
+    const { id } = await params;
+    const result = await deleteNewsById(id);
+    
+    if (!result.success) {
+      return NextResponse.json({ error: 'Delete failed' }, { status: 400 });
+    }
+    
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }
