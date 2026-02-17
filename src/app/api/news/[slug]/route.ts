@@ -1,15 +1,35 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getNewsById } from '@/lib/news/service';
+import { getNewsBySlug } from '@/lib/news/service';
 
-type Params = {
-  id: string;
+// Определяем тип строго под имя папки [slug]
+type RouteParams = {
+  slug: string;
 };
 
 export async function GET(
   _req: NextRequest,
-  context: { params: Promise<Params> }
+  { params }: { params: Promise<RouteParams> }
 ) {
-  const { id } = await context.params;
-  const result = await getNewsById(id);
-  return NextResponse.json(result);
+  try {
+    const { slug } = await params;
+    
+    if (!slug) {
+      return NextResponse.json({ error: 'Slug is required' }, { status: 400 });
+    }
+
+    const result = await getNewsBySlug(slug);
+
+    if (!result.data) {
+      return NextResponse.json({ error: 'News not found' }, { status: 404 });
+    }
+
+    if (!result.data.is_visible) {
+      return NextResponse.json({ error: 'News is not published' }, { status: 403 });
+    }
+
+    return NextResponse.json(result);
+  } catch (error) {
+    console.error('Error in public news slug API:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }
