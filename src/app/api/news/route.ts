@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getVisibleNews } from '@/lib/news/service';
+import { getNewsList } from '@/lib/news/service';
 
 /**
  * GET /api/news
@@ -7,11 +7,14 @@ import { getVisibleNews } from '@/lib/news/service';
  */
 export async function GET() {
   try {
-    const result = await getVisibleNews();
+    // Используем обновленный getNewsList, который корректно тянет медиа
+    const result = await getNewsList();
 
-    // Если данных нет, возвращаем пустой массив с успешным статусом
+    // Фильтруем данные, оставляя только те, где is_visible === true
+    const visibleNews = (result.data || []).filter(item => item.is_visible);
+
     return NextResponse.json({
-      data: result.data || []
+      data: visibleNews
     });
   } catch (error) {
     console.error('Public News API Error:', error);

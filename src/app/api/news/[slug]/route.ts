@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getNewsBySlug } from '@/lib/news/service';
+import { createClient } from '@/lib/server';
 
-// Определяем тип строго под имя папки [slug]
 type RouteParams = {
   slug: string;
 };
@@ -12,22 +11,35 @@ export async function GET(
 ) {
   try {
     const { slug } = await params;
+    const supabase = await createClient();
     
     if (!slug) {
       return NextResponse.json({ error: 'Slug is required' }, { status: 400 });
     }
 
-    const result = await getNewsBySlug(slug);
+    // Делаем запрос напрямую, используя новую структуру связей с media
+    const { data: newsItem, error } = await supabase
+      .from('news')
+      .select(`
+        *,
+        media:cover_image_id (
+          id,
+          path,
+          bucket
+        )
+      `)
+      .eq('slug', slug)
+      .single();
 
-    if (!result.data) {
+    if (error || !newsItem) {
       return NextResponse.json({ error: 'News not found' }, { status: 404 });
     }
 
-    if (!result.data.is_visible) {
+    if (!newsItem.is_visible) {
       return NextResponse.json({ error: 'News is not published' }, { status: 403 });
     }
 
-    return NextResponse.json(result);
+    return NextResponse.json({ data: newsItem });
   } catch (error) {
     console.error('Error in public news slug API:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
