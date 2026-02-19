@@ -1,25 +1,16 @@
-export interface NewsItem {
+export type NewsItem = {
   id: string;
-  slug: string;
   title: string;
-  body: string | null;
-  cover_image_url: string | null; // Добавлено
-  is_visible: boolean;
-  created_at: string;
-}
-
-export interface CreateNewsInput {
   slug: string;
-  title: string;
-  body?: string;
-  cover_image_url?: string;
+  body?: string | null;
   is_visible?: boolean;
-}
+  created_at?: string;
 
-export interface UpdateNewsInput {
-  slug?: string;
-  title?: string;
-  body?: string;
-  cover_image_url?: string;
-  is_visible?: boolean;
-}
+  cover_image_id?: string | null;
+
+  media?: {
+    id: string;
+    path: string;
+    bucket: string;
+  } | null;
+};
