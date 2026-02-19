@@ -1,74 +1,77 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { updateMedia, getMediaList, createMedia } from '@/lib/media/service';
+import { uploadMediaFile } from '@/lib/media/service';
+import { createAdminClient } from '@/lib/server';
 import { revalidatePath } from 'next/cache';
 
-// Принудительно отключаем кэширование на уровне сегмента API
 export const dynamic = 'force-dynamic';
-export const revalidate = 0;
 
-export async function GET() {
-  try {
-    const result = await getMediaList();
-    return NextResponse.json(result);
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-}
+// Список разрешенных категорий из вашей БД
+const ALLOWED_CATEGORIES = ['video', 'photo', 'partner', 'award', 'project', 'news', 'logo', 'header', 'footer'];
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const result = await createMedia(body);
+    const formData = await req.formData();
+    const file = formData.get('file') as File;
+    const title = formData.get('title') as string || file.name;
     
+    // Получаем категорию из формы. Если её нет или она неверная — ставим 'photo'
+    let category = formData.get('category') as string;
+    if (!ALLOWED_CATEGORIES.includes(category)) {
+      category = 'photo'; 
+    }
+
+    if (!file) {
+      return NextResponse.json({ error: 'Файл не найден' }, { status: 400 });
+    }
+
+    // 1. Загрузка в Storage
+    const uploadResult = await uploadMediaFile(file);
+    const filePath = uploadResult.data.path;
+
+    // 2. Запись в Базу Данных
+    const supabase = await createAdminClient();
+    
+    const { data: dbData, error: dbError } = await supabase
+      .from('media')
+      .insert([
+        {
+          title: title,
+          filename: filePath,
+          path: filePath,
+          bucket: 'media',
+          category: category, // Теперь здесь 'photo' или то, что пришло из формы
+          is_visible: true,
+          description: '', 
+          credits: ''
+        },
+      ])
+      .select()
+      .single();
+
+    if (dbError) {
+      console.error('Ошибка записи в БД:', dbError);
+      throw dbError;
+    }
+
     revalidatePath('/admin/media');
-    revalidatePath('/');
-    
-    return NextResponse.json(result);
+    return NextResponse.json({ data: dbData }, { status: 201 });
   } catch (error: any) {
+    console.error('Ошибка API:', error.message);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
 
-export async function PATCH(req: NextRequest) {
+export async function GET() {
   try {
-    // Читаем тело запроса
-    const body = await req.json();
-    
-    // ЛОГ ДЛЯ ПРОВЕРКИ В ТЕРМИНАЛЕ (серверный лог)
-    console.log('--- API PATCH INCOMING ---');
-    console.log('ID:', body.id);
-    console.log('Payload:', body);
+    const supabase = await createAdminClient();
+    const { data, error } = await supabase
+      .from('media')
+      .select('*')
+      .order('created_at', { ascending: false });
 
-    if (!body.id) {
-      return NextResponse.json({ error: 'Missing ID' }, { status: 400 });
-    }
-
-    // Вызываем сервис обновления
-    const data = await updateMedia(body.id, body);
-    
-    if (!data) {
-      throw new Error('Service returned no data after update');
-    }
-
-    // Очищаем кэш Next.js (обязательно для клиент-серверной модели)
-    revalidatePath('/admin/media');
-    revalidatePath(`/admin/media/${body.id}`);
-    revalidatePath('/', 'layout');
-
-    return NextResponse.json({ 
-      success: true, 
-      data,
-      updatedAt: new Date().toISOString() 
-    });
-
+    if (error) throw error;
+    return NextResponse.json({ data });
   } catch (error: any) {
-    // Выводим детальную ошибку в терминал VS Code
-    console.error('--- API PATCH CRITICAL ERROR ---');
-    console.error(error);
-    
-    return NextResponse.json(
-      { error: error.message || 'Internal Server Error' }, 
-      { status: 500 }
-    );
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

@@ -1,80 +1,57 @@
-import { createClient } from '@/lib/server';
+import { createAdminClient } from '@/lib/server';
 
-// Получение списка
-export async function getMediaList() {
-  const supabase = await createClient();
-  const { data, error } = await supabase
+/**
+ * Загрузка файла напрямую в корень бакета 'media'
+ */
+export async function uploadMediaFile(file: File) {
+  const supabase = await createAdminClient();
+  
+  // Генерируем уникальное имя, чтобы избежать проблем с кириллицей в путях
+  // и конфликтов одинаковых имен
+  const fileExt = file.name.split('.').pop();
+  const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 7)}.${fileExt}`;
+  
+  // Важно: filePath теперь — это просто имя файла, без префиксов и папок
+  const filePath = fileName;
+
+  const { data, error } = await supabase.storage
     .from('media')
-    .select('*')
-    .order('created_at', { ascending: false });
-  if (error) throw error;
-  return { data: data || [] };
-}
-
-// Получение по ID
-export async function getMediaById(id: string) {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from('media')
-    .select('*')
-    .eq('id', id)
-    .single();
-  if (error) throw error;
-  return { data };
-}
-
-// Создание
-export async function createMedia(input: any) {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from('media')
-    .insert([input])
-    .select()
-    .single();
-  if (error) throw error;
-  return { data };
-}
-
-// Обновление
-export async function updateMedia(id: string, input: any) {
-  const supabase = await createClient();
-  const cleanId = id.trim();
-
-  const updateData = {
-    title: input.title,
-    description: input.description,
-    credits: input.credits,
-    alt_text: input.alt_text,
-    link: input.link,
-    is_visible: input.is_visible,
-    filename: input.filename
-  };
-
-  const { data, error } = await supabase
-    .from('media')
-    .update(updateData)
-    .eq('id', cleanId)
-    .select();
+    .upload(filePath, file, {
+      cacheControl: '3600',
+      upsert: true // Если файл с таким именем есть, он обновится
+    });
 
   if (error) {
-    console.error('Supabase Error:', error.message);
+    console.error('Ошибка Storage:', error);
     throw error;
   }
 
-  if (!data || data.length === 0) {
-    throw new Error(`Запись с ID ${cleanId} не найдена.`);
-  }
+  const { data: { publicUrl } } = supabase.storage
+    .from('media')
+    .getPublicUrl(filePath);
 
-  return data[0];
+  return { data: { ...data, publicUrl } };
 }
 
-// Удаление
-export async function deleteMediaById(id: string) {
-  const supabase = await createClient();
-  const { error } = await supabase
+/**
+ * Получение списка файлов напрямую из корня бакета
+ */
+export async function getMediaList() {
+  const supabase = await createAdminClient();
+  
+  // Пустая строка '' означает поиск в корне бакета media
+  const { data, error } = await supabase.storage
     .from('media')
-    .delete()
-    .eq('id', id);
-  if (error) throw error;
-  return { success: true };
+    .list('', {
+      limit: 100,
+      sortBy: { column: 'created_at', order: 'desc' },
+    });
+
+  if (error) {
+    console.error('Ошибка получения списка:', error);
+    throw error;
+  }
+
+  // Фильтруем, чтобы не подхватить системные заглушки (если есть)
+  return data?.filter(item => item.name !== '.emptyFolderPlaceholder') || [];
 }
