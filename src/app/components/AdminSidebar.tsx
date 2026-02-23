@@ -6,12 +6,12 @@ import {
   HiOutlineChevronLeft, 
   HiOutlineHome, 
   HiOutlineUsers, 
-  HiOutlineViewGrid, 
   HiOutlineNewspaper,
-  HiOutlineStar,         // Замена для Trophy (Награды)
-  HiOutlineFilm,         // Замена для проектов/медиа
-  HiOutlineDocumentText, // Для контента
-  HiOutlineInbox          // Для заявок
+  HiOutlineStar,
+  HiOutlineFilm,
+  HiOutlineDocumentText,
+  HiOutlineInbox,
+  HiOutlinePhotograph 
 } from 'react-icons/hi';
 
 const menuItems = [
@@ -20,6 +20,7 @@ const menuItems = [
   { title: 'Новости', href: '/admin/news', icon: HiOutlineNewspaper },
   { title: 'Награды', href: '/admin/awards', icon: HiOutlineStar },
   { title: 'Партнеры', href: '/admin/partners', icon: HiOutlineUsers },
+  { title: 'Карусель', href: '/admin/home-carousel', icon: HiOutlinePhotograph }, // Добавлено
   { title: 'Контент', href: '/admin/content', icon: HiOutlineDocumentText },
   { title: 'Заявки', href: '/admin/film-reserve', icon: HiOutlineInbox },
 ];
@@ -30,7 +31,6 @@ export default function AdminSidebar() {
 
   return (
     <aside className={`${isCollapsed ? 'w-20' : 'w-64'} transition-all duration-300 bg-slate-900 min-h-screen text-white flex flex-col sticky top-0`}>
-      {/* Кнопка свернуть/развернуть */}
       <div className="p-4 flex justify-between items-center border-b border-slate-800">
         {!isCollapsed && <span className="font-bold text-sm tracking-widest uppercase">Админка</span>}
         <button 
@@ -41,10 +41,8 @@ export default function AdminSidebar() {
         </button>
       </div>
 
-      {/* Список ссылок */}
       <nav className="flex-grow p-4 space-y-2 overflow-y-auto">
         {menuItems.map((item) => {
-          // Активность: точное совпадение или начало пути (кроме главной)
           const isActive = pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href));
           const Icon = item.icon;
           

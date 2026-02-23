@@ -2,77 +2,75 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { getMediaByDomain, getMediaUrl } from '@/lib/media/media';
-import { MediaAsset } from '@/lib/media/types';
 
-interface PhotoCarouselProps {
-  category?: string;
-}
+type CarouselItem = {
+  id: string;
+  is_visible: boolean;
+  position: number;
+  media: {
+    filename: string;
+  } | null;
+};
 
-export default function PhotoCarousel({ category = 'photo' }: PhotoCarouselProps) {
-  const [photos, setPhotos] = useState<MediaAsset[]>([]);
+export default function PhotoCarousel() {
+  const [items, setItems] = useState<CarouselItem[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const storageUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 
   useEffect(() => {
-    const loadMedia = async () => {
+    const loadItems = async () => {
       try {
-        const mediaList = await getMediaByDomain(category as any);
-        const filtered = mediaList.filter(
-          (item: MediaAsset) => item.filename?.startsWith('pc_') && item.path
+        // Запрашиваем данные напрямую из API карусели
+        const res = await fetch('/api/admin/home-carousel');
+        const json = await res.json();
+        
+        // Оставляем только те, что помечены как "Опубликован" и имеют картинку
+        const activeItems = (json.data || []).filter(
+          (item: CarouselItem) => item.is_visible && item.media?.filename
         );
-
-        const mapped = await Promise.all(
-          filtered.map(async (item) => ({
-            ...item,
-            url: await getMediaUrl(item.path!),
-          }))
-        );
-
-        setPhotos(mapped);
+        
+        setItems(activeItems);
       } catch (error) {
-        console.error('Error loading media for PhotoCarousel:', error);
+        console.error('Error loading PhotoCarousel items:', error);
       }
     };
-    loadMedia();
-  }, [category]);
+    loadItems();
+  }, []);
 
   useEffect(() => {
-    if (photos.length < 2) return;
+    if (items.length < 2) return;
     const timer = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % photos.length);
+      setCurrentIndex((prev) => (prev + 1) % items.length);
     }, 5000);
     return () => clearInterval(timer);
-  }, [photos]);
+  }, [items]);
 
-  // Заменил bg-gray-200 на bg-transparent
-  if (!photos.length) {
+  if (!items.length) {
     return <div className="relative w-full aspect-video bg-transparent" />;
   }
 
   return (
-    // Заменил bg-white на bg-transparent
-    <div className="relative w-full aspect-video bg-transparent">
-      {photos.map((photo, index) => {
+    <div className="relative w-full aspect-video bg-transparent overflow-hidden">
+      {items.map((item, index) => {
         const isVisible = index === currentIndex;
+        // Формируем прямой URL к картинке в Supabase
+        const imageUrl = `${storageUrl}/storage/v1/object/public/media/${item.media?.filename}`;
 
         return (
           <div
-            key={photo.id}
+            key={item.id}
             className={`absolute inset-0 transition-opacity duration-1000 ${
               isVisible ? 'opacity-100' : 'opacity-0'
             }`}
           >
-            {photo.url && (
-              <Image
-                src={photo.url}
-                alt={photo.alt_text || 'Carousel Image'}
-                fill
-                sizes="100vw"
-                className="object-cover"
-                priority={index === 0}
-                unoptimized={photo.url.endsWith('.svg')}
-              />
-            )}
+            <Image
+              src={imageUrl}
+              alt={`Slide ${index + 1}`}
+              fill
+              sizes="100vw"
+              className="object-cover"
+              priority={index === 0}
+            />
           </div>
         );
       })}

@@ -1,7 +1,11 @@
-// src/app/admin/page.tsx
 import Link from 'next/link';
 
 const items = [
+  {
+    title: 'Home Carousel',
+    description: 'Управление слайдами на главной странице',
+    href: '/admin/home-carousel',
+  },
   {
     title: 'Awards',
     description: 'Менеджер наград и кинофестивалей',
