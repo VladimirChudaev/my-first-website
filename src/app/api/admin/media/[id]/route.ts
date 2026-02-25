@@ -1,38 +1,34 @@
 import { NextRequest, NextResponse } from 'next/server';
-import {
-  getNewsById,
-  updateNewsById,
-  deleteNewsById,
-} from '@/lib/news/service';
+import { MediaRepository } from '@/lib/repositories/MediaRepository';
 
-type Params = {
-  id: string;
-};
+type Params = { id: string };
 
-export async function GET(
-  _req: NextRequest,
-  context: { params: Promise<Params> }
-) {
-  const { id } = await context.params;
-  const result = await getNewsById(id);
-  return NextResponse.json(result);
-}
-
-export async function PUT(
+export async function PATCH(
   req: NextRequest,
   context: { params: Promise<Params> }
 ) {
-  const { id } = await context.params;
-  const body = await req.json();
-  const result = await updateNewsById(id, body);
-  return NextResponse.json(result);
+  try {
+    const { id } = await context.params;
+    const body = await req.json();
+    
+    // Обновляем категорию через репозиторий
+    const result = await MediaRepository.update(id, body);
+    
+    return NextResponse.json({ success: true, data: result });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 400 });
+  }
 }
 
 export async function DELETE(
   _req: NextRequest,
   context: { params: Promise<Params> }
 ) {
-  const { id } = await context.params;
-  await deleteNewsById(id);
-  return NextResponse.json({ success: true });
+  try {
+    const { id } = await context.params;
+    await MediaRepository.delete(id);
+    return NextResponse.json({ success: true });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 400 });
+  }
 }

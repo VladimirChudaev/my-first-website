@@ -9,7 +9,6 @@ export class MediaRepository {
   static async findByCategory(category: MediaDomain): Promise<MediaAsset[]> {
     const supabase = createClient();
     
-    // Запрос к таблице media, где хранятся пути и метаданные
     const { data, error } = await supabase
       .from('media')
       .select('*')
@@ -23,5 +22,43 @@ export class MediaRepository {
     }
 
     return data as MediaAsset[];
+  }
+
+  // Получить все файлы для админки
+  static async getAll(): Promise<MediaAsset[]> {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from('media')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data as MediaAsset[];
+  }
+
+  // Обновить поля (например, категорию)
+  static async update(id: string, data: Partial<MediaAsset>): Promise<MediaAsset> {
+    const supabase = createClient();
+    const { data: result, error } = await supabase
+      .from('media')
+      .update(data)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return result as MediaAsset;
+  }
+
+  // Удалить запись
+  static async delete(id: string): Promise<boolean> {
+    const supabase = createClient();
+    const { error } = await supabase
+      .from('media')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+    return true;
   }
 }

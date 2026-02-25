@@ -7,7 +7,8 @@ export type MediaDomain =
   | 'news'
   | 'logo'
   | 'header'
-  | 'footer';
+  | 'footer'
+  | 'film-reserve';
 
 export interface MediaAsset {
   id: string;

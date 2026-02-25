@@ -5,26 +5,40 @@ import { revalidatePath } from 'next/cache';
 
 export const dynamic = 'force-dynamic';
 
-// Список разрешенных категорий из вашей БД
-const ALLOWED_CATEGORIES = ['video', 'photo', 'partner', 'award', 'project', 'news', 'logo', 'header', 'footer'];
+// Актуальный список категорий, соответствующий вашему types.ts и БД
+const ALLOWED_CATEGORIES = [
+  'video', 
+  'photo', 
+  'partner', 
+  'award', 
+  'project', 
+  'news', 
+  'logo', 
+  'header', 
+  'footer', 
+  'film-reserve' // Добавлена новая категория
+];
 
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
     const file = formData.get('file') as File;
-    const title = formData.get('title') as string || file.name;
     
-    // Получаем категорию из формы. Если её нет или она неверная — ставим 'photo'
-    let category = formData.get('category') as string;
-    if (!ALLOWED_CATEGORIES.includes(category)) {
-      category = 'photo'; 
-    }
-
     if (!file) {
       return NextResponse.json({ error: 'Файл не найден' }, { status: 400 });
     }
 
-    // 1. Загрузка в Storage
+    const title = formData.get('title') as string || file.name;
+    
+    // Получаем категорию из формы.
+    let category = formData.get('category') as string;
+    
+    // Если категория не входит в список разрешенных — ставим 'photo' по умолчанию
+    if (!ALLOWED_CATEGORIES.includes(category)) {
+      category = 'photo'; 
+    }
+
+    // 1. Загрузка в Storage (вызывает сервис с createAdminClient)
     const uploadResult = await uploadMediaFile(file);
     const filePath = uploadResult.data.path;
 
@@ -39,10 +53,11 @@ export async function POST(req: NextRequest) {
           filename: filePath,
           path: filePath,
           bucket: 'media',
-          category: category, // Теперь здесь 'photo' или то, что пришло из формы
+          category: category,
           is_visible: true,
           description: '', 
-          credits: ''
+          credits: '',
+          position: 0 // Добавлено дефолтное значение для исключения ошибок NOT NULL
         },
       ])
       .select()
@@ -50,10 +65,12 @@ export async function POST(req: NextRequest) {
 
     if (dbError) {
       console.error('Ошибка записи в БД:', dbError);
-      throw dbError;
+      return NextResponse.json({ error: dbError.message }, { status: 500 });
     }
 
+    // Очищаем кэш, чтобы новые медиа появились в админке сразу
     revalidatePath('/admin/media');
+    
     return NextResponse.json({ data: dbData }, { status: 201 });
   } catch (error: any) {
     console.error('Ошибка API:', error.message);
