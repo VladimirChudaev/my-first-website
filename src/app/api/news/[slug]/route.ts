@@ -1,23 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/server';
 
-type RouteParams = {
+// Обновленный тип для соответствия стандартам Next.js 15/16
+type RouteParams = Promise<{
   slug: string;
-};
+  [key: string]: string | string[] | undefined;
+}>;
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: Promise<RouteParams> }
+  context: { params: RouteParams }
 ) {
   try {
-    const { slug } = await params;
+    // В новых версиях Next.js params — это Promise, который нужно дождаться
+    const { slug } = await context.params;
     const supabase = await createClient();
     
     if (!slug) {
       return NextResponse.json({ error: 'Slug is required' }, { status: 400 });
     }
 
-    // Делаем запрос напрямую, используя новую структуру связей с media
+    // Запрос к БД
     const { data: newsItem, error } = await supabase
       .from('news')
       .select(`
