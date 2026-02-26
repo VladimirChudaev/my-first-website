@@ -44,7 +44,8 @@ const items = [
   {
     title: 'Film reserve',
     description: 'Feedback form and page content',
-    href: '/admin/film-reserve',
+    // ИСПРАВЛЕННЫЙ ПУТЬ:
+    href: '/admin/pages/film-reserve',
   },
 ];
 
