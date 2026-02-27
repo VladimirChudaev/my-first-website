@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { X, ImageIcon, Save } from 'lucide-react';
 import Link from 'next/link';
+// Импортируем наш универсальный редактор
+import Editor from '@/components/admin/Editor';
 
 export default function AdminFilmReservePage() {
   const [blocks, setBlocks] = useState<any[]>([]);
@@ -62,7 +64,7 @@ export default function AdminFilmReservePage() {
       body: JSON.stringify(block),
     });
 
-    if (res.ok) alert('Текст сохранен успешно');
+    if (res.ok) alert('Данные сохранены успешно');
   };
 
   const selectedFile = mediaFiles.find(m => m.id === selectedFileId);
@@ -70,7 +72,16 @@ export default function AdminFilmReservePage() {
   return (
     <div className="p-10 bg-white min-h-screen text-black">
       <div className="max-w-5xl mx-auto">
-        <h1 className="text-4xl font-black uppercase tracking-tight mb-10">Film Reserve Editor</h1>
+        <div className="flex justify-between items-center mb-10">
+          <h1 className="text-4xl font-black uppercase tracking-tight">Film Reserve Editor</h1>
+          <Link 
+            href="/film-reserve" 
+            target="_blank"
+            className="text-[10px] font-black uppercase bg-gray-100 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors"
+          >
+            На сайт
+          </Link>
+        </div>
 
         {/* БЛОК ИЗОБРАЖЕНИЯ */}
         <div className="mb-8 p-8 bg-gray-50 rounded-[32px] border border-gray-100 shadow-sm">
@@ -119,11 +130,13 @@ export default function AdminFilmReservePage() {
                   onChange={e => setBlocks(blocks.map(b => b.id === block.id ? {...b, title: e.target.value} : b))}
                   placeholder="Заголовок"
                 />
-                <textarea 
-                  className="w-full p-4 bg-gray-50 border-none rounded-2xl min-h-[160px] text-sm leading-relaxed focus:ring-2 ring-black outline-none transition-all"
-                  value={block.body || ''}
-                  onChange={e => setBlocks(blocks.map(b => b.id === block.id ? {...b, body: e.target.value} : b))}
-                  placeholder="Текст контента"
+                
+                {/* УНИВЕРСАЛЬНЫЙ РЕДАКТОР С ТИПИЗАЦИЕЙ */}
+                <Editor 
+                  content={block.body || ''} 
+                  onChange={(html: string) => setBlocks(blocks.map(b => 
+                    b.id === block.id ? { ...b, body: html } : b
+                  ))}
                 />
               </div>
             </div>
@@ -142,7 +155,6 @@ export default function AdminFilmReservePage() {
               </button>
             </div>
             
-            {/* ИСПРАВЛЕННАЯ СЕТКА GRID */}
             <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 p-1">
                 {mediaFiles.map(file => (

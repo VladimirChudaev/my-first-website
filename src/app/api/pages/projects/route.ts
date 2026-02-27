@@ -14,28 +14,40 @@ export async function GET() {
 }
 
 export async function PATCH(request: Request) {
-  const supabase = await createClient();
-  const body = await request.json();
-  const { id, title, body: contentBody, bg_color } = body;
+  try {
+    const supabase = await createClient();
+    const json = await request.json();
+    
+    // Извлекаем данные
+    const { id, title, body, bg_color } = json;
 
-  // Если строка пустая после обрезки пробелов, записываем null
-  const updateData = {
-    title: title?.trim() || null,
-    body: contentBody?.trim() || null,
-    bg_color: bg_color || null,
-    updated_at: new Date().toISOString(),
-  };
+    console.log('API PATCH RECEIVED:', { id, title, bodyLength: body?.length });
 
-  const { data, error } = await supabase
-    .from('page_content')
-    .update(updateData)
-    .eq('id', id)
-    .select();
+    if (!id) {
+      return NextResponse.json({ error: 'Missing ID' }, { status: 400 });
+    }
 
-  if (error) {
-    console.error('PATCH PROJECTS ERROR:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    // ВАЖНО: Убрали updated_at, так как колонки нет в таблице
+    const updateData: any = {
+      title: title?.trim() || null,
+      body: body || null, // Сохраняем чистый HTML из редактора
+      bg_color: bg_color || null,
+    };
+
+    const { data, error } = await supabase
+      .from('page_content')
+      .update(updateData)
+      .eq('id', id)
+      .select();
+
+    if (error) {
+      console.error('DATABASE ERROR:', error.message);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+    
+    return NextResponse.json({ data });
+  } catch (err: any) {
+    console.error('SERVER ERROR:', err.message);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
-  
-  return NextResponse.json({ data });
 }

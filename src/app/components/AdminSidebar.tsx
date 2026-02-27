@@ -19,7 +19,7 @@ const menuItems = [
   { title: 'Медиатека', href: '/admin/media', icon: HiOutlinePhotograph },
   { title: 'Карусель (Главная)', href: '/admin/home-carousel', icon: HiOutlineCollection },
   { title: 'Новости', href: '/admin/news', icon: HiOutlineNewspaper },
-  { title: 'Проекты', href: '/admin/projects', icon: HiOutlineFilm },
+  { title: 'Проекты', href: '/admin/pages/projects', icon: HiOutlineFilm },
   { title: 'Страницы / Тексты', href: '/admin/content', icon: HiOutlineDocumentText },
   { title: 'Заявки (Резерв)', href: '/admin/pages/film-reserve', icon: HiOutlineInbox },
 ];

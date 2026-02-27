@@ -34,12 +34,11 @@ export default async function FilmReservePage() {
         {/* ВЕРХНИЙ БЛОК */}
         <div className="grid md:grid-cols-2 gap-12 items-start mb-24">
           <div className="text-gray-700 text-[15px] leading-relaxed">
-            {/* Выводим ТОЛЬКО контент из базы */}
+            {/* Исправленный вывод контента: добавлен prose и убран whitespace-pre-wrap */}
             <div 
-              className="whitespace-pre-wrap film-reserve-text"
+              className="prose prose-sm max-w-none film-reserve-text prose-p:my-4 prose-p:leading-relaxed"
               dangerouslySetInnerHTML={{ __html: intro?.body || 'Текст редактируется в админке...' }}
             />
-            {/* ХАРДКОД УДАЛЕН ОТСЮДА */}
           </div>
           
           <div className="relative aspect-video md:aspect-square w-full bg-gray-50 rounded-sm overflow-hidden grayscale hover:grayscale-0 transition-all duration-700 shadow-sm border border-gray-100">

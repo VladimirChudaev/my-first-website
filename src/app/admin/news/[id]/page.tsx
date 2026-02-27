@@ -2,6 +2,8 @@
 
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
+import Editor from '@/components/admin/Editor';
 
 export default function AdminNewsEditPage({
   params: paramsPromise,
@@ -18,6 +20,7 @@ export default function AdminNewsEditPage({
   const [mediaList, setMediaList] = useState<any[]>([]);
   const [isVisible, setIsVisible] = useState(true);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     fetch(`/api/admin/news/${params.id}`)
@@ -39,48 +42,62 @@ export default function AdminNewsEditPage({
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setSaving(true);
 
-    await fetch(`/api/admin/news/${params.id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        title,
-        slug,
-        body,
-        is_visible: isVisible,
-        cover_image_id: coverImageId,
-      }),
-    });
+    try {
+      const res = await fetch(`/api/admin/news/${params.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title,
+          slug,
+          body,
+          is_visible: isVisible,
+          cover_image_id: coverImageId,
+        }),
+      });
 
-    router.push('/admin/news');
-    router.refresh();
+      if (res.ok) {
+        toast.success('Обновлено');
+        router.push('/admin/news');
+        router.refresh();
+      }
+    } catch (err) {
+      toast.error('Ошибка сохранения');
+    } finally {
+      setSaving(false);
+    }
   }
 
-  if (loading) return <p className="p-8">Loading...</p>;
+  if (loading) return <div className="p-8 animate-pulse text-gray-400">Загрузка данных...</div>;
 
   return (
     <div className="space-y-6 max-w-4xl">
-      <h1 className="text-2xl font-semibold">Edit news</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-semibold">Редактирование новости</h1>
+      </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 border rounded">
-        <input
-          className="w-full border rounded px-3 py-2 font-medium"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Title"
-        />
+      <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 border rounded-2xl shadow-sm">
+        <div className="grid gap-4">
+          <input
+            className="w-full border rounded-xl px-4 py-3 font-medium focus:ring-2 ring-black outline-none transition-all"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Заголовок"
+          />
 
-        <input
-          className="w-full border rounded px-3 py-2 bg-gray-50 text-sm"
-          value={slug}
-          onChange={(e) => setSlug(e.target.value)}
-          placeholder="Slug"
-        />
+          <input
+            className="w-full border rounded-xl px-4 py-2 bg-gray-50 text-sm text-gray-500 outline-none"
+            value={slug}
+            onChange={(e) => setSlug(e.target.value)}
+            placeholder="Slug"
+          />
+        </div>
 
         {/* MEDIA PICKER */}
-        <div>
-          <p className="mb-2 text-sm font-medium">Cover image</p>
-          <div className="grid grid-cols-4 gap-3">
+        <div className="space-y-3">
+          <p className="text-sm font-medium px-1">Обложка новости</p>
+          <div className="grid grid-cols-4 md:grid-cols-6 gap-3">
             {mediaList.map((media) => {
               const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${media.bucket}/${media.path}`;
 
@@ -88,43 +105,53 @@ export default function AdminNewsEditPage({
                 <div
                   key={media.id}
                   onClick={() => setCoverImageId(media.id)}
-                  className={`cursor-pointer border rounded overflow-hidden ${
+                  className={`relative cursor-pointer aspect-square border-2 rounded-xl overflow-hidden transition-all ${
                     coverImageId === media.id
-                      ? 'ring-2 ring-black'
-                      : ''
+                      ? 'border-black ring-2 ring-black/10'
+                      : 'border-transparent hover:border-gray-200'
                   }`}
                 >
                   <img
                     src={url}
-                    className="h-24 w-full object-cover"
+                    className={`h-full w-full object-cover transition-transform ${coverImageId === media.id ? 'scale-105' : ''}`}
                   />
+                  {coverImageId === media.id && (
+                    <div className="absolute inset-0 bg-black/10 flex items-center justify-center">
+                      <div className="bg-black text-white rounded-full p-1">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M20 6L9 17l-5-5"/></svg>
+                      </div>
+                    </div>
+                  )}
                 </div>
               );
             })}
           </div>
         </div>
 
-        <textarea
-          className="w-full border rounded px-3 py-2 min-h-[200px]"
-          value={body}
-          onChange={(e) => setBody(e.target.value)}
-        />
+        <div className="space-y-2">
+          <label className="text-sm font-medium px-1">Текст новости</label>
+          <Editor content={body} onChange={setBody} />
+        </div>
 
-        <label className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            checked={isVisible}
-            onChange={(e) => setIsVisible(e.target.checked)}
-          />
-          Visible
-        </label>
+        <div className="flex items-center justify-between pt-4 border-t">
+          <label className="flex items-center gap-3 cursor-pointer group">
+            <input
+              type="checkbox"
+              className="w-5 h-5 rounded border-gray-300 text-black focus:ring-black cursor-pointer"
+              checked={isVisible}
+              onChange={(e) => setIsVisible(e.target.checked)}
+            />
+            <span className="text-sm font-medium text-gray-700 group-hover:text-black transition-colors">Опубликовано на сайте</span>
+          </label>
 
-        <button
-          type="submit"
-          className="px-4 py-2 bg-black text-white rounded text-sm"
-        >
-          Save
-        </button>
+          <button
+            type="submit"
+            disabled={saving}
+            className="px-8 py-3 bg-black text-white rounded-xl hover:bg-gray-800 disabled:bg-gray-400 transition-colors font-medium"
+          >
+            {saving ? 'Сохранение...' : 'Сохранить изменения'}
+          </button>
+        </div>
       </form>
     </div>
   );
