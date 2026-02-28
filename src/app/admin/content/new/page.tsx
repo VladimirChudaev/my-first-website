@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
@@ -10,29 +10,31 @@ export default function AdminContentCreatePage() {
   const router = useRouter();
 
   const [title, setTitle] = useState('');
-  const [slug, setSlug] = useState('');
+  const [page, setPage] = useState('partners'); // По умолчанию для твоей задачи
+  const [sectionKey, setSectionKey] = useState('header');
   const [body, setBody] = useState('');
-  const [scope, setScope] = useState<'global' | 'page'>('page');
   const [isVisible, setIsVisible] = useState(true);
-  const [coverImageId, setCoverImageId] = useState<string | null>(null);
-  const [mediaList, setMediaList] = useState<any[]>([]);
-
-  useEffect(() => {
-    fetch('/api/admin/media').then(res => res.json()).then(res => setMediaList(res.data || []));
-  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const res = await fetch('/api/admin/content', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title, slug, body, scope, is_visible: isVisible, cover_image_id: coverImageId }),
+      body: JSON.stringify({ 
+        title, 
+        page, 
+        section_key: sectionKey, 
+        body, 
+        is_visible: isVisible 
+      }),
     });
 
     if (res.ok) {
-      toast.success('Страница создана');
+      toast.success('Запись создана');
       router.push('/admin/content');
       router.refresh();
+    } else {
+      toast.error('Ошибка при создании');
     }
   }
 
@@ -43,37 +45,39 @@ export default function AdminContentCreatePage() {
         <Link href="/admin/content" className="text-sm underline">Назад к списку</Link>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 border rounded-2xl">
+      <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 border rounded-2xl shadow-sm">
         <div className="grid grid-cols-2 gap-4">
-          <input placeholder="Заголовок" className="border rounded-xl px-4 py-2" value={title} onChange={(e) => setTitle(e.target.value)} required />
-          <input placeholder="Slug (url)" className="border rounded-xl px-4 py-2" value={slug} onChange={(e) => setSlug(e.target.value)} required />
+          <div className="space-y-1">
+            <label className="text-xs font-medium text-gray-500 ml-1">Заголовок</label>
+            <input placeholder="Например: Наши партнеры" className="w-full border rounded-xl px-4 py-2" value={title} onChange={(e) => setTitle(e.target.value)} required />
+          </div>
+          <div className="space-y-1">
+            <label className="text-xs font-medium text-gray-500 ml-1">Страница (page)</label>
+            <input placeholder="partners, home..." className="w-full border rounded-xl px-4 py-2" value={page} onChange={(e) => setPage(e.target.value)} required />
+          </div>
         </div>
 
-        <div className="space-y-3">
-          <p className="text-sm font-medium">Обложка страницы</p>
-          <div className="grid grid-cols-6 gap-2 max-h-[200px] overflow-y-auto p-2 border rounded-xl">
-            {mediaList.map((media) => (
-              <div key={media.id} onClick={() => setCoverImageId(media.id)} className={`relative cursor-pointer aspect-square rounded-lg overflow-hidden border-2 ${coverImageId === media.id ? 'border-black' : 'border-transparent'}`}>
-                <img src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${media.bucket}/${media.path}`} className="object-cover h-full w-full" />
-              </div>
-            ))}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-1">
+            <label className="text-xs font-medium text-gray-500 ml-1">Ключ секции (section_key)</label>
+            <input placeholder="header, intro, about..." className="w-full border rounded-xl px-4 py-2" value={sectionKey} onChange={(e) => setSectionKey(e.target.value)} required />
+          </div>
+          <div className="flex items-end pb-2">
+            <label className="flex items-center gap-2 text-sm cursor-pointer">
+              <input type="checkbox" className="w-4 h-4" checked={isVisible} onChange={(e) => setIsVisible(e.target.checked)} /> 
+              Видимость на сайте
+            </label>
           </div>
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium">Контент</label>
+          <label className="text-sm font-medium">Контент (Body)</label>
           <Editor content={body} onChange={setBody} />
         </div>
 
-        <div className="flex items-center gap-6">
-          <select className="border rounded-xl px-4 py-2" value={scope} onChange={(e) => setScope(e.target.value as any)}>
-            <option value="page">Страница</option>
-            <option value="global">Глобальный блок</option>
-          </select>
-          <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={isVisible} onChange={(e) => setIsVisible(e.target.checked)} /> Видимость</label>
-        </div>
-
-        <button className="px-8 py-3 bg-black text-white rounded-xl font-medium">Создать</button>
+        <button className="px-8 py-3 bg-black text-white rounded-xl font-medium hover:bg-gray-800 transition-colors">
+          Создать запись
+        </button>
       </form>
     </div>
   );

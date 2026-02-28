@@ -12,28 +12,27 @@ export default function AdminContentEditPage() {
   const id = params.id;
 
   const [title, setTitle] = useState('');
-  const [slug, setSlug] = useState('');
+  const [page, setPage] = useState('');
+  const [sectionKey, setSectionKey] = useState('');
   const [body, setBody] = useState('');
-  const [scope, setScope] = useState<'global' | 'page'>('page');
   const [isVisible, setIsVisible] = useState(true);
-  const [coverImageId, setCoverImageId] = useState<string | null>(null);
-  const [mediaList, setMediaList] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Загружаем данные страницы
-    fetch(`/api/admin/content/${id}`).then(res => res.json()).then(res => {
-      const d = res.data;
-      if (d) {
-        setTitle(d.title || '');
-        setSlug(d.slug || '');
-        setBody(d.body || '');
-        setScope(d.scope || 'page');
-        setIsVisible(d.is_visible);
-        setCoverImageId(d.cover_image_id);
-      }
-    });
-    // Загружаем медиатеку
-    fetch('/api/admin/media').then(res => res.json()).then(res => setMediaList(res.data || []));
+    fetch(`/api/admin/content/${id}`)
+      .then(res => res.json())
+      .then(res => {
+        const d = res.data;
+        if (d) {
+          setTitle(d.title || '');
+          setPage(d.page || '');
+          setSectionKey(d.section_key || '');
+          setBody(d.body || '');
+          setIsVisible(d.is_visible);
+        }
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
   }, [id]);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -41,27 +40,43 @@ export default function AdminContentEditPage() {
     const res = await fetch(`/api/admin/content/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title, slug, body, scope, is_visible: isVisible, cover_image_id: coverImageId }),
+      body: JSON.stringify({ 
+        title, 
+        page, 
+        section_key: sectionKey, 
+        body, 
+        is_visible: isVisible 
+      }),
     });
 
     if (res.ok) {
-      toast.success('Обновлено');
+      toast.success('Обновлено успешно');
       router.push('/admin/content');
       router.refresh();
     }
   }
 
+  if (loading) return <div className="p-10 text-center text-gray-500">Загрузка данных...</div>;
+
   return (
     <div className="space-y-6 max-w-4xl">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Редактировать контент</h1>
-        <Link href="/admin/content" className="text-sm underline">Назад</Link>
+        <h1 className="text-2xl font-semibold text-gray-800">Редактировать текст</h1>
+        <Link href="/admin/content" className="text-sm text-gray-500 hover:underline">← Назад к списку</Link>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 border rounded-2xl shadow-sm">
         <div className="grid grid-cols-2 gap-4">
-          <input className="border rounded-xl px-4 py-2" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Заголовок" />
-          <input className="border rounded-xl px-4 py-2 text-gray-400" value={slug} readOnly />
+          <div className="space-y-1">
+            <label className="text-xs font-medium text-gray-400 uppercase ml-1">Заголовок</label>
+            <input className="w-full border rounded-xl px-4 py-2 font-medium" value={title} onChange={(e) => setTitle(e.target.value)} />
+          </div>
+          <div className="space-y-1 text-gray-400 cursor-not-allowed">
+            <label className="text-xs font-medium uppercase ml-1">Место (Page / Key)</label>
+            <div className="px-4 py-2 bg-gray-50 border rounded-xl text-sm">
+              {page} / {sectionKey}
+            </div>
+          </div>
         </div>
 
         <div className="space-y-2">
@@ -69,22 +84,25 @@ export default function AdminContentEditPage() {
           <Editor content={body} onChange={setBody} />
         </div>
 
-        <div className="grid grid-cols-6 gap-2 max-h-[200px] overflow-y-auto p-2 border rounded-xl">
-           {mediaList.map((media) => (
-              <div key={media.id} onClick={() => setCoverImageId(media.id)} className={`relative cursor-pointer aspect-square rounded-lg overflow-hidden border-2 ${coverImageId === media.id ? 'border-black' : 'border-transparent'}`}>
-                <img src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${media.bucket}/${media.path}`} className="object-cover h-full w-full" />
-              </div>
-            ))}
-        </div>
-
-        <div className="flex gap-4">
-          <button className="px-8 py-2 bg-black text-white rounded-xl">Сохранить</button>
-          <button type="button" onClick={async () => { 
-            if(confirm('Удалить?')) { 
-              await fetch(`/api/admin/content/${id}`, { method: 'DELETE' });
-              router.push('/admin/content');
-            }
-          }} className="px-8 py-2 border rounded-xl text-red-500">Удалить</button>
+        <div className="flex items-center justify-between pt-4 border-t">
+          <div className="flex gap-4">
+            <button className="px-10 py-2 bg-black text-white rounded-xl font-medium hover:bg-gray-800 transition-colors">
+              Сохранить
+            </button>
+            <button type="button" onClick={async () => { 
+              if(confirm('Удалить эту текстовую секцию?')) { 
+                await fetch(`/api/admin/content/${id}`, { method: 'DELETE' });
+                router.push('/admin/content');
+              }
+            }} className="px-6 py-2 border border-red-100 rounded-xl text-red-500 hover:bg-red-50 transition-colors">
+              Удалить
+            </button>
+          </div>
+          
+          <label className="flex items-center gap-2 text-sm font-medium cursor-pointer">
+            <input type="checkbox" className="w-4 h-4" checked={isVisible} onChange={(e) => setIsVisible(e.target.checked)} /> 
+            Отображать на сайте
+          </label>
         </div>
       </form>
     </div>
