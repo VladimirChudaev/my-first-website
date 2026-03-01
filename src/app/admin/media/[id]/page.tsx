@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useEffect, useState, use } from 'react';
 import { createClient } from '@/lib/client';
+import Editor from '@/components/admin/Editor'; // Импортируем наш редактор
 
 export default function AdminMediaEditPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
@@ -119,13 +120,13 @@ export default function AdminMediaEditPage({ params }: { params: Promise<{ id: s
           />
         </div>
 
+        {/* ЗАМЕНЕНО: Textarea на Editor */}
         <div className="flex flex-col gap-2">
           <label className="text-xs font-black uppercase text-gray-400">Описание (SEO)</label>
-          <textarea
-            rows={4}
-            className="p-4 bg-gray-50 rounded-xl outline-none border-2 focus:border-blue-500 resize-none"
-            value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+          <Editor 
+            content={formData.description}
+            onChange={(html) => setFormData({ ...formData, description: html })}
+            minHeight="180px"
           />
         </div>
 
