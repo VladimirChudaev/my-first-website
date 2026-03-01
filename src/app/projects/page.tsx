@@ -9,6 +9,7 @@ export default async function ProjectsPage() {
   const supabase = await createClient();
   const allMedia = await ProjectsService.getProjectsWithMedia();
   
+  // Запрашиваем ВСЕ блоки для этой страницы без фильтрации по visibility (пока тестим)
   const { data: contentBlocks } = await supabase
     .from('page_content')
     .select('*')
@@ -21,6 +22,7 @@ export default async function ProjectsPage() {
     title: item.title || '', 
     description: item.description || item.alt_text || '',
     author: item.credits || '',
+    // Возвращаю твой оригинальный способ формирования ссылки
     imageUrl: `https://hdrxoowpnhrschlonivc.supabase.co/storage/v1/object/public/${item.bucket}/${item.filename}`
   });
 
@@ -41,8 +43,7 @@ export default async function ProjectsPage() {
           const block = getBlock(section.key);
           if (section.data.length === 0) return null;
 
-          // СЛОЙ ОБРАБОТКИ ДАННЫХ (Data Layer Logic)
-          // Извлекаем чистый HEX, чтобы не завязываться на специфичные префиксы базы
+          // Возвращаю твою логику цвета
           const colorMatch = (block.bg_color || '').match(/#[a-fA-F0-9]{3,6}/);
           const cleanHex = colorMatch ? colorMatch[0] : null;
 
@@ -50,9 +51,7 @@ export default async function ProjectsPage() {
             <section 
               key={section.key} 
               id={section.key} 
-              // СЛОЙ ПРЕДСТАВЛЕНИЯ (View Layer)
-              // Используем style для динамики, а классы для статики. 
-              // Это стандарт для "Layer Separation": динамические данные — в style.
+              // Возвращаю оригинальные стили и подложки
               style={cleanHex ? { backgroundColor: cleanHex } : {}}
               className="py-16 md:py-24 border-b border-gray-100 transition-colors duration-500"
             >
@@ -60,21 +59,23 @@ export default async function ProjectsPage() {
                 <div className="flex flex-col md:flex-row gap-8 md:gap-16 items-start mb-16">
                   <div className="w-full md:w-1/3">
                     <h2 className="text-3xl md:text-4xl font-black uppercase tracking-widest text-gray-900 leading-tight">
-                      {block.title}
+                      {block.title || 'Загрузка...'}
                     </h2>
                   </div>
 
-                  {block.title && block.body && (
+                  {/* Вертикальная черта (разделитель) */}
+                  {block.title && (
                     <div className="hidden md:block w-px h-20 bg-gray-300 self-center"></div>
                   )}
 
                   <div className="w-full md:w-2/3">
                     <div 
-                      className="text-base md:text-lg text-gray-700 leading-relaxed font-light prose prose-slate max-w-none [&_strong]:font-bold [&_strong]:text-gray-900"
+                      className="text-base md:text-lg text-gray-700 leading-relaxed font-light prose prose-slate max-w-none"
                       dangerouslySetInnerHTML={{ __html: block.body || '' }}
                     />
                   </div>
                 </div>
+                {/* Карусель проектов */}
                 <ProjectCarousel projects={section.data} isTvCarousel={section.isTv} />
               </div>
             </section>

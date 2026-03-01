@@ -9,7 +9,7 @@ type Award = {
   festival: string;
   status: string;
   description: string | null;
-  image_url: string | null; // Оставляем для совместимости, если где-то еще есть старые данные
+  image_url: string | null;
   position: number;
   is_visible: boolean;
   media?: {
@@ -17,7 +17,14 @@ type Award = {
   } | null;
 };
 
-export default function AwardsCarousel() {
+interface AwardsCarouselProps {
+  content?: {
+    title: string;
+    body: string;
+  };
+}
+
+export default function AwardsCarousel({ content }: AwardsCarouselProps) {
   const [awards, setAwards] = useState<Award[]>([]);
   const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -40,7 +47,6 @@ export default function AwardsCarousel() {
         setLoading(false);
       }
     }
-
     load();
   }, []);
 
@@ -53,8 +59,6 @@ export default function AwardsCarousel() {
   if (loading || !awards.length) return null;
 
   const current = awards[page % awards.length];
-
-  // Формируем URL картинки: приоритет новому полю media.filename
   const displayImageUrl = current.media?.filename
     ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/media/${current.media.filename}`
     : current.image_url;
@@ -62,6 +66,24 @@ export default function AwardsCarousel() {
   return (
     <section className="bg-white py-20 border-t border-gray-100 text-black overflow-hidden">
       <div className="max-w-6xl mx-auto px-8">
+        
+        {/* Блок заголовка: отображается только если content существует (is_visible: true) */}
+        {content && (
+          <div className="mb-16 text-center md:text-left">
+            {content.title && (
+              <h2 className="text-3xl md:text-5xl font-black uppercase tracking-widest mb-4">
+                {content.title}
+              </h2>
+            )}
+            {content.body && (
+              <div 
+                className="text-gray-500 text-lg md:text-xl font-light max-w-2xl"
+                dangerouslySetInnerHTML={{ __html: content.body }}
+              />
+            )}
+          </div>
+        )}
+
         <div className="relative min-h-[400px] flex items-center">
           <AnimatePresence mode="wait">
             <motion.div
@@ -76,16 +98,10 @@ export default function AwardsCarousel() {
                 <h3 className="text-4xl font-black uppercase tracking-tighter leading-[0.9]">
                   {current.title}
                 </h3>
-
                 <div className="space-y-1">
-                  <p className="text-sm font-bold uppercase tracking-[0.2em]">
-                    {current.festival}
-                  </p>
-                  <p className="text-gray-400 italic text-sm">
-                    — {current.status}
-                  </p>
+                  <p className="text-sm font-bold uppercase tracking-[0.2em]">{current.festival}</p>
+                  <p className="text-gray-400 italic text-sm">— {current.status}</p>
                 </div>
-
                 {current.description && (
                   <p className="text-lg text-gray-600 leading-relaxed italic border-t border-gray-50 pt-6">
                     {current.description}
@@ -99,13 +115,7 @@ export default function AwardsCarousel() {
                     src={displayImageUrl}
                     alt={current.title}
                     className="max-w-full max-h-full object-contain"
-                    onError={(e) => {
-                      console.error(
-                        'Ошибка загрузки картинки:',
-                        e.currentTarget.src
-                      );
-                      e.currentTarget.style.display = 'none';
-                    }}
+                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
                   />
                 </div>
               )}
