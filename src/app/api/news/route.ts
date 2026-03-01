@@ -1,20 +1,26 @@
 import { NextResponse } from 'next/server';
-import { getNewsList } from '@/lib/news/service';
+import { createClient } from '@/lib/server';
 
-/**
- * GET /api/news
- * Возвращает список только опубликованных новостей для публичного сайта
- */
 export async function GET() {
   try {
-    // Используем обновленный getNewsList, который корректно тянет медиа
-    const result = await getNewsList();
+    const supabase = await createClient();
 
-    // Фильтруем данные, оставляя только те, где is_visible === true
-    const visibleNews = (result.data || []).filter(item => item.is_visible);
+    // Запрашиваем новости напрямую с JOIN таблицы media
+    const { data, error } = await supabase
+      .from('news')
+      .select(`
+        *,
+        cover_image:cover_image_id (
+          filename
+        )
+      `)
+      .eq('is_visible', true)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
 
     return NextResponse.json({
-      data: visibleNews
+      data: data || []
     });
   } catch (error) {
     console.error('Public News API Error:', error);

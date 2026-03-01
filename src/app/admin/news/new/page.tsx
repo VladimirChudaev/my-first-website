@@ -8,29 +8,28 @@ import Editor from '@/components/admin/Editor';
 export default function AdminNewsCreatePage() {
   const router = useRouter();
 
+  // Состояния формы
   const [title, setTitle] = useState('');
   const [slug, setSlug] = useState('');
   const [body, setBody] = useState('');
   const [coverImageId, setCoverImageId] = useState<string | null>(null);
+  const [createdAt, setCreatedAt] = useState(new Date().toISOString().slice(0, 16)); // Поле даты
+  
+  // Состояния загрузки медиа
   const [mediaList, setMediaList] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [fetchingMedia, setFetchingMedia] = useState(true);
 
-  // Подгружаем список доступных фото (убрали фильтр ?category=photo для теста)
+  // Загрузка медиатеки
   useEffect(() => {
     setFetchingMedia(true);
     fetch('/api/admin/media')
       .then((res) => {
-        if (!res.ok) throw new Error('Ошибка сервера при загрузке медиа');
+        if (!res.ok) throw new Error('Ошибка сервера');
         return res.json();
       })
-      .then((res) => {
-        setMediaList(res.data || []);
-      })
-      .catch((err) => {
-        console.error(err);
-        toast.error('Не удалось загрузить медиатеку');
-      })
+      .then((res) => setMediaList(res.data || []))
+      .catch(() => toast.error('Не удалось загрузить медиатеку'))
       .finally(() => setFetchingMedia(false));
   }, []);
 
@@ -49,14 +48,12 @@ export default function AdminNewsCreatePage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!coverImageId) {
-      toast.error('Выберите обложку из медиатеки');
+      toast.error('Выберите обложку');
       return;
     }
 
     setLoading(true);
-
     try {
       const res = await fetch('/api/admin/news', {
         method: 'POST',
@@ -66,6 +63,7 @@ export default function AdminNewsCreatePage() {
           slug,
           body,
           cover_image_id: coverImageId,
+          created_at: createdAt, // Передаем нашу дату
         }),
       });
 
@@ -89,6 +87,7 @@ export default function AdminNewsCreatePage() {
       <h1 className="text-2xl font-semibold">Новая новость</h1>
       
       <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 border rounded-2xl shadow-sm">
+        {/* Заголовок и Slug */}
         <div className="space-y-4">
           <input
             className="w-full border rounded-xl px-4 py-3 font-medium focus:ring-2 ring-black outline-none"
@@ -108,39 +107,42 @@ export default function AdminNewsCreatePage() {
           />
         </div>
 
+        {/* ДАТА ПУБЛИКАЦИИ */}
+        <div className="space-y-2">
+          <label className="text-[10px] font-bold uppercase text-gray-400 tracking-wider px-1">Дата публикации</label>
+          <input 
+            type="datetime-local" 
+            value={createdAt}
+            onChange={(e) => setCreatedAt(e.target.value)}
+            className="w-full border rounded-xl px-4 py-3 focus:ring-2 ring-black outline-none transition-all"
+          />
+          <p className="text-[10px] text-gray-400 px-1 italic">
+            Для старых новостей выберите дату из прошлого, чтобы они ушли вниз списка.
+          </p>
+        </div>
+
         {/* МЕДИАТЕКА */}
         <div className="space-y-3">
-          <div className="flex justify-between items-center px-1">
-            <p className="text-sm font-medium">Выберите обложку</p>
-            {fetchingMedia && <span className="text-xs animate-pulse text-gray-400">Загрузка медиа...</span>}
-          </div>
-          
+          <p className="text-sm font-medium px-1">Выберите обложку</p>
           <div className="grid grid-cols-4 md:grid-cols-6 gap-3 max-h-[300px] overflow-y-auto p-1 border rounded-xl">
-            {mediaList.length > 0 ? (
-              mediaList.map((media) => {
-                const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${media.bucket}/${media.path}`;
-                return (
-                  <div
-                    key={media.id}
-                    onClick={() => setCoverImageId(media.id)}
-                    className={`relative cursor-pointer aspect-square border-2 rounded-lg overflow-hidden transition-all ${
-                      coverImageId === media.id ? 'border-black ring-2 ring-black/10' : 'border-transparent hover:border-gray-200'
-                    }`}
-                  >
-                    <img src={url} className="h-full w-full object-cover" alt="" />
-                  </div>
-                );
-              })
-            ) : (
-              !fetchingMedia && (
-                <div className="col-span-full py-8 text-center text-gray-400 text-sm">
-                  Медиатека пуста или недоступна.
+            {mediaList.map((media) => {
+              const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${media.bucket}/${media.path}`;
+              return (
+                <div
+                  key={media.id}
+                  onClick={() => setCoverImageId(media.id)}
+                  className={`relative cursor-pointer aspect-square border-2 rounded-lg overflow-hidden transition-all ${
+                    coverImageId === media.id ? 'border-black ring-2 ring-black/10' : 'border-transparent hover:border-gray-200'
+                  }`}
+                >
+                  <img src={url} className="h-full w-full object-cover" alt="" />
                 </div>
-              )
-            )}
+              );
+            })}
           </div>
         </div>
 
+        {/* РЕДАКТОР */}
         <div className="space-y-2">
           <label className="text-sm font-medium px-1">Контент</label>
           <Editor content={body} onChange={setBody} />
@@ -149,7 +151,7 @@ export default function AdminNewsCreatePage() {
         <button 
           type="submit"
           disabled={loading}
-          className="w-full md:w-auto px-8 py-3 bg-black text-white rounded-xl hover:bg-gray-800 disabled:bg-gray-400 font-medium transition-all"
+          className="px-8 py-3 bg-black text-white rounded-xl hover:bg-gray-800 disabled:bg-gray-400 font-medium transition-all"
         >
           {loading ? 'Создание...' : 'Опубликовать'}
         </button>

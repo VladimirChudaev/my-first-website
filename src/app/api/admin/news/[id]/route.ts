@@ -21,7 +21,7 @@ export async function GET(
   return NextResponse.json(result);
 }
 
-// Используем PATCH для частичного обновления
+// PATCH теперь корректно обработает created_at, так как мы передаем весь body в сервис
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<Params> }

@@ -1,12 +1,16 @@
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
+// 1. Импортируем клиент базы данных
+import { createClient } from '@/lib/server';
+
+// 2. Импортируем все компоненты
 import PhotoCarousel from './components/PhotoCarousel';
 import PartnersCarousel from './components/PartnersCarousel';
 import AwardsCarousel from './components/AwardsCarousel';
 import CompanyProjects from './components/CompanyProjects';
 import VideoCarousel from './components/VideoCarousel';
-import { createClient } from '@/lib/server';
+import NewsSection from './components/NewsSection';
 
 export default async function Home() {
   const supabase = await createClient();
@@ -15,11 +19,10 @@ export default async function Home() {
   const { data: content } = await supabase
     .from('page_content')
     .select('*')
-    .eq('page', 'home')
-    .eq('is_visible', true);
+    .eq('page', 'home');
 
-  // Функция-помощник для поиска нужного текста
-  const getBlock = (key: string) => content?.find(b => b.section_key === key);
+  // Функция-помощник (добавили типизацию : any, чтобы ушла ошибка "b")
+  const getBlock = (key: string) => content?.find((b: any) => b.section_key === key);
 
   return (
     <main className="bg-white min-h-screen">
@@ -33,6 +36,9 @@ export default async function Home() {
       <AwardsCarousel content={getBlock('awards_intro')} />
       <VideoCarousel />
       <CompanyProjects content={getBlock('about_company')} />
+      
+      {/* Секция новостей, которой мы занимались */}
+      <NewsSection content={getBlock('news_intro')} />
     </main>
   );
 }

@@ -13,16 +13,21 @@ export default function AdminNewsEditPage({
   const params = use(paramsPromise);
   const router = useRouter();
 
+  // Состояния формы
   const [title, setTitle] = useState('');
   const [slug, setSlug] = useState('');
   const [body, setBody] = useState('');
   const [coverImageId, setCoverImageId] = useState<string | null>(null);
-  const [mediaList, setMediaList] = useState<any[]>([]);
+  const [createdAt, setCreatedAt] = useState(''); // Новое состояние для даты
   const [isVisible, setIsVisible] = useState(true);
+  
+  // Состояния загрузки
+  const [mediaList, setMediaList] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
+    // Загружаем данные новости
     fetch(`/api/admin/news/${params.id}`)
       .then((res) => res.json())
       .then((res) => {
@@ -32,9 +37,14 @@ export default function AdminNewsEditPage({
         setBody(item.body || '');
         setCoverImageId(item.cover_image_id || null);
         setIsVisible(item.is_visible);
+        // Форматируем дату из базы для инпута datetime-local
+        if (item.created_at) {
+          setCreatedAt(new Date(item.created_at).toISOString().slice(0, 16));
+        }
         setLoading(false);
       });
 
+    // Загружаем медиатеку
     fetch(`/api/admin/media?category=photo`)
       .then((res) => res.json())
       .then((res) => setMediaList(res.data || []));
@@ -54,6 +64,7 @@ export default function AdminNewsEditPage({
           body,
           is_visible: isVisible,
           cover_image_id: coverImageId,
+          created_at: createdAt, // Отправляем измененную дату
         }),
       });
 
@@ -94,10 +105,21 @@ export default function AdminNewsEditPage({
           />
         </div>
 
+        {/* ПОЛЕ ДАТЫ */}
+        <div className="space-y-2">
+          <label className="text-[10px] font-bold uppercase text-gray-400 tracking-wider px-1">Дата публикации</label>
+          <input 
+            type="datetime-local" 
+            value={createdAt}
+            onChange={(e) => setCreatedAt(e.target.value)}
+            className="w-full border rounded-xl px-4 py-3 focus:ring-2 ring-black outline-none transition-all"
+          />
+        </div>
+
         {/* MEDIA PICKER */}
         <div className="space-y-3">
           <p className="text-sm font-medium px-1">Обложка новости</p>
-          <div className="grid grid-cols-4 md:grid-cols-6 gap-3">
+          <div className="grid grid-cols-4 md:grid-cols-6 gap-3 max-h-[300px] overflow-y-auto p-1 border rounded-xl">
             {mediaList.map((media) => {
               const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${media.bucket}/${media.path}`;
 
@@ -114,6 +136,7 @@ export default function AdminNewsEditPage({
                   <img
                     src={url}
                     className={`h-full w-full object-cover transition-transform ${coverImageId === media.id ? 'scale-105' : ''}`}
+                    alt=""
                   />
                   {coverImageId === media.id && (
                     <div className="absolute inset-0 bg-black/10 flex items-center justify-center">

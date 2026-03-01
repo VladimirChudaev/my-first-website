@@ -8,8 +8,15 @@ type Props = {
   params: Promise<{ slug: string }>;
 };
 
+// Добавляем описание типа для соседних новостей
+interface AdjacentNews {
+  id: string;
+  title: string;
+  slug: string;
+}
+
 /* =========================
-   🔹 METADATA
+    🔹 METADATA
 ========================= */
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -40,23 +47,27 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 /* =========================
-   🔹 PAGE
+    🔹 PAGE
 ========================= */
 
 export default async function NewsSinglePage({ params }: Props) {
   const { slug } = await params;
-  const { data: newsItem } = await getNewsBySlug(slug);
+  
+  const { data: newsItem, navigation } = await getNewsBySlug(slug);
 
   if (!newsItem || !newsItem.is_visible) {
     notFound();
   }
+
+  // Явно типизируем для TS, чтобы убрать ошибки "type never"
+  const prev = navigation?.prev as AdjacentNews | null;
+  const next = navigation?.next as AdjacentNews | null;
 
   const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const imageUrl = newsItem.media
     ? `${baseUrl}/storage/v1/object/public/${newsItem.media.bucket}/${newsItem.media.path}`
     : null;
 
-  // Безопасное форматирование даты
   const formattedDate = newsItem.created_at 
     ? new Date(newsItem.created_at).toLocaleDateString('ru-RU')
     : '';
@@ -94,12 +105,45 @@ export default async function NewsSinglePage({ params }: Props) {
             dangerouslySetInnerHTML={{ __html: newsItem.body || '' }}
           />
 
-          <div className="mt-20">
+          {/* 🔹 БЛОК НАВИГАЦИИ (ЛЕНТА) */}
+          <div className="mt-20 pt-10 border-t border-gray-100 flex flex-col md:flex-row justify-between gap-8">
+            
+            {/* Предыдущая новость */}
+            <div className="flex-1">
+              {prev && (
+                <Link href={`/news/${prev.slug}`} className="group block max-w-xs">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 group-hover:text-black transition-colors">
+                    ← Предыдущая
+                  </span>
+                  <p className="mt-2 text-sm font-light text-gray-600 group-hover:text-black line-clamp-2 leading-snug">
+                    {prev.title}
+                  </p>
+                </Link>
+              )}
+            </div>
+
+            {/* Следующая новость */}
+            <div className="flex-1 md:text-right flex md:justify-end">
+              {next && (
+                <Link href={`/news/${next.slug}`} className="group block max-w-xs">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 group-hover:text-black transition-colors">
+                    Следующая →
+                  </span>
+                  <p className="mt-2 text-sm font-light text-gray-600 group-hover:text-black line-clamp-2 leading-snug">
+                    {next.title}
+                  </p>
+                </Link>
+              )}
+            </div>
+
+          </div>
+
+          <div className="mt-16">
             <Link 
               href="/news"
-              className="text-sm font-medium hover:underline underline-offset-4 text-black"
+              className="text-xs uppercase tracking-widest font-bold hover:underline underline-offset-4 text-black"
             >
-              ← Назад к списку
+              Все новости
             </Link>
           </div>
         </div>

@@ -8,13 +8,14 @@ export async function POST(req: NextRequest) {
     // Получаем JSON данные из тела запроса
     const bodyData = await req.json();
 
-    const { title, slug, body, cover_image_id } = bodyData;
+    // Добавили created_at в деструктуризацию, чтобы принимать дату из формы
+    const { title, slug, body, cover_image_id, created_at } = bodyData;
 
     if (!cover_image_id) {
       return NextResponse.json({ error: 'Необходимо выбрать обложку' }, { status: 400 });
     }
 
-    // Просто создаем запись в таблице news, ссылаясь на ID в таблице media
+    // Создаем запись, включая поле created_at
     const { data: newsRow, error: newsError } = await supabase
       .from('news')
       .insert({
@@ -22,7 +23,9 @@ export async function POST(req: NextRequest) {
         slug,
         body,
         is_visible: true,
-        cover_image_id: cover_image_id, // Используем уже существующий ID
+        cover_image_id: cover_image_id,
+        // Если дата передана из формы — используем её, если нет — ставим текущую
+        created_at: created_at || new Date().toISOString(),
       })
       .select()
       .single();
