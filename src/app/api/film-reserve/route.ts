@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { NextResponse } from 'next/server'
 import { sendFilmReserveEmail } from '@/lib/email/smtp'
 import { verifyTurnstile } from '@/lib/security/turnstile'
