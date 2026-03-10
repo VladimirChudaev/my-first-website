@@ -40,30 +40,34 @@ export default function Footer() {
       <div className="container mx-auto px-6 lg:px-20">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12 mb-16 items-start">
 
+          {/* Логотип */}
           <div className="md:col-span-4 flex justify-center md:justify-start">
             <div className="relative w-[280px] md:w-[320px] aspect-[16/9]">
               <Logo />
             </div>
           </div>
 
+          {/* Навигация (Синхронизировано с хедером) */}
           <div className="md:col-span-3 flex flex-col items-center md:items-start gap-5">
             <h4 className="text-white font-bold uppercase text-[10px] tracking-[0.2em] opacity-40">
               Навигация
             </h4>
             <nav className="flex flex-col items-center md:items-start gap-4 text-xl">
-              <Link href="/">Главная</Link>
-              <Link href="/partners">Партнёры</Link>
-              <Link href="/projects">Проекты</Link>
-              <Link href="/news">Новости</Link>
+              <Link href="/" className="hover:text-gray-400 transition-colors">Главная</Link>
+              <Link href="/projects" className="hover:text-gray-400 transition-colors">Проекты</Link>
+              <Link href="/partners" className="hover:text-gray-400 transition-colors">Партнёры</Link>
+              <Link href="/film-reserve" className="hover:text-gray-400 transition-colors">Кинорезерв</Link>
+              <Link href="/news" className="hover:text-gray-400 transition-colors">Новости</Link>
             </nav>
           </div>
 
+          {/* Контакты */}
           <div className="md:col-span-3 flex flex-col items-center md:items-start gap-6 text-center md:text-left">
             <h4 className="text-white font-bold uppercase text-[10px] tracking-[0.2em] opacity-40">
               Контакты
             </h4>
 
-            <div className="flex items-center gap-3 text-xl">
+            <div className="flex items-center gap-3 text-xl hover:text-gray-400 transition-colors">
               <FaEnvelope className="text-white/20 hidden md:block" />
               <a href="mailto:info@vtagency.ru">info@vtagency.ru</a>
             </div>
@@ -79,35 +83,37 @@ export default function Footer() {
             </div>
           </div>
 
+          {/* Соцсети */}
           <div className="md:col-span-2 flex flex-col items-center md:items-end gap-6">
             <h4 className="text-white font-bold uppercase text-[10px] tracking-[0.2em] opacity-40">
               Мы в сети
             </h4>
 
             <div className="flex items-center gap-6 text-3xl">
-              <FaTelegram />
-              <FaVk />
-              <FaYoutube />
+              <a href="#" className="hover:text-gray-400 transition-colors"><FaTelegram /></a>
+              <a href="#" className="hover:text-gray-400 transition-colors"><FaVk /></a>
+              <a href="#" className="hover:text-gray-400 transition-colors"><FaYoutube /></a>
               {zenUrl && (
-                <div className="w-[24px] h-[24px] relative">
+                <div className="w-[24px] h-[24px] relative cursor-pointer hover:opacity-100 transition-opacity opacity-80">
                   <Image
                     src={zenUrl}
                     alt="Дзен"
                     fill
-                    className="invert opacity-80 object-contain"
+                    className="invert object-contain"
                   />
                 </div>
               )}
-              <Link href="/auth/login" className="opacity-20 hover:opacity-100">
+              <Link href="/auth/login" className="opacity-20 hover:opacity-100 transition-opacity">
                 <FaLock className="text-2xl" />
               </Link>
             </div>
           </div>
         </div>
 
+        {/* Копирайт */}
         <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 text-[9px] tracking-[0.2em] uppercase opacity-30 text-center">
           <p>© {currentYear} ООО «Кинокомпания Ви Эн Ти». ВСЕ ПРАВА ЗАЩИЩЕНЫ.</p>
-          <Link href="/privacy" className="underline underline-offset-8 decoration-white/20">
+          <Link href="/privacy" className="underline underline-offset-8 decoration-white/20 hover:text-white transition-colors">
             Политика конфиденциальности
           </Link>
         </div>
