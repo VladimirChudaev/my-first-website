@@ -2,6 +2,21 @@ import Link from 'next/link';
 
 const items = [
   {
+    title: 'Content',
+    description: 'Управление текстовыми блоками всех страниц (включая Главную)',
+    href: '/admin/content',
+  },
+  {
+    title: 'Projects',
+    description: 'Projects page content',
+    href: '/admin/pages/projects',
+  },
+  {
+    title: 'Film reserve',
+    description: 'Feedback form and page content',
+    href: '/admin/pages/film-reserve',
+  },
+  {
     title: 'Home Carousel',
     description: 'Управление слайдами на главной странице',
     href: '/admin/home-carousel',
@@ -17,11 +32,6 @@ const items = [
     href: '/admin/partners',
   },
   {
-    title: 'Content',
-    description: 'Manage page blocks and structured content',
-    href: '/admin/content',
-  },
-  {
     title: 'Media',
     description: 'Images, videos and files',
     href: '/admin/media',
@@ -30,22 +40,6 @@ const items = [
     title: 'News',
     description: 'Create and edit news posts',
     href: '/admin/news',
-  },
-  {
-    title: 'Home page',
-    description: 'Main page blocks and order',
-    href: '/admin/pages/home',
-  },
-  {
-    title: 'Projects',
-    description: 'Projects page content',
-    href: '/admin/pages/projects',
-  },
-  {
-    title: 'Film reserve',
-    description: 'Feedback form and page content',
-    // ИСПРАВЛЕННЫЙ ПУТЬ:
-    href: '/admin/pages/film-reserve',
   },
 ];
 

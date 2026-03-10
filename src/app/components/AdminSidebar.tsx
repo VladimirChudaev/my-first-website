@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { usePathname } from 'next/navigation';
-// Добавляем все иконки в импорт здесь:
 import { 
   HiOutlineChevronLeft, 
   HiOutlineHome, 
@@ -19,8 +18,11 @@ const menuItems = [
   { title: 'Медиатека', href: '/admin/media', icon: HiOutlinePhotograph },
   { title: 'Карусель (Главная)', href: '/admin/home-carousel', icon: HiOutlineCollection },
   { title: 'Новости', href: '/admin/news', icon: HiOutlineNewspaper },
+  // Оставляем Проекты, так как они были в основном списке
   { title: 'Проекты', href: '/admin/pages/projects', icon: HiOutlineFilm },
-  { title: 'Страницы / Тексты', href: '/admin/content', icon: HiOutlineDocumentText },
+  // Уточняем название для Content
+  { title: 'Контент страниц', href: '/admin/content', icon: HiOutlineDocumentText },
+  // Оставляем Резерв
   { title: 'Заявки (Резерв)', href: '/admin/pages/film-reserve', icon: HiOutlineInbox },
 ];
 
@@ -42,6 +44,7 @@ export default function AdminSidebar() {
 
       <nav className="flex-grow p-4 space-y-1 overflow-y-auto">
         {menuItems.map((item) => {
+          // Улучшенная логика активности ссылки
           const isActive = pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href));
           const Icon = item.icon;
           

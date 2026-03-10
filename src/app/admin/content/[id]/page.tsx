@@ -18,6 +18,10 @@ export default function AdminContentEditPage() {
   const [isVisible, setIsVisible] = useState(true);
   const [loading, setLoading] = useState(true);
 
+  // Списки для выбора
+  const standardPages = ['home', 'partners', 'projects', 'film-reserve'];
+  const standardKeys = ['awards_intro', 'about_company', 'news_intro', 'header'];
+
   useEffect(() => {
     fetch(`/api/admin/content/${id}`)
       .then(res => res.json())
@@ -66,16 +70,62 @@ export default function AdminContentEditPage() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 border rounded-2xl shadow-sm">
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-1">
             <label className="text-xs font-medium text-gray-400 uppercase ml-1">Заголовок</label>
-            <input className="w-full border rounded-xl px-4 py-2 font-medium" value={title} onChange={(e) => setTitle(e.target.value)} />
+            <input 
+              className="w-full border rounded-xl px-4 py-2 font-medium" 
+              value={title} 
+              onChange={(e) => setTitle(e.target.value)} 
+            />
           </div>
-          <div className="space-y-1 text-gray-400 cursor-not-allowed">
-            <label className="text-xs font-medium uppercase ml-1">Место (Page / Key)</label>
-            <div className="px-4 py-2 bg-gray-50 border rounded-xl text-sm">
-              {page} / {sectionKey}
-            </div>
+
+          <div className="space-y-1">
+            <label className="text-xs font-medium text-gray-400 uppercase ml-1">Страница (page)</label>
+            <select 
+              className="w-full border rounded-xl px-4 py-2 bg-white"
+              value={standardPages.includes(page) ? page : 'custom'}
+              onChange={(e) => setPage(e.target.value === 'custom' ? '' : e.target.value)}
+            >
+              {standardPages.map(p => <option key={p} value={p}>{p}</option>)}
+              {!standardPages.includes(page) && page !== '' && <option value={page}>{page}</option>}
+              <option value="custom">-- Другая страница --</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-1">
+            <label className="text-xs font-medium text-gray-400 uppercase ml-1">Ключ секции (section_key)</label>
+            <select 
+              className="w-full border rounded-xl px-4 py-2 bg-white mb-2"
+              value={standardKeys.includes(sectionKey) ? sectionKey : 'custom'}
+              onChange={(e) => {
+                const val = e.target.value;
+                setSectionKey(val === 'custom' ? '' : val);
+              }}
+            >
+              {standardKeys.map(k => <option key={k} value={k}>{k}</option>)}
+              {!standardKeys.includes(sectionKey) && sectionKey !== '' && <option value={sectionKey}>{sectionKey}</option>}
+              <option value="custom">-- Свой ключ (вручную) --</option>
+            </select>
+
+            {!standardKeys.includes(sectionKey) && (
+              <input 
+                placeholder="Введите ключ..." 
+                className="w-full border rounded-xl px-4 py-2 bg-blue-50 border-blue-200"
+                value={sectionKey}
+                onChange={(e) => setSectionKey(e.target.value)}
+                required
+              />
+            )}
+          </div>
+
+          <div className="flex items-center pt-4">
+             <label className="flex items-center gap-2 text-sm font-medium cursor-pointer">
+              <input type="checkbox" className="w-4 h-4" checked={isVisible} onChange={(e) => setIsVisible(e.target.checked)} /> 
+              Отображать на сайте
+            </label>
           </div>
         </div>
 
@@ -86,7 +136,7 @@ export default function AdminContentEditPage() {
 
         <div className="flex items-center justify-between pt-4 border-t">
           <div className="flex gap-4">
-            <button className="px-10 py-2 bg-black text-white rounded-xl font-medium hover:bg-gray-800 transition-colors">
+            <button type="submit" className="px-10 py-2 bg-black text-white rounded-xl font-medium hover:bg-gray-800 transition-colors">
               Сохранить
             </button>
             <button type="button" onClick={async () => { 
@@ -98,11 +148,6 @@ export default function AdminContentEditPage() {
               Удалить
             </button>
           </div>
-          
-          <label className="flex items-center gap-2 text-sm font-medium cursor-pointer">
-            <input type="checkbox" className="w-4 h-4" checked={isVisible} onChange={(e) => setIsVisible(e.target.checked)} /> 
-            Отображать на сайте
-          </label>
         </div>
       </form>
     </div>
