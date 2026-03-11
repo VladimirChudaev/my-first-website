@@ -6,7 +6,6 @@ import Link from 'next/link';
 import {
   FaTelegram,
   FaVk,
-  FaYoutube,
   FaEnvelope,
   FaPhone,
   FaLocationDot,
@@ -18,21 +17,27 @@ import { getMediaByDomain, getMediaUrl } from '@/lib/media/media';
 export default function Footer() {
   const currentYear = new Date().getFullYear();
   const [zenUrl, setZenUrl] = useState<string>('');
+  const [rutubeUrl, setRutubeUrl] = useState<string>('');
 
   useEffect(() => {
-    const loadZen = async () => {
+    const loadIcons = async () => {
       try {
         const assets = await getMediaByDomain('photo');
-        const zen = assets.find(a => a.filename === 'zen.svg');
-        if (!zen?.path) return;
-        const url = await getMediaUrl(zen.path);
-        setZenUrl(url);
+        if (assets?.length) {
+          // Загрузка Дзена
+          const zen = assets.find(a => a.filename === 'zen.svg');
+          if (zen?.path) setZenUrl(await getMediaUrl(zen.path));
+
+          // Загрузка Rutube
+          const rutube = assets.find(a => a.filename === 'rutube.svg');
+          if (rutube?.path) setRutubeUrl(await getMediaUrl(rutube.path));
+        }
       } catch (e) {
-        console.error('Zen icon load error:', e);
+        console.warn('Footer icons load error');
       }
     };
 
-    loadZen();
+    loadIcons();
   }, []);
 
   return (
@@ -47,7 +52,7 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Навигация (Синхронизировано с хедером) */}
+          {/* Навигация */}
           <div className="md:col-span-3 flex flex-col items-center md:items-start gap-5">
             <h4 className="text-white font-bold uppercase text-[10px] tracking-[0.2em] opacity-40">
               Навигация
@@ -90,19 +95,37 @@ export default function Footer() {
             </h4>
 
             <div className="flex items-center gap-6 text-3xl">
-              <a href="#" className="hover:text-gray-400 transition-colors"><FaTelegram /></a>
-              <a href="#" className="hover:text-gray-400 transition-colors"><FaVk /></a>
-              <a href="#" className="hover:text-gray-400 transition-colors"><FaYoutube /></a>
-              {zenUrl && (
-                <div className="w-[24px] h-[24px] relative cursor-pointer hover:opacity-100 transition-opacity opacity-80">
-                  <Image
-                    src={zenUrl}
-                    alt="Дзен"
-                    fill
-                    className="invert object-contain"
-                  />
-                </div>
+              <a href="https://t.me/VandTAgency" target="_blank" className="hover:text-gray-400 transition-colors"><FaTelegram /></a>
+              <a href="https://vk.com/club230590987" target="_blank" className="hover:text-gray-400 transition-colors"><FaVk /></a>
+              
+              {/* RUTUBE - Обесцвечиваем и инвертируем в белый */}
+              {rutubeUrl && (
+                <a href="https://rutube.ru/channel/25381755/" target="_blank" className="hover:opacity-60 transition-opacity">
+                  <div className="w-7 h-7 relative">
+                    <Image
+                      src={rutubeUrl}
+                      alt="Rutube"
+                      fill
+                      className="object-contain grayscale invert"
+                    />
+                  </div>
+                </a>
               )}
+
+              {/* DZEN - Инвертируем черный в белый */}
+              {zenUrl && (
+                <a href="https://dzen.ru/vtagency" target="_blank" className="hover:opacity-60 transition-opacity">
+                  <div className="w-7 h-7 relative">
+                    <Image
+                      src={zenUrl}
+                      alt="Дзен"
+                      fill
+                      className="object-contain invert"
+                    />
+                  </div>
+                </a>
+              )}
+
               <Link href="/auth/login" className="opacity-20 hover:opacity-100 transition-opacity">
                 <FaLock className="text-2xl" />
               </Link>
