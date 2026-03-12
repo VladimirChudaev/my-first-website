@@ -1,33 +1,24 @@
-'use client';
-
-import { usePathname } from 'next/navigation';
 import { Geist, Geist_Mono } from "next/font/google";
-import Script from 'next/script'; // Добавили импорт
+import Script from 'next/script';
 import "./globals.css";
-import SiteHeader from './components/SiteHeader';
-import Footer from './components/Footer';
+import ClientLayoutWrapper from './components/ClientLayoutWrapper';
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname() || '';
-  const isAdmin = pathname.startsWith('/admin');
+export const metadata = {
+  title: 'V&T Agency | Видеопроизводство и рекламные технологии',
+  description: 'Профессиональное создание видеоконтента и инновационные решения для B2B сектора.',
+};
 
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ru">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        {!isAdmin && <SiteHeader />}
-        
-        <div className={!isAdmin ? "flex flex-col min-h-screen" : ""}>
-          <main className={!isAdmin ? "flex-grow" : ""}>
-            {children}
-          </main>
-        </div>
+        <ClientLayoutWrapper>
+          {children}
+        </ClientLayoutWrapper>
 
-        {!isAdmin && <Footer />}
-
-        {/* Yandex.Metrika */}
         <Script id="yandex-metrika" strategy="afterInteractive">
           {`
             (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
@@ -44,15 +35,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             });
           `}
         </Script>
-        <noscript>
-          <div>
-            <img 
-              src="https://mc.yandex.ru/watch/107279154" 
-              style={{ position: 'absolute', left: '-9999px' }} 
-              alt="" 
-            />
-          </div>
-        </noscript>
       </body>
     </html>
   );
