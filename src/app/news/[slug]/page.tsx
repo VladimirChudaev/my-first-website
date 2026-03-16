@@ -4,146 +4,88 @@ import Link from 'next/link';
 import InnerPageHeader from '@/app/components/InnerPageHeader';
 import { getNewsBySlug } from '@/lib/news/service';
 
-type Props = {
-  params: Promise<{ slug: string }>;
-};
-
-// Добавляем описание типа для соседних новостей
-interface AdjacentNews {
-  id: string;
-  title: string;
-  slug: string;
-}
-
-/* =========================
-    🔹 METADATA
-========================= */
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params;
-  const { data: newsItem } = await getNewsBySlug(slug);
-
-  if (!newsItem || !newsItem.is_visible) {
-    return { title: 'Новость не найдена' };
-  }
-
-  const description = newsItem.body?.replace(/<[^>]*>/g, '').slice(0, 160) || '';
-  const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  
-  const imageUrl = newsItem.media
-    ? `${baseUrl}/storage/v1/object/public/${newsItem.media.bucket}/${newsItem.media.path}`
-    : null;
-
-  return {
-    title: newsItem.title,
-    description,
-    openGraph: {
-      title: newsItem.title,
-      description,
-      type: 'article',
-      images: imageUrl ? [{ url: imageUrl }] : [],
-    },
-  };
-}
-
-/* =========================
-    🔹 PAGE
-========================= */
+type Props = { params: Promise<{ slug: string }>; };
 
 export default async function NewsSinglePage({ params }: Props) {
   const { slug } = await params;
-  
   const { data: newsItem, navigation } = await getNewsBySlug(slug);
 
-  if (!newsItem || !newsItem.is_visible) {
-    notFound();
-  }
-
-  // Явно типизируем для TS, чтобы убрать ошибки "type never"
-  const prev = navigation?.prev as AdjacentNews | null;
-  const next = navigation?.next as AdjacentNews | null;
+  if (!newsItem || !newsItem.is_visible) notFound();
 
   const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const imageUrl = newsItem.media
-    ? `${baseUrl}/storage/v1/object/public/${newsItem.media.bucket}/${newsItem.media.path}`
-    : null;
-
-  const formattedDate = newsItem.created_at 
-    ? new Date(newsItem.created_at).toLocaleDateString('ru-RU')
-    : '';
+  const imageUrl = newsItem.media ? `${baseUrl}/storage/v1/object/public/${newsItem.media.bucket}/${newsItem.media.path}` : null;
+  const formattedDate = newsItem.created_at ? new Date(newsItem.created_at).toLocaleDateString('ru-RU') : '';
 
   return (
     <>
       <InnerPageHeader />
-
       <main className="bg-white min-h-screen pt-32 md:pt-40">
         <div className="max-w-3xl mx-auto px-6 pb-20">
-
+          
+          {/* ФОТО ИЗ БАКЕТА */}
           {imageUrl && (
-            <div className="w-full aspect-[16/9] rounded-2xl overflow-hidden mb-10 shadow-sm bg-gray-50">
-              <img
-                src={imageUrl}
-                alt={newsItem.title}
-                className="w-full h-full object-cover"
-              />
+            <div className="w-full aspect-[16/9] rounded-2xl overflow-hidden shadow-sm bg-gray-50">
+              <img src={imageUrl} alt={newsItem.title} className="w-full h-full object-cover" />
             </div>
           )}
 
-          <h1 className="text-3xl md:text-5xl font-light mb-6 leading-tight text-gray-900">
-            {newsItem.title}
-          </h1>
-
-          <div className="text-sm text-gray-400 mb-10 pb-6 border-b border-gray-100">
-            {formattedDate}
-          </div>
-
+          {/* КОНТЕНТ (РЕДАКТОР) */}
           <article 
-            className="prose prose-lg max-w-none text-gray-800 
-              prose-p:my-6 prose-p:leading-relaxed 
-              prose-headings:font-light prose-headings:mt-12 prose-headings:mb-6
-              empty:prose-p:after:content-['\\00a0']"
+            className="prose prose-lg max-w-none text-gray-800 news-body mt-2"
             dangerouslySetInnerHTML={{ __html: newsItem.body || '' }}
           />
 
-          {/* 🔹 БЛОК НАВИГАЦИИ (ЛЕНТА) */}
-          <div className="mt-20 pt-10 border-t border-gray-100 flex flex-col md:flex-row justify-between gap-8">
-            
-            {/* Предыдущая новость */}
-            <div className="flex-1">
-              {prev && (
-                <Link href={`/news/${prev.slug}`} className="group block max-w-xs">
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 group-hover:text-black transition-colors">
-                    ← Предыдущая
-                  </span>
-                  <p className="mt-2 text-sm font-light text-gray-600 group-hover:text-black line-clamp-2 leading-snug">
-                    {prev.title}
-                  </p>
-                </Link>
-              )}
+          {/* ЗАГОЛОВОК И ДАТА ПОСЛЕ ФОТО И ПОДПИСИ */}
+          <div className="mt-10">
+            <h1 className="text-3xl md:text-5xl font-light mb-4 text-gray-900 leading-tight">
+              {newsItem.title}
+            </h1>
+            <div className="text-sm text-gray-400 pb-6 border-b border-gray-100">
+              {formattedDate}
             </div>
-
-            {/* Следующая новость */}
-            <div className="flex-1 md:text-right flex md:justify-end">
-              {next && (
-                <Link href={`/news/${next.slug}`} className="group block max-w-xs">
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 group-hover:text-black transition-colors">
-                    Следующая →
-                  </span>
-                  <p className="mt-2 text-sm font-light text-gray-600 group-hover:text-black line-clamp-2 leading-snug">
-                    {next.title}
-                  </p>
-                </Link>
-              )}
-            </div>
-
           </div>
 
-          <div className="mt-16">
-            <Link 
-              href="/news"
-              className="text-xs uppercase tracking-widest font-bold hover:underline underline-offset-4 text-black"
-            >
-              Все новости
+          <style>{`
+            /* СТИЛЬ ПОДПИСИ ПОД ФОТО */
+            /* Если первая строка в редакторе сдвинута вправо — это подпись */
+            .news-body p[style*="text-align: right"]:first-child {
+              font-size: 0.75rem !important;
+              color: #9ca3af !important;
+              text-align: right !important;
+              margin-top: 0.5rem !important;
+              margin-bottom: 2rem !important;
+              font-style: italic !important;
+              line-height: 1 !important;
+            }
+
+            /* ЦИТАТА С КАВЫЧКОЙ */
+            .news-body blockquote {
+              position: relative;
+              border-left: none !important;
+              padding-left: 3.5rem !important;
+              margin: 3.5rem 0 !important;
+            }
+            .news-body blockquote::before {
+              content: "“";
+              position: absolute;
+              left: 0; top: -1.5rem;
+              font-size: 7rem;
+              color: #e5e7eb;
+              font-family: serif;
+              line-height: 1;
+            }
+            .news-body blockquote p {
+              font-size: 1.4rem !important;
+              font-style: italic !important;
+              color: #4b5563 !important;
+              line-height: 1.6 !important;
+              margin: 0 !important;
+            }
+          `}</style>
+
+          <div className="mt-20 border-t pt-10">
+            <Link href="/news" className="text-xs uppercase font-bold tracking-widest text-black hover:underline">
+              ← Все новости
             </Link>
           </div>
         </div>

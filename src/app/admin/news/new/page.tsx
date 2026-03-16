@@ -13,7 +13,7 @@ export default function AdminNewsCreatePage() {
   const [slug, setSlug] = useState('');
   const [body, setBody] = useState('');
   const [coverImageId, setCoverImageId] = useState<string | null>(null);
-  const [createdAt, setCreatedAt] = useState(new Date().toISOString().slice(0, 16)); // Поле даты
+  const [createdAt, setCreatedAt] = useState(new Date().toISOString().slice(0, 16)); 
   
   // Состояния загрузки медиа
   const [mediaList, setMediaList] = useState<any[]>([]);
@@ -46,7 +46,8 @@ export default function AdminNewsCreatePage() {
       .replace(/-+/g, '-');
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Измененная функция отправки: принимает параметр isPublished
+  const handleSubmit = async (e: React.FormEvent, isPublished: boolean) => {
     e.preventDefault();
     if (!coverImageId) {
       toast.error('Выберите обложку');
@@ -63,12 +64,13 @@ export default function AdminNewsCreatePage() {
           slug,
           body,
           cover_image_id: coverImageId,
-          created_at: createdAt, // Передаем нашу дату
+          created_at: createdAt,
+          is_visible: isPublished, // Отправляем статус видимости
         }),
       });
 
       if (res.ok) {
-        toast.success('Новость создана');
+        toast.success(isPublished ? 'Новость опубликована' : 'Сохранено в черновики');
         router.push('/admin/news');
         router.refresh();
       } else {
@@ -83,59 +85,84 @@ export default function AdminNewsCreatePage() {
   };
 
   return (
-    <div className="max-w-4xl space-y-6">
-      <h1 className="text-2xl font-semibold">Новая новость</h1>
+    <div className="max-w-5xl mx-auto space-y-6 pb-10 px-4">
+      <div className="flex items-center justify-between py-2 border-b border-slate-200">
+        <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Новая новость</h1>
+        <button 
+          onClick={() => router.back()}
+          className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all"
+        >
+          Отмена
+        </button>
+      </div>
       
-      <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 border rounded-2xl shadow-sm">
+      {/* Убираем onSubmit из тега form, так как у нас разные действия на кнопках */}
+      <form onSubmit={(e) => e.preventDefault()} className="space-y-8 bg-white p-6 md:p-10 border border-slate-100 rounded-3xl shadow-xl">
+        
         {/* Заголовок и Slug */}
-        <div className="space-y-4">
-          <input
-            className="w-full border rounded-xl px-4 py-3 font-medium focus:ring-2 ring-black outline-none"
-            value={title}
-            onChange={(e) => {
-              setTitle(e.target.value);
-              setSlug(generateSlug(e.target.value));
-            }}
-            placeholder="Заголовок новости"
-            required
-          />
-          <input 
-            className="w-full border rounded-xl px-4 py-2 bg-gray-50 text-sm text-gray-500 outline-none"
-            value={slug} 
-            placeholder="url-адрес"
-            readOnly 
-          />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="space-y-3">
+            <label className="text-sm font-bold uppercase tracking-wider text-slate-900 ml-1">Заголовок</label>
+            <input
+              className="w-full bg-white border border-slate-300 rounded-xl px-5 py-4 text-slate-900 focus:ring-4 focus:ring-blue-100 focus:border-blue-400 outline-none transition-all placeholder:text-slate-400"
+              value={title}
+              onChange={(e) => {
+                setTitle(e.target.value);
+                setSlug(generateSlug(e.target.value));
+              }}
+              placeholder="Введите название..."
+              required
+            />
+          </div>
+          <div className="space-y-3">
+            <label className="text-sm font-bold uppercase tracking-wider text-slate-700 ml-1">Slug (URL)</label>
+            <input 
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-4 text-slate-600 outline-none cursor-not-allowed font-mono text-sm"
+              value={slug} 
+              readOnly 
+            />
+          </div>
         </div>
 
         {/* ДАТА ПУБЛИКАЦИИ */}
-        <div className="space-y-2">
-          <label className="text-[10px] font-bold uppercase text-gray-400 tracking-wider px-1">Дата публикации</label>
+        <div className="space-y-3">
+          <label className="text-sm font-bold uppercase tracking-wider text-slate-900 ml-1">Дата и время публикации</label>
           <input 
             type="datetime-local" 
             value={createdAt}
             onChange={(e) => setCreatedAt(e.target.value)}
-            className="w-full border rounded-xl px-4 py-3 focus:ring-2 ring-black outline-none transition-all"
+            className="w-full md:w-1/3 bg-white border border-slate-300 rounded-xl px-5 py-4 text-slate-900 focus:ring-4 focus:ring-blue-100 focus:border-blue-400 outline-none transition-all [color-scheme:light]"
           />
-          <p className="text-[10px] text-gray-400 px-1 italic">
-            Для старых новостей выберите дату из прошлого, чтобы они ушли вниз списка.
-          </p>
         </div>
 
         {/* МЕДИАТЕКА */}
-        <div className="space-y-3">
-          <p className="text-sm font-medium px-1">Выберите обложку</p>
-          <div className="grid grid-cols-4 md:grid-cols-6 gap-3 max-h-[300px] overflow-y-auto p-1 border rounded-xl">
+        <div className="space-y-4">
+          <div className="flex items-center justify-between ml-1">
+            <label className="text-sm font-bold uppercase tracking-wider text-slate-900">Обложка новости</label>
+            <span className="text-xs text-slate-600 bg-slate-100 px-2 py-1 rounded">Выберите одно фото</span>
+          </div>
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4 max-h-[320px] overflow-y-auto p-5 bg-white border border-slate-200 rounded-2xl custom-scrollbar shadow-inner">
             {mediaList.map((media) => {
               const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${media.bucket}/${media.path}`;
+              const isActive = coverImageId === media.id;
               return (
                 <div
                   key={media.id}
                   onClick={() => setCoverImageId(media.id)}
-                  className={`relative cursor-pointer aspect-square border-2 rounded-lg overflow-hidden transition-all ${
-                    coverImageId === media.id ? 'border-black ring-2 ring-black/10' : 'border-transparent hover:border-gray-200'
+                  className={`relative cursor-pointer aspect-square border-2 rounded-xl overflow-hidden transition-all duration-200 group ${
+                    isActive 
+                      ? 'border-blue-500 scale-95 ring-4 ring-blue-100' 
+                      : 'border-slate-100 hover:border-slate-300 hover:shadow-md'
                   }`}
                 >
-                  <img src={url} className="h-full w-full object-cover" alt="" />
+                  <img src={url} className="h-full w-full object-cover transition-transform group-hover:scale-105" alt="" />
+                  {isActive && (
+                    <div className="absolute inset-0 bg-blue-500/10 flex items-center justify-center">
+                       <div className="bg-blue-500 text-white rounded-full p-1 shadow-lg">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4"><path d="M20 6L9 17l-5-5"/></svg>
+                       </div>
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -143,18 +170,40 @@ export default function AdminNewsCreatePage() {
         </div>
 
         {/* РЕДАКТОР */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium px-1">Контент</label>
-          <Editor content={body} onChange={setBody} />
+        <div className="space-y-3">
+          <label className="text-sm font-bold uppercase tracking-wider text-slate-900 ml-1">Контент новости</label>
+          <div className="rounded-2xl overflow-hidden border border-slate-300 bg-white">
+            <Editor content={body} onChange={setBody} />
+          </div>
         </div>
 
-        <button 
-          type="submit"
-          disabled={loading}
-          className="px-8 py-3 bg-black text-white rounded-xl hover:bg-gray-800 disabled:bg-gray-400 font-medium transition-all"
-        >
-          {loading ? 'Создание...' : 'Опубликовать'}
-        </button>
+        {/* БЛОК КНОПОК */}
+        <div className="pt-8 flex flex-col md:flex-row items-center justify-end gap-4 border-t border-slate-100">
+          <button 
+            type="button"
+            onClick={(e) => handleSubmit(e, false)} // Сохранить как черновик (is_visible: false)
+            disabled={loading}
+            className="w-full md:w-auto px-8 py-4 bg-slate-100 text-slate-900 rounded-xl hover:bg-slate-200 disabled:opacity-50 font-bold transition-all"
+          >
+            Сохранить черновик
+          </button>
+          
+          <button 
+            type="button"
+            onClick={(e) => handleSubmit(e, true)} // Опубликовать сразу (is_visible: true)
+            disabled={loading}
+            className="w-full md:w-auto px-12 py-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:bg-slate-300 disabled:text-slate-600 font-bold transition-all shadow-lg shadow-blue-500/10 flex items-center justify-center gap-2"
+          >
+            {loading ? (
+              <>
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                Обработка...
+              </>
+            ) : (
+              'Опубликовать новость'
+            )}
+          </button>
+        </div>
       </form>
     </div>
   );

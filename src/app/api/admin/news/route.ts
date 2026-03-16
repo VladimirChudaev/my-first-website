@@ -5,26 +5,25 @@ export async function POST(req: NextRequest) {
   try {
     const supabase = await createClient();
     
-    // Получаем JSON данные из тела запроса
     const bodyData = await req.json();
 
-    // Добавили created_at в деструктуризацию, чтобы принимать дату из формы
-    const { title, slug, body, cover_image_id, created_at } = bodyData;
+    // Добавляем is_visible в деструктуризацию
+    const { title, slug, body, cover_image_id, created_at, is_visible } = bodyData;
 
     if (!cover_image_id) {
       return NextResponse.json({ error: 'Необходимо выбрать обложку' }, { status: 400 });
     }
 
-    // Создаем запись, включая поле created_at
+    // Теперь используем переменную is_visible, которую прислал фронтенд
     const { data: newsRow, error: newsError } = await supabase
       .from('news')
       .insert({
         title,
         slug,
         body,
-        is_visible: true,
+        // Если флаг не передан, по умолчанию ставим false (черновик) для безопасности
+        is_visible: is_visible ?? false, 
         cover_image_id: cover_image_id,
-        // Если дата передана из формы — используем её, если нет — ставим текущую
         created_at: created_at || new Date().toISOString(),
       })
       .select()
