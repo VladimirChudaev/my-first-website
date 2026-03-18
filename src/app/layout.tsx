@@ -10,7 +10,7 @@ export const metadata = {
   title: 'V&T Agency | Кинопроизводство и визуальные технологии',
   description: 'Профессиональное создание видеоконтента и инновационные решения для B2B сектора',
 verification: {
-    yandex: 'd3e7aafa1d34990c',
+    yandex: '5c164ba0a681fc40',
   },
 };
 
