@@ -7,8 +7,11 @@ const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
 export const metadata = {
-  title: 'V&T Agency | Видеопроизводство и рекламные технологии',
-  description: 'Профессиональное создание видеоконтента и инновационные решения для B2B сектора.',
+  title: 'V&T Agency | Кинопроизводство и визуальные технологии',
+  description: 'Профессиональное создание видеоконтента и инновационные решения для B2B сектора',
+verification: {
+    yandex: 'd3e7aafa1d34990c',
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
