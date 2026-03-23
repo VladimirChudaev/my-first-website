@@ -1,17 +1,17 @@
 import { createClient } from '@/lib/server';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 /**
  * Удаление видео-проекта из карусели
  */
 export async function DELETE(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // ДОБАВЛЯЕМ await ТУТ
+    // В новых версиях Next.js params — это Promise, его нужно дождаться
+    const { id } = await params;
     const supabase = await createClient(); 
-    const { id } = params;
 
     if (!id) {
       return NextResponse.json({ error: 'ID не указан' }, { status: 400 });
@@ -29,6 +29,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (err) {
+    console.error('Catch error during DELETE:', err);
     return NextResponse.json({ error: 'Внутренняя ошибка сервера' }, { status: 500 });
   }
 }
@@ -37,18 +38,26 @@ export async function DELETE(
  * Получение данных одного проекта
  */
 export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  // И ДОБАВЛЯЕМ await ТУТ
-  const supabase = await createClient(); 
-  
-  const { data, error } = await supabase
-    .from('video_projects')
-    .select(`*, media:media_id (*)`)
-    .eq('id', params.id)
-    .single();
+  try {
+    const { id } = await params;
+    const supabase = await createClient(); 
+    
+    const { data, error } = await supabase
+      .from('video_projects')
+      .select(`*, media:media_id (*)`)
+      .eq('id', id)
+      .single();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 404 });
-  return NextResponse.json(data);
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 404 });
+    }
+
+    return NextResponse.json(data);
+  } catch (err) {
+    console.error('Catch error during GET:', err);
+    return NextResponse.json({ error: 'Внутренняя ошибка сервера' }, { status: 500 });
+  }
 }
