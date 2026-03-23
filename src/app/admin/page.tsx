@@ -21,6 +21,12 @@ const items = [
     description: 'Управление слайдами на главной странице',
     href: '/admin/home-carousel',
   },
+  // ДОБАВЛЕНО: Новая плитка для видео-карусели
+  {
+    title: 'Video Projects',
+    description: 'Видео-карусель: обложки и ссылки на Rutube',
+    href: '/admin/video-projects',
+  },
   {
     title: 'Awards',
     description: 'Менеджер наград и кинофестивалей',

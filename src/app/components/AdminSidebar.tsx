@@ -10,17 +10,19 @@ import {
   HiOutlineDocumentText,
   HiOutlineInbox,
   HiOutlinePhotograph,
-  HiOutlineCollection
+  HiOutlineCollection,
+  HiOutlinePlay // Добавил иконку для видео
 } from 'react-icons/hi';
 
 const menuItems = [
   { title: 'Дашборд', href: '/admin', icon: HiOutlineHome },
   { title: 'Медиатека', href: '/admin/media', icon: HiOutlinePhotograph },
   { title: 'Карусель (Главная)', href: '/admin/home-carousel', icon: HiOutlineCollection },
+  // Наш новый пункт:
+  { title: 'Видео-проекты', href: '/admin/video-projects', icon: HiOutlinePlay },
   { title: 'Новости', href: '/admin/news', icon: HiOutlineNewspaper },
   { title: 'Проекты', href: '/admin/pages/projects', icon: HiOutlineFilm },
   { title: 'Контент страниц', href: '/admin/content', icon: HiOutlineDocumentText },
-  // Обновленное название:
   { title: 'Заявки (Кинорезерв)', href: '/admin/pages/film-reserve', icon: HiOutlineInbox },
 ];
 
@@ -42,6 +44,7 @@ export default function AdminSidebar() {
 
       <nav className="flex-grow p-4 space-y-1 overflow-y-auto">
         {menuItems.map((item) => {
+          // Улучшенная логика подсветки активного пункта
           const isActive = pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href));
           const Icon = item.icon;
           
